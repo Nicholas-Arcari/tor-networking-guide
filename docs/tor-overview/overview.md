@@ -79,9 +79,9 @@ un circuito di **3 nodi**:
 
 Ogni hop aggiunge o rimuove uno *strato* di crittografia:
 
-🔒 **Strato 1:** Exit → Middle → Entry  
-🔒 **Strato 2:** Middle → Entry  
-🔒 **Strato 3:** Entry
+**Strato 1:** Exit → Middle → Entry  
+**Strato 2:** Middle → Entry  
+**Strato 3:** Entry
 
 Solo l’Exit vede il traffico in chiaro (se non è HTTPS).
 

@@ -20,10 +20,15 @@ sudo nano /etc/proxychains4.conf
 
 # Aggiunte Principali
 dynamic_chain               # Se un proxy fallisce, passa automaticamente al successivo
+
 proxy_dns                   # Impedisce DNS leak (obbligatorio per privacy!)
+
 tcp_read_time_out 15000
+
 tcp_connect_time_out 8000
+
 [ProxyList]
+
 socks5 127.0.0.1 9050       # Tor come unico proxy
 
 # Verifica

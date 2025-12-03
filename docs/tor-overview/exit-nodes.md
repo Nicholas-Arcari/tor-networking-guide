@@ -43,7 +43,7 @@ Questa separazione è la base dell’anonimato.
 
 ---
 
-## ⚠️ Rischi degli Exit Nodes
+## Rischi degli Exit Nodes
 
 Poiché l’Exit Node “esce su Internet”, **il traffico NON è cifrato dopo
 l’uscita**, a meno che:

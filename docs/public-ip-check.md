@@ -3,7 +3,9 @@
 ## Esperienza personale
 
 Ho verificato più volte il mio IP reale e l’IP Tor.
+
 Senza proxy il mio IP era italiano (Parma).
+
 Con ProxyChains appariva un IP straniero fornito dal circuito Tor.
 
 L’uso contemporaneo di Tor + VPN + bridges era inutile, perché Tor effettua tunneling completo e ignora la rete esterna.

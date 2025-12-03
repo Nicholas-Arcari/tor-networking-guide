@@ -33,7 +33,7 @@ Tor invece:
 - Bilancia il traffico su circuiti differenti → impossibile avere “un solo IP”
 - Non è pensato per traffico persistente o real-time
 
-➡️ **Tor ≠ VPN**  
+- **Tor != VPN**  
 E non può diventarlo senza violare i suoi principi di design.
 
 ---
@@ -196,7 +196,7 @@ non c’è abbastanza banda disponibile.
 
 ---
 
-## ⚖️ Compromessi di ciascun approccio
+## Compromessi di ciascun approccio
 
 | Configurazione           | Sicurezza  | Anonimato  | Velocità | Affidabilità |
 | ------------------------ | ---------- | ---------- | -------- | ------------ |
@@ -211,7 +211,7 @@ non c’è abbastanza banda disponibile.
 
 ## Quindi qual è la soluzione ibrida “migliore”?
 
-### **➡️ La soluzione più stabile e sicura è questa:**
+### **La soluzione più stabile e sicura è questa:**
 
 1. **Tor configurato bene**
 
