@@ -18,7 +18,7 @@ Il comando `~/newnym` inizialmente dava errore:
 
 ## Aggiungere utente al gruppo debian-tor
 ```bash
-sudo usermod -aG debian-tor $USER           # poi bisogna riavviare la sessione del dispostivo
+sudo usermod -aG debian-tor $USER           # poi bisogna riavviare la sessione del dispostivo, eseguire comando pkill -KILL -u $USER
 firefox -no-remote -CreateProfile tor-proxy # questo crea un profilo Firefox dedicato a Tor ed evita crash e conflitti con il profilo normale
 ```
 
