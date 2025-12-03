@@ -1,0 +1,3 @@
+#!/bin/bash
+COOKIE=$(xxd -p /run/tor/control.authcookie | tr -d '\n')
+printf "AUTHENTICATE %s\r\nSIGNAL NEWNYM\r\nQUIT\r\n" "$COOKIE" | nc 127.0.0.1 9051
