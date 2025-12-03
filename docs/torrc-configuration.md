@@ -1,7 +1,9 @@
 # Configurazione torrc con bridges obfs4
 
 ## Obiettivo
+
 Configurare Tor per:
+
 - funzionare con ProxyChains
 - usare bridges obfs4
 - evitare leak IPv6
@@ -10,8 +12,9 @@ Configurare Tor per:
 ---
 
 ## Esperienza personale
+
 - Ho provato a prendere un bridge dal sito ufficiale Tor: `https://bridges.torproject.org/bridges` (generatomi da ChatGPT). Non funzionava, quindi ho utilizzato bridges pubblici già disponibili.
-- Ho provato un setup "ibrido" con `UseBridges` e connessione normale via Tor da un altro paese: non compatibile con la migration IP perché Tor cerca di mantenere il circuito stabile su quella exit.  
+- Ho provato un setup "ibrido" con `UseBridges` e connessione normale via Tor da un altro paese: non compatibile con la migration IP perché Tor cerca di mantenere il circuito stabile su quella exit.
   → Conclusione: bridges e routing da un altro paese vanno usati separatamente.
 
 ---
@@ -26,6 +29,7 @@ journalctl -u tor@default.service -f                        # mostra i log in te
 ```
 
 # Aggiunte principali
+
 SocksPort 9050              # Permette ai programmi (es. ProxyChains) di connettersi alla rete Tor
 DNSPort 5353                # Tor intercetta le richieste DNS → evita DNS leak
 AutomapHostsOnResolve 1     # Risolve automaticamente richieste DNS attraverso Tor
@@ -40,6 +44,7 @@ UseBridges 1
 ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy # /usr/bin/obfs4proxy deve essere eseguibile
 
 # Esempio di bridge
-Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B4469808CE7A660AD33AC391FB64A cert=... iat-mode=0
-  → sostituire xxx con indirizzo IPv4 dato dal sito ufficiale Tor
+
+Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D39509... cert=... iat-mode=0
+  → sostituire xxx con indirizzo IPv4 dato dal sito ufficiale Tor, sostituire ... con informazioni date dal sito ufficiale Tor
   → aggirano blocchi Tor, camuffano il traffico tramite offuscamento.

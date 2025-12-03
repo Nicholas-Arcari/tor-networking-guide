@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# non implementato nella mia esperienza perche alcuni siti web, se viene fatto un repentino cambio di indizzi ip lo notano e bloccano la connessione
+
+
+while true; do
+  echo -e 'AUTHENTICATE ""\nSIGNAL NEWNYM\nQUIT' | nc localhost 9051
+  echo "New IP assigned"
+  sleep 60   # cambia IP ogni 60 secondi
+done
+
+# eventualmente renderlo eseguibile eseguendo a cli i seguenti comandi:
+# chmod +x tor-newip.sh
+# ./tor-newip.sh

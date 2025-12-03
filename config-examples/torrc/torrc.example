@@ -1,5 +1,3 @@
-┌──(nick㉿kali)-[~]
-└─$ cat /etc/tor/torrc
 ## Configuration file for a typical Tor user
 ## Last updated 9 October 2013 for Tor 0.2.5.2-alpha.
 ## (may or may not work for much older or much newer versions of Tor.)
@@ -213,5 +211,5 @@ Log notice file /var/log/tor/notices.log
 UseBridges 1
 ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy 
 
-Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B4469808CE7A660AD33AC391FB64A cert=... iat-mode=0   # sostituire "xxx" e "..." con valori veritieri (censurati per ovvi motivi)
-Bridge obfs4 xxx.xxx.xxx.xxx:13630 A3D55AA6178E80AE486B6DAEAFBA5AB79B29B399 cert=... iat-mode=2  # sostituire "xxx" e "..." con valori veritieri (censurati per ovvi motivi)
+Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B... cert=... iat-mode=0   # sostituire "xxx" e "..." con valori veritieri (censurati per ovvi motivi)
+Bridge obfs4 xxx.xxx.xxx.xxx:13630 A3D55AA6178... cert=... iat-mode=2   # sostituire "xxx" e "..." con valori veritieri (censurati per ovvi motivi)
