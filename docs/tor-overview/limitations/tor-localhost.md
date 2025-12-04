@@ -1,4 +1,4 @@
-# Tor & Localhost — Perché Tor Browser non può accedere a localhost
+# Tor & Localhost - Perché Tor Browser non può accedere a localhost
 
 Questo documento spiega in modo chiaro perché Tor Browser non può accedere a servizi locali (come applicazioni Docker su localhost:5173), quali rischi vengono evitati, e quali sono le soluzioni possibili.
 
