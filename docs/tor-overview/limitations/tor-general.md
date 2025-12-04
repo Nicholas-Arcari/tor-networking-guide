@@ -298,8 +298,4 @@ Per accedere a servizi locali (come Docker su `5173`):
 - usare Firefox normale (non Tor Browser)  
 - oppure usare `torsocks` da CLI  
 - oppure esporre temporaneamente il servizio verso l'esterno (non consigliato)  
-- oppure usare un reverse proxy che esponga una porta pubblica  
-
----
-
-## Fine documento
+- oppure usare un reverse proxy che esponga una porta pubblica
