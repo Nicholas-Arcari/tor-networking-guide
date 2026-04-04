@@ -1,0 +1,76 @@
+#!/bin/bash
+# transparent-proxy.sh — Forza tutto il traffico TCP del sistema via Tor
+#
+# ATTENZIONE:
+# - UDP (tranne DNS) viene bloccato
+# - Se Tor non è attivo, tutta la rete è bloccata
+# - Richiede TransPort 9040 e DNSPort 5353 nel torrc
+#
+# Uso:
+#   sudo ./transparent-proxy.sh start    # attiva
+#   sudo ./transparent-proxy.sh stop     # disattiva
+
+TOR_UID=$(id -u debian-tor)
+TRANS_PORT=9040
+DNS_PORT=5353
+
+start() {
+    echo "[+] Attivazione transparent proxy Tor..."
+
+    # Flush regole esistenti
+    iptables -t nat -F OUTPUT
+    iptables -F OUTPUT
+
+    # === NAT: ridireziona traffico al TransPort di Tor ===
+
+    # Il traffico di Tor stesso non viene toccato (previene loop)
+    iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN
+
+    # Ridireziona DNS al DNSPort di Tor
+    iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports $DNS_PORT
+
+    # Non ridirezionare traffico verso localhost
+    iptables -t nat -A OUTPUT -d 127.0.0.0/8 -j RETURN
+    iptables -t nat -A OUTPUT -d 192.168.0.0/16 -j RETURN
+    iptables -t nat -A OUTPUT -d 10.0.0.0/8 -j RETURN
+
+    # Ridireziona tutto il traffico TCP al TransPort
+    iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT
+
+    # === FILTER: blocca leak ===
+
+    # Permetti traffico di Tor
+    iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
+
+    # Permetti traffico locale
+    iptables -A OUTPUT -d 127.0.0.0/8 -j ACCEPT
+
+    # Permetti DNS locale verso DNSPort
+    iptables -A OUTPUT -p udp -d 127.0.0.1 --dport $DNS_PORT -j ACCEPT
+
+    # Blocca TUTTO il resto
+    iptables -A OUTPUT -j DROP
+
+    echo "[+] Transparent proxy attivo."
+    echo "[!] ATTENZIONE: UDP (tranne DNS) è bloccato."
+    echo "[!] Per disattivare: sudo $0 stop"
+}
+
+stop() {
+    echo "[-] Disattivazione transparent proxy..."
+
+    # Rimuovi tutte le regole
+    iptables -t nat -F OUTPUT
+    iptables -F OUTPUT
+
+    # Ripristina policy di default (accetta tutto)
+    iptables -P OUTPUT ACCEPT
+
+    echo "[-] Transparent proxy disattivato. Traffico diretto ripristinato."
+}
+
+case "$1" in
+    start)  start ;;
+    stop)   stop ;;
+    *)      echo "Uso: $0 {start|stop}" ;;
+esac
