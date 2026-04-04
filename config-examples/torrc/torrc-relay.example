@@ -1,0 +1,26 @@
+# torrc — Configurazione relay (middle, non exit)
+# Per contribuire alla rete Tor come relay
+
+# === Relay settings ===
+ORPort 9001                       # Porta per connessioni da altri relay
+#ORPort 443 NoListen              # Alternativa: advertise 443 per aggirare firewall
+#ORPort 127.0.0.1:9001 NoAdvertise
+
+Nickname MyTorRelay               # Nome del relay (visibile nel consenso)
+ContactInfo your-email@example.com # Contatto dell'operatore
+
+# === NON essere un exit (solo middle/guard) ===
+ExitPolicy reject *:*             # Rifiuta tutto il traffico in uscita
+
+# === Bandwidth ===
+RelayBandwidthRate 1 MB           # Throttle a 1 MB/s (800 Kbps)
+RelayBandwidthBurst 2 MB          # Burst fino a 2 MB/s
+AccountingMax 500 GB              # Massimo 500 GB per periodo
+AccountingStart month 1 00:00     # Periodo mensile
+
+# === Dati e logging ===
+DataDirectory /var/lib/tor
+Log notice file /var/log/tor/notices.log
+
+# === Se gestisci più relay ===
+#MyFamily $FINGERPRINT1,$FINGERPRINT2
