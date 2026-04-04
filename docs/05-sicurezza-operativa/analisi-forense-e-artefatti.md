@@ -11,7 +11,7 @@ investigare l'uso di Tor su un sistema.
 > ambienti amnestici.
 
 ---
-
+ 
 ## Indice
 
 - [Prospettiva dell'analisi forense](#prospettiva-dellanalisi-forense)
