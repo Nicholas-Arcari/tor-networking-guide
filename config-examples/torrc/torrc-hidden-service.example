@@ -1,0 +1,33 @@
+# torrc — Configurazione Onion Service v3
+# Per esporre un servizio locale come indirizzo .onion
+
+# === Porte client (opzionali, se si usa anche come client) ===
+SocksPort 9050
+ControlPort 9051
+CookieAuthentication 1
+
+# === Dati ===
+DataDirectory /var/lib/tor
+
+# === Onion Service ===
+# Directory dove Tor salva chiavi e hostname del servizio
+HiddenServiceDir /var/lib/tor/hidden_service/
+
+# Mapping: porta .onion → servizio locale
+# Formato: HiddenServicePort <porta_onion> <indirizzo_locale>:<porta_locale>
+HiddenServicePort 80 127.0.0.1:8080    # Web: .onion:80 → localhost:8080
+#HiddenServicePort 22 127.0.0.1:22     # SSH: .onion:22 → localhost:22
+#HiddenServicePort 443 127.0.0.1:8443  # HTTPS: .onion:443 → localhost:8443
+
+# === Opzionale: Autenticazione client ===
+# Solo i client con la chiave possono connettersi
+#HiddenServiceAuthorizeClient stealth client1,client2
+
+# === Opzionale: Vanguards per protezione guard ===
+#VanguardsEnabled 1
+
+# === Logging ===
+Log notice file /var/log/tor/notices.log
+
+# Dopo il riavvio, l'indirizzo .onion è in:
+# cat /var/lib/tor/hidden_service/hostname
