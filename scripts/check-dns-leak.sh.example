@@ -1,0 +1,54 @@
+#!/bin/bash
+# check-dns-leak.sh — Verifica che non ci siano DNS leak
+#
+# Confronta l'IP reale con l'IP Tor e verifica che il traffico
+# esca correttamente dalla rete Tor.
+
+echo "=== Test DNS Leak ==="
+echo ""
+
+# IP senza Tor
+echo "[1] Verifico IP reale (senza Tor)..."
+REAL_IP=$(curl -s --max-time 10 https://api.ipify.org)
+if [ -z "$REAL_IP" ]; then
+    echo "    ERRORE: impossibile ottenere IP reale"
+    exit 1
+fi
+echo "    IP reale: $REAL_IP"
+
+# IP con Tor
+echo "[2] Verifico IP Tor (via proxychains)..."
+TOR_IP=$(proxychains curl -s --max-time 30 https://api.ipify.org 2>/dev/null)
+if [ -z "$TOR_IP" ]; then
+    echo "    ERRORE: impossibile ottenere IP Tor (Tor attivo? Bootstrap 100%?)"
+    exit 1
+fi
+echo "    IP Tor:   $TOR_IP"
+
+# Confronto
+echo ""
+echo "[3] Confronto..."
+if [ "$REAL_IP" != "$TOR_IP" ]; then
+    echo "    OK: IP diversi — Tor funziona"
+else
+    echo "    ATTENZIONE: stesso IP! Il traffico NON sta passando da Tor!"
+    exit 1
+fi
+
+# Verifica exit Tor
+echo ""
+echo "[4] Verifico che l'IP sia un exit Tor noto..."
+IS_TOR=$(proxychains curl -s --max-time 30 https://check.torproject.org/api/ip 2>/dev/null)
+if echo "$IS_TOR" | grep -q '"IsTor":true'; then
+    echo "    OK: confermato exit node Tor"
+else
+    echo "    ATTENZIONE: l'IP non risulta come exit Tor"
+fi
+
+# Info dettagliate
+echo ""
+echo "[5] Dettagli exit node..."
+proxychains curl -s --max-time 30 https://ipinfo.io 2>/dev/null | grep -E '"(ip|city|country|org)"'
+
+echo ""
+echo "=== Test completato ==="
