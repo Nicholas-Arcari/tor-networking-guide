@@ -1,0 +1,116 @@
+#!/bin/bash
+# tor-health-monitor.sh — Monitoraggio continuo di Tor con notifiche
+#
+# Verifica periodicamente: servizio attivo, bootstrap, connessione,
+# DNS leak, traffico non-Tor. Logga su file e notifica su desktop.
+#
+# Uso: ./tor-health-monitor.sh [--interval SECONDI] [--log FILE]
+# Default: check ogni 60 secondi, log in /var/log/tor-health.log
+
+set -euo pipefail
+
+INTERVAL=${1:-60}
+LOG_FILE="${2:-/var/log/tor-health.log}"
+ALERT_COUNT=0
+
+log() {
+    local level="$1"
+    local msg="$2"
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $msg" | tee -a "$LOG_FILE"
+
+    if [ "$level" = "ALERT" ]; then
+        # Notifica desktop (se disponibile)
+        notify-send "Tor Health Alert" "$msg" 2>/dev/null || true
+        ALERT_COUNT=$((ALERT_COUNT + 1))
+    fi
+}
+
+check_service() {
+    if systemctl is-active --quiet tor@default.service; then
+        return 0
+    else
+        log "ALERT" "Tor service non attivo!"
+        return 1
+    fi
+}
+
+check_bootstrap() {
+    if journalctl -u tor@default.service --no-pager 2>/dev/null | grep -q "Bootstrapped 100%"; then
+        return 0
+    else
+        log "ALERT" "Tor non ha completato il bootstrap"
+        return 1
+    fi
+}
+
+check_connection() {
+    local tor_ip
+    tor_ip=$(curl --socks5-hostname 127.0.0.1:9050 -s --max-time 15 https://api.ipify.org 2>/dev/null)
+    if [ -n "$tor_ip" ]; then
+        log "OK" "Connessione Tor attiva (exit: $tor_ip)"
+        return 0
+    else
+        log "ALERT" "Connessione Tor fallita!"
+        return 1
+    fi
+}
+
+check_dns_leak() {
+    # Cattura pacchetti DNS in uscita (5 secondi)
+    local dns_packets
+    dns_packets=$(sudo timeout 5 tcpdump -i eth0 -c 1 -n port 53 2>/dev/null | wc -l)
+    if [ "$dns_packets" -gt 0 ]; then
+        log "ALERT" "DNS leak rilevato! Pacchetti DNS in chiaro su eth0"
+        return 1
+    fi
+    return 0
+}
+
+check_ports() {
+    local fail=0
+
+    if ! ss -tlnp 2>/dev/null | grep -q ":9050 "; then
+        log "ALERT" "SocksPort 9050 non in ascolto"
+        fail=1
+    fi
+
+    if ! ss -tlnp 2>/dev/null | grep -q ":9051 "; then
+        log "ALERT" "ControlPort 9051 non in ascolto"
+        fail=1
+    fi
+
+    return $fail
+}
+
+# --- Main loop ---
+
+log "INFO" "Tor Health Monitor avviato (intervallo: ${INTERVAL}s)"
+
+while true; do
+    PASS=0
+    FAIL=0
+
+    check_service && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+    check_ports && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+    check_bootstrap && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+
+    # Check connessione ogni 5 cicli (per non sovraccaricare)
+    if [ $((RANDOM % 5)) -eq 0 ]; then
+        check_connection && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+    fi
+
+    # Check DNS leak ogni 3 cicli
+    if [ $((RANDOM % 3)) -eq 0 ]; then
+        check_dns_leak && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+    fi
+
+    if [ $FAIL -eq 0 ]; then
+        log "OK" "Health check: $PASS/$((PASS+FAIL)) OK"
+    else
+        log "WARN" "Health check: $FAIL problemi rilevati ($ALERT_COUNT alert totali)"
+    fi
+
+    sleep "$INTERVAL"
+done
