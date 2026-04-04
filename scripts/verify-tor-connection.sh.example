@@ -1,0 +1,73 @@
+#!/bin/bash
+# verify-tor-connection.sh — Verifica completa dello stato di Tor
+#
+# Controlla: servizio attivo, porte in ascolto, bootstrap, connessione,
+# ControlPort, NEWNYM.
+
+echo "=== Verifica connessione Tor ==="
+echo ""
+PASS=0
+FAIL=0
+
+check() {
+    if [ $1 -eq 0 ]; then
+        echo "    [OK]  $2"
+        PASS=$((PASS + 1))
+    else
+        echo "    [!!]  $2"
+        FAIL=$((FAIL + 1))
+    fi
+}
+
+# 1. Servizio attivo
+echo "[1] Servizio Tor..."
+systemctl is-active tor@default.service > /dev/null 2>&1
+check $? "tor@default.service attivo"
+
+# 2. Porte in ascolto
+echo "[2] Porte..."
+ss -tlnp 2>/dev/null | grep -q ":9050 " 2>/dev/null
+check $? "SocksPort 9050 in ascolto"
+
+ss -tlnp 2>/dev/null | grep -q ":9051 " 2>/dev/null
+check $? "ControlPort 9051 in ascolto"
+
+ss -ulnp 2>/dev/null | grep -q ":5353 " 2>/dev/null
+check $? "DNSPort 5353 in ascolto"
+
+# 3. Bootstrap
+echo "[3] Bootstrap..."
+journalctl -u tor@default.service --no-pager 2>/dev/null | grep -q "Bootstrapped 100%"
+check $? "Bootstrap al 100%"
+
+# 4. Connessione Tor
+echo "[4] Connessione..."
+TOR_IP=$(curl --socks5-hostname 127.0.0.1:9050 -s --max-time 30 https://api.ipify.org)
+if [ -n "$TOR_IP" ]; then
+    check 0 "Connessione via Tor funzionante (exit: $TOR_IP)"
+else
+    check 1 "Connessione via Tor fallita"
+fi
+
+# 5. ControlPort
+echo "[5] ControlPort..."
+if [ -r /run/tor/control.authcookie ]; then
+    COOKIE=$(xxd -p /run/tor/control.authcookie | tr -d '\n')
+    RESULT=$(printf "AUTHENTICATE %s\r\nGETINFO version\r\nQUIT\r\n" "$COOKIE" | nc -w 5 127.0.0.1 9051 2>/dev/null | head -3)
+    if echo "$RESULT" | grep -q "250"; then
+        check 0 "ControlPort autenticazione OK"
+    else
+        check 1 "ControlPort autenticazione fallita"
+    fi
+else
+    check 1 "Cookie non leggibile (sei nel gruppo debian-tor?)"
+fi
+
+# Riepilogo
+echo ""
+echo "=== Risultato: $PASS OK, $FAIL FALLITI ==="
+if [ $FAIL -eq 0 ]; then
+    echo "Tor è completamente operativo."
+else
+    echo "Ci sono problemi da risolvere."
+fi
