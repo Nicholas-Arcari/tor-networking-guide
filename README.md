@@ -1,189 +1,193 @@
-# Tor Networking Guide 🧅
+# Tor Networking Guide
 
-Documentazione completa sull’utilizzo di Tor, gestione dei bridge, rotazione dell’IP, controlli del proprio indirizzo pubblico, configurazione di script, gestione delle sessioni e considerazioni sulla privacy e legalità.
+Documentazione tecnica approfondita sulla rete Tor: architettura a livello di protocollo,
+crittografia dei circuiti, configurazione operativa, strumenti di analisi, sicurezza
+operativa, attacchi noti e difese, aspetti legali, scenari operativi reali.
 
-Questo progetto raccoglie in un’unica guida tutto il lavoro tecnico e le configurazioni realizzate durante lo studio della rete Tor e delle sue funzionalità in un ambiente di sviluppo Kali Linux (Debian).
+Questo progetto raccoglie tutto il lavoro tecnico e l'esperienza personale accumulata
+durante lo studio e l'uso reale della rete Tor su Kali Linux (Debian), con proxychains,
+bridge obfs4, ControlPort, script di automazione e analisi dei circuiti.
 
----
-
-## Indice
-
-- [Introduzione](#introduzione)
-- [Obiettivi del progetto](#obiettivi-del-progetto)
-- [Come funziona Tor](#come-funziona-tor)
-- [Bridge e Obfs4](#bridge-e-obfs4)
-- [Controllo del proprio IP pubblico](#controllo-del-proprio-ip-pubblico)
-- [Rotazione IP / SIGNAL NEWNYM](#rotazione-ip--signal-newnym)
-- [Compatibilità delle configurazioni](#compatibilità-delle-configurazioni)
-- [Sicurezza, fingerprinting e tracciamento](#sicurezza-fingerprinting-e-tracciamento)
-- [Legalità](#legalità)
-- [Script utili](#script-utili)
+**Non è una guida ad alto livello**: ogni documento scende nel dettaglio del protocollo,
+delle celle, della crittografia, delle interazioni reali con il sistema operativo e con
+la rete.
 
 ---
 
-## Introduzione
+## Quick Start
 
-La rete Tor (The Onion Router) permette di ottenere anonimato e privacy grazie a un’architettura distribuita e basata sul concetto di onion routing.  
-Questa guida è pensata per:
-
-- utenti che vogliono capire come funziona Tor  
-- sviluppatori che desiderano utilizzare Tor da CLI  
-- chi vuole evitare censura e blocchi tramite bridge  
-- chi vuole gestire rotazioni IP o circuiti multipli  
-- chi vuole ridurre fingerprinting e leak  
-
----
-
-## Obiettivi del progetto
-
-- fornire una documentazione chiara e completa sull’uso avanzato di Tor  
-- spiegare configurazioni del file `torrc`  
-- mostrare come verificare l’IP pubblico tramite Tor  
-- automatizzare la rotazione IP tramite il ControlPort  
-- chiarire limiti, rischi e considerazioni legali  
-
----
-
-## Come funziona Tor
-
-Tor costruisce un circuito a 3 nodi:
-
-1. **Guard Node**  
-   - vede il tuo IP  
-   - non vede la destinazione  
-
-2. **Middle Node**  
-   - nodo di transito  
-   - non vede né origine né destinazione  
-
-3. **Exit Node**  
-   - vede la destinazione  
-   - non conosce l’IP reale del client  
-
-Ogni hop è cifrato a strati (onion routing), quindi ogni nodo conosce solo quello immediatamente precedente e successivo.
-
----
-
-## Bridge e Obfs4
-
-I bridge sono nodi Tor non pubblici, utili per:
-
-- aggirare censura e DPI  
-- evitare che l’ISP sappia che stai usando Tor  
-- ridurre fingerprinting sul nodo di ingresso  
-
-Il trasporto **obfs4** (Obfuscation v4) offusca completamente il traffico Tor rendendolo indistinguibile dal rumore.
-
-### Vantaggi di obfs4:
-
-- resistente a DPI avanzata  
-- non permette fingerprinting per riconoscere Tor  
-- non rivela il nodo di ingresso pubblico  
-- funziona anche su reti restrittive  
-
----
-
-## Controllo del proprio IP pubblico
-
-### Senza Tor:
 ```bash
-curl https://api.ipify.org
+# Setup completo (installa tutto, configura torrc, crea profilo Firefox)
+sudo ./setup.sh
+
+# Verificare che tutto funzioni
+./tests/smoke-test-tor.sh
 ```
 
-### Con Tor:
+---
+
+## Struttura del progetto
+
+### docs/01-fondamenti/
+Architettura interna di Tor, protocollo delle celle, handshake ntor, crittografia
+AES-128-CTR/Curve25519, consenso e Directory Authorities.
+
+- [Architettura di Tor](docs/01-fondamenti/architettura-tor.md) — Bootstrap, componenti, circuiti, stream isolation, modello di minaccia
+- [Circuiti, Crittografia e Celle](docs/01-fondamenti/circuiti-crittografia-e-celle.md) — Celle 514 byte, RELAY commands, cifratura strato per strato, flow control, handshake ntor
+- [Consenso e Directory Authorities](docs/01-fondamenti/consenso-e-directory-authorities.md) — Votazione, flag, bandwidth authorities, descriptor, cache
+
+### docs/02-installazione-e-configurazione/
+Installazione, configurazione torrc completa (ogni direttiva spiegata), gestione systemd.
+
+- [Installazione e Verifica](docs/02-installazione-e-configurazione/installazione-e-verifica.md) — Pacchetti, permessi, gruppo debian-tor, profilo Firefox, troubleshooting
+- [torrc — Guida Completa](docs/02-installazione-e-configurazione/torrc-guida-completa.md) — SocksPort, DNSPort, ControlPort, bridge, isolamento, exit policy, relay config
+- [Gestione del Servizio](docs/02-installazione-e-configurazione/gestione-del-servizio.md) — systemd, log, bootstrap, segnali, debug, manutenzione
+
+### docs/03-nodi-e-rete/
+Analisi dettagliata di ogni tipo di nodo, bridge e pluggable transports, onion services v3,
+monitoring e metriche.
+
+- [Guard Nodes](docs/03-nodi-e-rete/guard-nodes.md) — Selezione persistente, file state, path bias, vanguards, attacchi
+- [Middle Relay](docs/03-nodi-e-rete/middle-relay.md) — Selezione pesata, bandwidth weights, ruolo di separazione
+- [Exit Nodes](docs/03-nodi-e-rete/exit-nodes.md) — Exit policy, rischi (sniffing, MITM, injection), verifica IP, blocchi
+- [Bridges e Pluggable Transports](docs/03-nodi-e-rete/bridges-e-pluggable-transports.md) — obfs4 internals, meek, Snowflake, resistenza DPI, active probing
+- [Onion Services v3](docs/03-nodi-e-rete/onion-services-v3.md) — Protocollo rendezvous, introduction points, descriptor cifrati
+- [Relay Monitoring e Metriche](docs/03-nodi-e-rete/relay-monitoring-e-metriche.md) — Tor Metrics, Prometheus/Grafana, bandwidth accounting, OONI
+
+### docs/04-strumenti-operativi/
+Uso pratico di proxychains, torsocks, ControlPort, NEWNYM, verifica leak, nyx, browser, DNS.
+
+- [ProxyChains — Guida Completa](docs/04-strumenti-operativi/proxychains-guida-completa.md) — LD_PRELOAD, chain modes, proxy_dns, debugging
+- [torsocks](docs/04-strumenti-operativi/torsocks.md) — Blocco UDP, IsolatePID, confronto dettagliato con proxychains, edge cases
+- [Controllo Circuiti e NEWNYM](docs/04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Protocollo ControlPort, comandi, Stem (Python), script
+- [Verifica IP, DNS e Leak](docs/04-strumenti-operativi/verifica-ip-dns-e-leak.md) — Test IP, DNS leak, IPv6 leak, WebRTC leak, firewall
+- [Nyx e Monitoraggio](docs/04-strumenti-operativi/nyx-e-monitoraggio.md) — Monitor TUI, 5 schermate, debugging scenari, Stem scripting
+- [Tor Browser e Applicazioni](docs/04-strumenti-operativi/tor-browser-e-applicazioni.md) — Anti-fingerprinting, FPI, routing applicazioni, matrice compatibilità
+- [Tor e DNS — Risoluzione](docs/04-strumenti-operativi/tor-e-dns-risoluzione.md) — DNSPort, AutomapHosts, SOCKS5 remote DNS, systemd-resolved, hardening DNS
+
+### docs/05-sicurezza-operativa/
+DNS leak, traffic analysis, fingerprinting, OPSEC, isolamento, hardening, forensics.
+
+- [DNS Leak](docs/05-sicurezza-operativa/dns-leak.md) — Scenari di leak, prevenzione multilivello, firewall iptables
+- [Traffic Analysis](docs/05-sicurezza-operativa/traffic-analysis.md) — Correlazione end-to-end, website fingerprinting, timing attacks
+- [Fingerprinting](docs/05-sicurezza-operativa/fingerprinting.md) — Browser, TLS/JA3, OS, canvas, WebGL, tracking senza cookie
+- [OPSEC e Errori Comuni](docs/05-sicurezza-operativa/opsec-e-errori-comuni.md) — 10 errori fatali, casi reali di deanonimizzazione, checklist
+- [Isolamento e Compartimentazione](docs/05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Whonix, Tails, Qubes, network namespaces, Docker
+- [Hardening di Sistema](docs/05-sicurezza-operativa/hardening-sistema.md) — sysctl, kernel params, AppArmor, nftables, servizi da disabilitare
+- [Analisi Forense e Artefatti](docs/05-sicurezza-operativa/analisi-forense-e-artefatti.md) — Artefatti disco, RAM, rete, browser, timeline forense, mitigazione
+
+### docs/06-configurazioni-avanzate/
+VPN+Tor ibrido, transparent proxy, multi-istanza, localhost.
+
+- [VPN e Tor Ibrido](docs/06-configurazioni-avanzate/vpn-e-tor-ibrido.md) — VPN→Tor, Tor→VPN, TransPort, routing selettivo, ExitNodes
+- [Transparent Proxy](docs/06-configurazioni-avanzate/transparent-proxy.md) — iptables/nftables, TransPort internals, IPv6, gateway LAN, troubleshooting, hardening
+- [Multi-Istanza e Stream Isolation](docs/06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — systemd templates, flag isolamento, SessionGroup, Tor Browser model
+- [Tor e Localhost](docs/06-configurazioni-avanzate/tor-e-localhost.md) — Local Service Discovery Attack, Docker, sviluppo web, onion services locali
+
+### docs/07-limitazioni-e-attacchi/
+Limitazioni del protocollo, incompatibilità applicative, attacchi documentati.
+
+- [Limitazioni del Protocollo](docs/07-limitazioni-e-attacchi/limitazioni-protocollo.md) — TCP-only, latenza, bandwidth, SOCKS5, circuiti multipli
+- [Limitazioni nelle Applicazioni](docs/07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Siti che bloccano Tor, app desktop, strumenti di sicurezza
+- [Attacchi Noti](docs/07-limitazioni-e-attacchi/attacchi-noti.md) — Sybil, relay early, correlazione, website fingerprinting, HSDir, DoS
+
+### docs/08-aspetti-legali-ed-etici/
+Quadro legale Italia/UE, etica dell'anonimato, responsabilità.
+
+- [Aspetti Legali](docs/08-aspetti-legali-ed-etici/aspetti-legali.md) — Legalità in Italia, GDPR, exit node, bridge, precedenti
+- [Etica e Responsabilità](docs/08-aspetti-legali-ed-etici/etica-e-responsabilita.md) — Dilemma etico, casi studio, relay operator, sorveglianza, contributi alla rete
+
+### docs/09-scenari-operativi/
+Scenari pratici di utilizzo di Tor in contesti reali.
+
+- [Ricognizione Anonima](docs/09-scenari-operativi/ricognizione-anonima.md) — OSINT via Tor, strumenti compatibili, anti-detection, gestione identità
+- [Comunicazione Sicura](docs/09-scenari-operativi/comunicazione-sicura.md) — Email anonima, SecureDrop, OnionShare, SSH via Tor, messaggistica
+- [Sviluppo e Test](docs/09-scenari-operativi/sviluppo-e-test.md) — Test multi-IP, geolocalizzazione, rate limiting, CI/CD, debug API
+- [Incident Response](docs/09-scenari-operativi/incident-response.md) — IP leak recovery, guard compromesso, exit malevolo, monitoring
+
+### [Glossario](docs/glossario.md)
+Terminologia tecnica: celle, circuiti, handshake, flag, strumenti, attacchi.
+
+---
+
+## Config examples
+
+| File | Descrizione |
+|------|-------------|
+| [torrc-client.example](config-examples/torrc/torrc-client.example) | Configurazione client con bridge obfs4 |
+| [torrc.example](config-examples/torrc/torrc.example) | Template torrc di default con annotazioni |
+| [torrc-relay.example](config-examples/torrc/torrc-relay.example) | Configurazione relay (middle, non exit) |
+| [torrc-hidden-service.example](config-examples/torrc/torrc-hidden-service.example) | Configurazione onion service v3 |
+| [proxychains4.conf.example](config-examples/proxychains/proxychains4.conf.example) | Configurazione ProxyChains per Tor |
+| [transparent-proxy.sh.example](config-examples/iptables/transparent-proxy.sh.example) | Script iptables per transparent proxy |
+
+## Scripts
+
+| File | Descrizione |
+|------|-------------|
+| [newnym.example](scripts/newnym.example) | Rotazione IP via ControlPort (cookie auth) |
+| [newnym-with-verify.sh.example](scripts/newnym-with-verify.sh.example) | NEWNYM con verifica cambio IP e retry |
+| [check-dns-leak.sh.example](scripts/check-dns-leak.sh.example) | Test automatico DNS leak |
+| [verify-tor-connection.sh.example](scripts/verify-tor-connection.sh.example) | Verifica completa stato Tor |
+| [tor-circuit-info.py.example](scripts/tor-circuit-info.py.example) | Visualizza circuiti attivi (Python/Stem) |
+| [tor-health-monitor.sh.example](scripts/tor-health-monitor.sh.example) | Monitoring continuo con notifiche |
+| [setup-tor-profile.sh.example](scripts/setup-tor-profile.sh.example) | Crea profilo Firefox tor-proxy configurato |
+
+## Tests
+
+| File | Descrizione |
+|------|-------------|
+| [validate-docs.sh](tests/validate-docs.sh) | Valida struttura e contenuto documentazione |
+| [smoke-test-tor.sh](tests/smoke-test-tor.sh) | Smoke test completo funzionamento Tor |
+
+## Setup
+
 ```bash
-curl --socks5-hostname 127.0.0.1:9050 https://api.ipify.org
+# Installazione completa automatica
+sudo ./setup.sh
 ```
 
-### Con proxychains:
+---
+
+## Comandi rapidi
+
 ```bash
+# Avviare Tor
+sudo systemctl start tor@default.service
+
+# Verificare il bootstrap
+sudo journalctl -u tor@default.service | grep "Bootstrapped 100%"
+
+# Verificare l'IP via Tor
 proxychains curl https://api.ipify.org
+
+# Cambiare IP (NEWNYM con verifica)
+~/scripts/newnym-with-verify.sh
+
+# Navigare via Tor (Firefox con profilo dedicato)
+proxychains firefox -no-remote -P tor-proxy & disown
+
+# Monitorare Tor in tempo reale
+nyx
+
+# Validare la documentazione
+./tests/validate-docs.sh
+
+# Smoke test Tor
+./tests/smoke-test-tor.sh
 ```
 
 ---
 
-## Rotazione IP / SIGNAL NEWNYM
+## Ambiente
 
-Puoi cambiare IP di uscita chiedendo a Tor un nuovo circuito:
-```bash
-echo -e 'AUTHENTICATE ""\nSIGNAL NEWNYM\nQUIT' | nc 127.0.0.1 9051
-```
-Richiede:
-
-- ControlPort 9051 attivo
-- CookieAuthentication 1 nel torrc
-
-Il cambio non è immediato: Tor impone un tempo minimo tra due richieste NEWNYM.
+- **OS**: Kali Linux (Debian-based)
+- **Tor**: daemon + bridge obfs4 + ControlPort
+- **Strumenti**: proxychains4, torsocks, nyx, curl, Firefox (profilo tor-proxy)
+- **Localizzazione**: Parma, Italia
 
 ---
 
-## Compatibilità delle configurazioni
+## Licenza
 
-Tor non è una VPN.
-Funziona solo su connessioni TCP, non UDP.
-
-Problemi comuni:
-
-- alcune app ignorano il proxy SOCKS
-- DNS leak se non configurato `DNSPort`
-- IPv6 leak se non disabilitato
-- traffico locale che bypassa il circuito
-
-Tor Browser minimizza fingerprinting, CLI no.
-
----
-
-## Sicurezza, fingerprinting e tracciamento
-
-- l’ISP non vede i siti visitati
-- i siti vedono solo l’exit node
-- fingerprinting HTTP rimane possibile
-- JavaScript, WebGL, canvas e font possono rivelare identità
-- le richieste Tor CLI hanno fingerprint diverso da Tor Browser
-
-Per massima privacy: usare sempre Tor Browser.
-
----
-
-## Legalità
-
-In Italia, usare Tor è legale
-
-Non è legale:
-- violare sistemi
-- aggirare login non autorizzati
-- compiere azioni criminali tramite Tor
-
-Le configurazioni tecniche descritte servono per studio, sicurezza e anonimato legittimo.
-
----
-
-## Script utili
-
-### Controllo IP via Tor:
-```bash
-#!/bin/bash
-curl --socks5-hostname 127.0.0.1:9050 https://api.ipify.org
-```
-
-### Rotazione IP (NEWNYM):
-```bash
-#!/bin/bash
-echo -e 'AUTHENTICATE ""\nSIGNAL NEWNYM\nQUIT' | nc 127.0.0.1 9051
-```
-
-Rendi eseguibile:
-```bash
-chmod +x newnym.sh
-```
-
-### comando per avviare Tor:
-```bash
-firefox -no-remote -CreateProfile tor-proxy             # questo crea un profilo Firefox dedicato a Tor ed evita crash e conflitti con il profilo normale
-proxychains firefox -no-remote -P tor-proxy & disown    # questo forza Firefox a usare Tor, DNS attraverso Tor, e niente conflitti con sessioni esistenti
-```
-si potrebbe anche usare:
-```bash
-nohup proxychains firefox -no-remote -P tor-proxy >/dev/null 2>&1 &     # usato per processi permanenti, se vuoi che continui anche dopo logout
-```
-
+[MIT](LICENSE)
