@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+"""
+tor-circuit-info.py — Mostra i circuiti Tor attivi con dettagli per ogni hop.
+
+Richiede: pip install stem
+Richiede: ControlPort 9051 attivo con CookieAuthentication
+
+Uso: python3 tor-circuit-info.py
+"""
+
+from stem.control import Controller
+
+
+def main():
+    try:
+        with Controller.from_port(port=9051) as ctrl:
+            ctrl.authenticate()  # usa CookieAuthentication automaticamente
+
+            version = ctrl.get_version()
+            print(f"Tor version: {version}")
+            print()
+
+            circuits = ctrl.get_circuits()
+            built = [c for c in circuits if c.status == "BUILT"]
+
+            if not built:
+                print("Nessun circuito attivo.")
+                return
+
+            print(f"Circuiti attivi: {len(built)}")
+            print("=" * 70)
+
+            for circ in built:
+                print(f"\nCircuito #{circ.id}  (purpose: {circ.purpose})")
+                print(f"  Costruito: {circ.time_created}")
+
+                for i, entry in enumerate(circ.path):
+                    fingerprint, nickname = entry
+                    role = ["Guard", "Middle", "Exit"][i] if i < 3 else f"Hop {i+1}"
+
+                    # Ottieni info dal consenso
+                    try:
+                        ns = ctrl.get_network_status(fingerprint)
+                        print(
+                            f"  [{role:6}] {nickname:20} "
+                            f"{ns.address}:{ns.or_port}  "
+                            f"BW:{ns.bandwidth:>6} KB/s  "
+                            f"Flags: {','.join(ns.flags)}"
+                        )
+                    except Exception:
+                        print(f"  [{role:6}] {nickname:20} {fingerprint[:16]}...")
+
+                print("-" * 70)
+
+    except Exception as e:
+        print(f"Errore: {e}")
+        print("Verifica che Tor sia attivo con ControlPort 9051 e CookieAuthentication.")
+
+
+if __name__ == "__main__":
+    main()
