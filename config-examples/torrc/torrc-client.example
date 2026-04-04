@@ -1,0 +1,42 @@
+# torrc — Configurazione client con bridge obfs4
+# Ambiente: Kali Linux (Debian-based)
+# Uso: navigazione anonima via proxychains, rotazione IP via ControlPort
+
+# === Porte client ===
+SocksPort 9050                    # Proxy SOCKS5 per applicazioni (proxychains, curl, browser)
+DNSPort 5353                      # DNS via Tor — previene DNS leak
+AutomapHostsOnResolve 1           # Mapping automatico .onion e hostname via Tor
+
+# === Controllo ===
+ControlPort 9051                  # Per NEWNYM (rotazione IP), monitoring (nyx), Stem
+CookieAuthentication 1            # Auth via cookie file (/run/tor/control.authcookie)
+
+# === Sicurezza ===
+ClientUseIPv6 0                   # Disabilita IPv6 — previene leak IPv6
+
+# === Dati ===
+DataDirectory /var/lib/tor
+
+# === Logging ===
+# Livelli: err, warn, notice, info, debug
+# ATTENZIONE: info e debug possono loggare dati sensibili (hostname, fingerprint)
+Log notice file /var/log/tor/notices.log
+
+# === Bridge obfs4 ===
+# Attivare se: ISP blocca Tor, rete con DPI, vuoi nascondere l'uso di Tor
+UseBridges 1
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+
+# Bridge ottenuti da https://bridges.torproject.org/options
+# Formato: Bridge obfs4 IP:PORT FINGERPRINT cert=CERT iat-mode=N
+# iat-mode: 0=no padding temporale, 1=moderato, 2=massimo
+Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B... cert=... iat-mode=0
+Bridge obfs4 xxx.xxx.xxx.xxx:13630 A3D55AA6178... cert=... iat-mode=2
+
+# === Opzionale: Stream Isolation ===
+# Porta separata per browser con isolamento per destinazione
+#SocksPort 9052 IsolateDestAddr IsolateDestPort
+
+# === Opzionale: Transparent Proxy ===
+#TransPort 9040
+#VirtualAddrNetworkIPv4 10.192.0.0/10
