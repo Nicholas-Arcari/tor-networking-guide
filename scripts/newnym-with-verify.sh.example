@@ -1,0 +1,114 @@
+#!/bin/bash
+# newnym-with-verify.sh — NEWNYM con verifica cambio IP e retry
+#
+# Invia SIGNAL NEWNYM al ControlPort, aspetta il nuovo circuito,
+# verifica che l'IP sia effettivamente cambiato. Retry se fallisce.
+#
+# Richiede: ControlPort 9051, CookieAuthentication, gruppo debian-tor
+# Uso: ./newnym-with-verify.sh [--max-retries N]
+
+set -euo pipefail
+
+MAX_RETRIES=${1:-3}
+CONTROL_PORT=9051
+SOCKS_PORT=9050
+NEWNYM_COOLDOWN=10
+
+# Colori
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+get_tor_ip() {
+    curl --socks5-hostname 127.0.0.1:${SOCKS_PORT} -s --max-time 15 https://api.ipify.org 2>/dev/null
+}
+
+send_newnym() {
+    # Autenticazione con cookie
+    if [ -r /run/tor/control.authcookie ]; then
+        COOKIE=$(xxd -p /run/tor/control.authcookie | tr -d '\n')
+        RESULT=$(printf "AUTHENTICATE %s\r\nSIGNAL NEWNYM\r\nQUIT\r\n" "$COOKIE" | \
+                 nc -w 5 127.0.0.1 $CONTROL_PORT 2>/dev/null)
+
+        if echo "$RESULT" | grep -q "250 OK"; then
+            return 0
+        else
+            echo -e "${RED}Errore NEWNYM: $RESULT${NC}"
+            return 1
+        fi
+    else
+        echo -e "${RED}Cookie non leggibile. Sei nel gruppo debian-tor?${NC}"
+        return 1
+    fi
+}
+
+main() {
+    echo "=== NEWNYM con verifica ==="
+    echo ""
+
+    # Ottenere IP corrente
+    echo -n "IP corrente: "
+    OLD_IP=$(get_tor_ip)
+    if [ -z "$OLD_IP" ]; then
+        echo -e "${RED}impossibile ottenere IP (Tor attivo?)${NC}"
+        exit 1
+    fi
+    echo -e "${YELLOW}$OLD_IP${NC}"
+
+    # Tentare NEWNYM con retry
+    for attempt in $(seq 1 $MAX_RETRIES); do
+        echo ""
+        echo "--- Tentativo $attempt/$MAX_RETRIES ---"
+
+        # Inviare NEWNYM
+        echo -n "Invio NEWNYM... "
+        if ! send_newnym; then
+            echo -e "${RED}fallito${NC}"
+            continue
+        fi
+        echo -e "${GREEN}OK${NC}"
+
+        # Aspettare il cooldown + tempo per costruire nuovo circuito
+        echo -n "Attendo nuovo circuito (${NEWNYM_COOLDOWN}s)... "
+        sleep $NEWNYM_COOLDOWN
+        echo "fatto"
+
+        # Verificare nuovo IP
+        echo -n "Nuovo IP: "
+        NEW_IP=$(get_tor_ip)
+        if [ -z "$NEW_IP" ]; then
+            echo -e "${RED}impossibile ottenere nuovo IP${NC}"
+            continue
+        fi
+
+        if [ "$NEW_IP" != "$OLD_IP" ]; then
+            echo -e "${GREEN}$NEW_IP${NC}"
+            echo ""
+            echo -e "${GREEN}✓ IP cambiato con successo!${NC}"
+            echo "  Vecchio: $OLD_IP"
+            echo "  Nuovo:   $NEW_IP"
+
+            # Verificare che sia exit Tor
+            IS_TOR=$(curl --socks5-hostname 127.0.0.1:${SOCKS_PORT} -s --max-time 15 \
+                     https://check.torproject.org/api/ip 2>/dev/null)
+            if echo "$IS_TOR" | grep -q '"IsTor":true'; then
+                echo -e "  Exit Tor: ${GREEN}confermato${NC}"
+            fi
+            exit 0
+        else
+            echo -e "${YELLOW}$NEW_IP (uguale al precedente)${NC}"
+            echo "  Il circuito potrebbe non essere ancora cambiato, retry..."
+        fi
+    done
+
+    echo ""
+    echo -e "${RED}✗ Impossibile cambiare IP dopo $MAX_RETRIES tentativi${NC}"
+    echo "  Possibili cause:"
+    echo "  - Guard node con pochi circuiti disponibili"
+    echo "  - Rate limiting NEWNYM (max 1 ogni 10 secondi)"
+    echo "  - Problemi di rete"
+    exit 1
+}
+
+main
