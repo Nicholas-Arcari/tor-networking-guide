@@ -1,0 +1,148 @@
+#!/bin/bash
+# setup-tor-profile.sh — Crea e configura un profilo Firefox dedicato per Tor
+#
+# Crea il profilo "tor-proxy" con tutte le impostazioni about:config
+# per privacy, anti-fingerprinting, e routing via SOCKS5 Tor.
+#
+# Uso: ./setup-tor-profile.sh
+
+set -euo pipefail
+
+PROFILE_NAME="tor-proxy"
+FIREFOX_DIR="$HOME/.mozilla/firefox"
+
+# Colori
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+log() { echo -e "${GREEN}[+]${NC} $1"; }
+warn() { echo -e "${YELLOW}[!]${NC} $1"; }
+err() { echo -e "${RED}[✗]${NC} $1"; }
+
+# --- 1. Verificare Firefox ---
+if ! command -v firefox &>/dev/null; then
+    err "Firefox non trovato. Installalo con: sudo apt install firefox-esr"
+    exit 1
+fi
+log "Firefox trovato: $(firefox --version 2>/dev/null || echo 'versione sconosciuta')"
+
+# --- 2. Creare il profilo ---
+if firefox -CreateProfile "$PROFILE_NAME" 2>/dev/null; then
+    log "Profilo '$PROFILE_NAME' creato"
+else
+    warn "Il profilo '$PROFILE_NAME' potrebbe già esistere"
+fi
+
+# --- 3. Trovare la directory del profilo ---
+PROFILE_DIR=$(find "$FIREFOX_DIR" -maxdepth 1 -type d -name "*.$PROFILE_NAME" 2>/dev/null | head -1)
+
+if [ -z "$PROFILE_DIR" ]; then
+    err "Directory del profilo non trovata in $FIREFOX_DIR"
+    exit 1
+fi
+log "Directory profilo: $PROFILE_DIR"
+
+# --- 4. Scrivere user.js con le impostazioni di sicurezza ---
+cat > "$PROFILE_DIR/user.js" << 'USERJS'
+// =============================================================
+// user.js — Profilo Firefox tor-proxy
+// Configurazione per privacy, anti-fingerprinting, e Tor routing
+// Generato da setup-tor-profile.sh
+// =============================================================
+
+// --- Proxy SOCKS5 via Tor ---
+user_pref("network.proxy.type", 1);
+user_pref("network.proxy.socks", "127.0.0.1");
+user_pref("network.proxy.socks_port", 9050);
+user_pref("network.proxy.socks_version", 5);
+user_pref("network.proxy.socks_remote_dns", true);
+user_pref("network.proxy.no_proxies_on", "");
+
+// --- DNS ---
+user_pref("network.dns.disablePrefetch", true);
+user_pref("network.dns.disableIPv6", true);
+user_pref("network.predictor.enabled", false);
+user_pref("network.prefetch-next", false);
+user_pref("network.http.speculative-parallel-limit", 0);
+
+// --- Privacy e Anti-fingerprinting ---
+user_pref("privacy.resistFingerprinting", true);
+user_pref("privacy.firstparty.isolate", true);
+user_pref("privacy.trackingprotection.enabled", true);
+user_pref("privacy.trackingprotection.socialtracking.enabled", true);
+
+// --- WebRTC (previene IP leak) ---
+user_pref("media.peerconnection.enabled", false);
+user_pref("media.peerconnection.ice.default_address_only", true);
+user_pref("media.peerconnection.ice.no_host", true);
+user_pref("media.navigator.enabled", false);
+
+// --- Geolocation ---
+user_pref("geo.enabled", false);
+user_pref("geo.wifi.uri", "");
+user_pref("browser.search.geoip.url", "");
+
+// --- Telemetry e reporting ---
+user_pref("toolkit.telemetry.enabled", false);
+user_pref("toolkit.telemetry.unified", false);
+user_pref("datareporting.healthreport.uploadEnabled", false);
+user_pref("datareporting.policy.dataSubmissionEnabled", false);
+user_pref("browser.ping-centre.telemetry", false);
+user_pref("browser.newtabpage.activity-stream.feeds.telemetry", false);
+user_pref("browser.newtabpage.activity-stream.telemetry", false);
+
+// --- Safe browsing (contatta Google) ---
+user_pref("browser.safebrowsing.malware.enabled", false);
+user_pref("browser.safebrowsing.phishing.enabled", false);
+user_pref("browser.safebrowsing.downloads.enabled", false);
+
+// --- Beacon e tracking ---
+user_pref("beacon.enabled", false);
+user_pref("dom.battery.enabled", false);
+user_pref("dom.event.clipboardevents.enabled", false);
+
+// --- Cache e storage ---
+user_pref("browser.cache.disk.enable", false);
+user_pref("browser.cache.offline.enable", false);
+user_pref("browser.sessionstore.privacy_level", 2);
+
+// --- HTTPS-Only mode ---
+user_pref("dom.security.https_only_mode", true);
+user_pref("dom.security.https_only_mode_ever_enabled", true);
+
+// --- Varie sicurezza ---
+user_pref("network.cookie.lifetimePolicy", 2);
+user_pref("network.http.sendRefererHeader", 0);
+user_pref("network.http.sendSecureXSiteReferrer", false);
+user_pref("browser.formfill.enable", false);
+user_pref("signon.rememberSignons", false);
+USERJS
+
+log "user.js scritto con $(grep -c 'user_pref' "$PROFILE_DIR/user.js") preferenze"
+
+# --- 5. Riepilogo ---
+echo ""
+echo "================================================="
+echo -e "${GREEN}Profilo '$PROFILE_NAME' configurato!${NC}"
+echo "================================================="
+echo ""
+echo "Per avviare Firefox con questo profilo:"
+echo "  firefox -no-remote -P $PROFILE_NAME &"
+echo ""
+echo "Per avviare via proxychains (raccomandato):"
+echo "  proxychains firefox -no-remote -P $PROFILE_NAME & disown"
+echo ""
+echo "Impostazioni applicate:"
+echo "  - Proxy SOCKS5: 127.0.0.1:9050"
+echo "  - DNS remoto via SOCKS: attivo"
+echo "  - WebRTC: disabilitato"
+echo "  - Fingerprint resistance: attivo"
+echo "  - First-party isolation: attivo"
+echo "  - Telemetry: disabilitato"
+echo "  - Cache disco: disabilitata"
+echo "  - HTTPS-Only: attivo"
+echo ""
+warn "Ricorda: Tor deve essere attivo prima di avviare il browser"
+warn "Verifica: proxychains curl https://check.torproject.org/api/ip"
