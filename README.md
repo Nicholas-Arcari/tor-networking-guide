@@ -105,6 +105,15 @@ Scenari pratici di utilizzo di Tor in contesti reali.
 - [Sviluppo e Test](docs/09-scenari-operativi/sviluppo-e-test.md) — Test multi-IP, geolocalizzazione, rate limiting, CI/CD, debug API
 - [Incident Response](docs/09-scenari-operativi/incident-response.md) — IP leak recovery, guard compromesso, exit malevolo, monitoring
 
+### docs/10-laboratorio-pratico/
+Esercizi pratici guidati passo a passo, dalla configurazione base all'isolamento avanzato.
+
+- [Lab 01 — Setup e Verifica](docs/10-laboratorio-pratico/lab-01-setup-e-verifica.md) — Installazione completa, bootstrap, SocksPort, ControlPort, profilo Firefox
+- [Lab 02 — Analisi Circuiti](docs/10-laboratorio-pratico/lab-02-analisi-circuiti.md) — Stem, nyx, ispezione circuiti, manipolazione con Python
+- [Lab 03 — DNS Leak Testing](docs/10-laboratorio-pratico/lab-03-dns-leak-testing.md) — tcpdump, --socks5 vs --socks5-hostname, iptables anti-leak
+- [Lab 04 — Onion Service](docs/10-laboratorio-pratico/lab-04-onion-service.md) — Onion Service v3, chiavi ed25519, autenticazione client x25519, hardening
+- [Lab 05 — Stream Isolation](docs/10-laboratorio-pratico/lab-05-stream-isolation.md) — SocksPort multipli, multi-istanza Tor, identità separate
+
 ### [Glossario](docs/glossario.md)
 Terminologia tecnica: celle, circuiti, handshake, flag, strumenti, attacchi.
 
@@ -118,6 +127,8 @@ Terminologia tecnica: celle, circuiti, handshake, flag, strumenti, attacchi.
 | [torrc.example](config-examples/torrc/torrc.example) | Template torrc di default con annotazioni |
 | [torrc-relay.example](config-examples/torrc/torrc-relay.example) | Configurazione relay (middle, non exit) |
 | [torrc-hidden-service.example](config-examples/torrc/torrc-hidden-service.example) | Configurazione onion service v3 |
+| [torrc-bridge.example](config-examples/torrc/torrc-bridge.example) | Configurazione bridge server con obfs4 |
+| [torrc-exit.example](config-examples/torrc/torrc-exit.example) | Configurazione exit node (reduced exit policy) |
 | [proxychains4.conf.example](config-examples/proxychains/proxychains4.conf.example) | Configurazione ProxyChains per Tor |
 | [transparent-proxy.sh.example](config-examples/iptables/transparent-proxy.sh.example) | Script iptables per transparent proxy |
 
@@ -132,6 +143,7 @@ Terminologia tecnica: celle, circuiti, handshake, flag, strumenti, attacchi.
 | [tor-circuit-info.py.example](scripts/tor-circuit-info.py.example) | Visualizza circuiti attivi (Python/Stem) |
 | [tor-health-monitor.sh.example](scripts/tor-health-monitor.sh.example) | Monitoring continuo con notifiche |
 | [setup-tor-profile.sh.example](scripts/setup-tor-profile.sh.example) | Crea profilo Firefox tor-proxy configurato |
+| [tor-newip.sh.example](scripts/tor-newip.sh.example) | Rotazione IP continua con intervallo configurabile |
 
 ## Tests
 
@@ -169,13 +181,28 @@ proxychains firefox -no-remote -P tor-proxy & disown
 
 # Monitorare Tor in tempo reale
 nyx
-
-# Validare la documentazione
-./tests/validate-docs.sh
-
-# Smoke test Tor
-./tests/smoke-test-tor.sh
 ```
+
+## Automazione
+
+```bash
+# Mostra comandi disponibili
+make help
+
+# Validare la documentazione (212 check)
+make validate
+
+# Smoke test Tor (richiede Tor attivo)
+make smoke
+
+# Statistiche del progetto
+make stats
+
+# Installazione completa
+make setup
+```
+
+Vedi anche: [CHANGELOG.md](CHANGELOG.md) per la cronologia delle modifiche.
 
 ---
 
