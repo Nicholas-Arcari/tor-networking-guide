@@ -9,6 +9,21 @@ Basato sulla mia esperienza diretta su Kali Linux (Debian-based), dove ho config
 Tor per uso con proxychains, bridge obfs4 e ControlPort.
 
 ---
+---
+
+## Indice
+
+- [Prerequisiti di sistema](#prerequisiti-di-sistema)
+- [Installazione dei pacchetti](#installazione-dei-pacchetti)
+- [Verifica dell'installazione](#verifica-dellinstallazione)
+- [Gestione del servizio systemd](#gestione-del-servizio-systemd)
+- [Configurazione iniziale minima](#configurazione-iniziale-minima)
+- [Configurazione del gruppo debian-tor](#configurazione-del-gruppo-debian-tor)
+- [Configurazione del profilo Firefox per Tor](#configurazione-del-profilo-firefox-per-tor)
+- [Troubleshooting dell'installazione](#troubleshooting-dellinstallazione)
+- [Struttura dei file di Tor dopo l'installazione](#struttura-dei-file-di-tor-dopo-linstallazione)
+- [Aggiornamento di Tor](#aggiornamento-di-tor)
+
 
 ## Prerequisiti di sistema
 
@@ -536,3 +551,13 @@ e patchate regolarmente. Le versioni obsolete possono avere:
 La politica di sicurezza di Tor: le versioni in "end of life" non ricevono patch.
 Verificare sempre la [pagina delle release](https://www.torproject.org/download/tor/) 
 per assicurarsi di essere su una versione supportata.
+
+---
+
+## Vedi anche
+
+- [torrc — Guida Completa](torrc-guida-completa.md) — Configurazione completa dopo l'installazione
+- [Gestione del Servizio](gestione-del-servizio.md) — systemd, log, troubleshooting
+- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) — Test post-installazione
+- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Configurare proxychains dopo Tor
+- [Tor Browser e Applicazioni](../04-strumenti-operativi/tor-browser-e-applicazioni.md) — Profilo Firefox per Tor
