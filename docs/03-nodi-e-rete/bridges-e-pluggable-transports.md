@@ -9,6 +9,21 @@ debuggare connessioni fallite, e usarli su reti restrittive (universitarie,
 hotspot pubblici).
 
 ---
+---
+
+## Indice
+
+- [Perché esistono i Bridge](#perché-esistono-i-bridge)
+- [Come funzionano i Bridge a livello di protocollo](#come-funzionano-i-bridge-a-livello-di-protocollo)
+- [Pluggable Transports — I protocolli di offuscamento](#pluggable-transports-i-protocolli-di-offuscamento)
+- [obfs4 — Analisi tecnica approfondita](#obfs4-analisi-tecnica-approfondita)
+- [Resistenza alla censura — Come obfs4 sopravvive ai censori](#resistenza-alla-censura-come-obfs4-sopravvive-ai-censori)
+- [Come ottenere bridge — Esperienza pratica](#come-ottenere-bridge-esperienza-pratica)
+- [Configurazione dei bridge nel torrc](#configurazione-dei-bridge-nel-torrc)
+- [meek — Incapsulamento in CDN](#meek-incapsulamento-in-cdn)
+- [Snowflake — Bridge peer-to-peer](#snowflake-bridge-peer-to-peer)
+- [Confronto tra i Pluggable Transport](#confronto-tra-i-pluggable-transport)
+
 
 ## Perché esistono i Bridge
 
@@ -432,3 +447,13 @@ Uso obfs4 perché:
 
 Per scenari di censura estrema, meek o Snowflake sarebbero la scelta migliore perché
 non richiedono bridge specifici che possono essere scoperti e bloccati.
+
+---
+
+## Vedi anche
+
+- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione bridge nel torrc
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Bridge come difesa dal DPI
+- [VPN e Tor Ibrido](../06-configurazioni-avanzate/vpn-e-tor-ibrido.md) — Bridge vs VPN per nascondere Tor
+- [Aspetti Legali](../08-aspetti-legali-ed-etici/aspetti-legali.md) — Legalità dei bridge e anti-censura
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — TLS fingerprint dei bridge
