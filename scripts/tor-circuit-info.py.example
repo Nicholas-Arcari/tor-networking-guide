@@ -8,7 +8,14 @@ Richiede: ControlPort 9051 attivo con CookieAuthentication
 Uso: python3 tor-circuit-info.py
 """
 
-from stem.control import Controller
+import sys
+
+try:
+    from stem.control import Controller
+except ImportError:
+    print("Errore: libreria 'stem' non installata.")
+    print("Installa con: pip3 install stem")
+    sys.exit(1)
 
 
 def main():
