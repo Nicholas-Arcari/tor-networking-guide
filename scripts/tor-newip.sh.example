@@ -1,14 +1,49 @@
 #!/bin/bash
+# tor-newip.sh — Rotazione IP continua a intervalli regolari
+#
+# NOTA: alcuni siti rilevano cambi IP repentini e bloccano la connessione.
+# Usare con cautela e con intervalli ragionevoli (>= 30 secondi).
+#
+# Uso: ./tor-newip.sh [INTERVALLO_SECONDI]
+# Default: 60 secondi
 
-# non implementato nella mia esperienza perche alcuni siti web, se viene fatto un repentino cambio di indizzi ip lo notano e bloccano la connessione
+set -euo pipefail
 
+INTERVAL="${1:-60}"
 
+# Validazione input
+if ! [[ "$INTERVAL" =~ ^[0-9]+$ ]] || [ "$INTERVAL" -lt 10 ]; then
+    echo "Errore: intervallo deve essere >= 10 secondi (ricevuto: '$INTERVAL')"
+    echo "Uso: $0 [SECONDI]"
+    exit 1
+fi
+
+# Verificare dipendenze
+if ! command -v nc &>/dev/null; then
+    echo "Errore: 'nc' (netcat) non trovato. Installa con: sudo apt install netcat-openbsd"
+    exit 1
+fi
+
+# Verificare che il ControlPort sia raggiungibile
+if ! ss -tlnp 2>/dev/null | grep -q ":9051 "; then
+    echo "Errore: ControlPort 9051 non in ascolto. Tor è attivo con ControlPort?"
+    exit 1
+fi
+
+echo "=== Rotazione IP ogni ${INTERVAL}s ==="
+echo "Premi Ctrl+C per fermare"
+echo ""
+
+COUNT=0
 while true; do
-  echo -e 'AUTHENTICATE ""\nSIGNAL NEWNYM\nQUIT' | nc localhost 9051
-  echo "New IP assigned"
-  sleep 60   # cambia IP ogni 60 secondi
-done
+    COUNT=$((COUNT + 1))
+    RESULT=$(echo -e 'AUTHENTICATE ""\r\nSIGNAL NEWNYM\r\nQUIT' | nc -w 5 127.0.0.1 9051 2>/dev/null)
 
-# eventualmente renderlo eseguibile eseguendo a cli i seguenti comandi:
-# chmod +x tor-newip.sh
-# ./tor-newip.sh
+    if echo "$RESULT" | grep -q "250 OK"; then
+        echo "[$(date '+%H:%M:%S')] #$COUNT NEWNYM inviato — nuovo circuito richiesto"
+    else
+        echo "[$(date '+%H:%M:%S')] #$COUNT ERRORE: $RESULT"
+    fi
+
+    sleep "$INTERVAL"
+done
