@@ -8,6 +8,20 @@ Include osservazioni dalla mia esperienza nel verificare exit IP, nel gestire
 blocchi e CAPTCHA, e nel comprendere perché certi siti non funzionano via Tor.
 
 ---
+---
+
+## Indice
+
+- [Ruolo dell'Exit Node](#ruolo-dellexit-node)
+- [Exit Policy — Le regole di uscita](#exit-policy-le-regole-di-uscita)
+- [Rischi specifici degli Exit Node](#rischi-specifici-degli-exit-node)
+- [Verificare l'IP dell'Exit Node](#verificare-lip-dellexit-node)
+- [Blocchi e CAPTCHA — Come i siti reagiscono agli Exit Node](#blocchi-e-captcha-come-i-siti-reagiscono-agli-exit-node)
+- [Exit Node e DNS — Chi risolve cosa](#exit-node-e-dns-chi-risolve-cosa)
+- [Exit Policy e il principio di selettività](#exit-policy-e-il-principio-di-selettività)
+- [Identificare gli Exit Node nel consenso](#identificare-gli-exit-node-nel-consenso)
+- [Riepilogo dei rischi e mitigazioni](#riepilogo-dei-rischi-e-mitigazioni)
+
 
 ## Ruolo dell'Exit Node
 
@@ -447,3 +461,13 @@ Il numero relativamente basso di exit rispetto ai relay totali è il motivo per 
 | MITM su TLS | Exit genera cert falso | Non ignorare errori certificato |
 | Blocchi/CAPTCHA | IP exit è pubblico | NEWNYM, accettare il compromesso |
 | Exit policy restrittiva | Porte non standard | Riprova con NEWNYM |
+
+---
+
+## Vedi anche
+
+- [Guard Nodes](guard-nodes.md) — Primo hop del circuito
+- [Middle Relay](middle-relay.md) — Secondo hop del circuito
+- [Aspetti Legali](../08-aspetti-legali-ed-etici/aspetti-legali.md) — Legalità dell'operare un exit node
+- [Etica e Responsabilità](../08-aspetti-legali-ed-etici/etica-e-responsabilita.md) — Responsabilità dell'operatore
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Siti che bloccano exit Tor
