@@ -398,3 +398,13 @@ I problemi principali che ho incontrato:
   network scanning
 - **Tool Go (amass, etc.)**: binari statici che bypassano proxychains/torsocks.
   Per questi tool, il transparent proxy (iptables) è l'unica soluzione affidabile
+
+---
+
+## Vedi anche
+
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Evitare deanonimizzazione durante OSINT
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — Rischi fingerprint durante ricognizione
+- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Proxare strumenti OSINT
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Compatibilità tool con Tor
+- [Transparent Proxy](../06-configurazioni-avanzate/transparent-proxy.md) — Forzare tool Go/statici via Tor
