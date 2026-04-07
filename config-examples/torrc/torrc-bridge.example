@@ -1,0 +1,45 @@
+# torrc — Configurazione bridge server
+# Per operare un bridge Tor con obfs4 (aiuta gli utenti censurati)
+#
+# IMPORTANTE: un bridge NON è un exit node. Il tuo IP non apparirà nel
+# traffico degli utenti. Il rischio legale è minimo rispetto a un exit.
+# Il tuo bridge sarà distribuito tramite BridgeDB a chi ne ha bisogno.
+
+# === Bridge settings ===
+BridgeRelay 1
+ORPort 9001                         # Porta OR (connessione relay standard)
+ServerTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+ServerTransportListenAddr obfs4 0.0.0.0:443   # Porta esterna obfs4 (443 = meno sospetto)
+ExtORPort auto                      # Extended OR port per pluggable transports
+
+# === Identificazione ===
+Nickname MyTorBridge                # Nome del bridge (visibile solo alle DA)
+ContactInfo your-email@example.com  # Contatto operatore (raccomandato)
+
+# === NON essere un exit ===
+ExitPolicy reject *:*               # I bridge non sono exit
+
+# === Distribuzione ===
+# Il bridge viene automaticamente pubblicato a BridgeDB
+# Per NON pubblicarlo (uso privato):
+#PublishServerDescriptor 0
+
+# === Bandwidth ===
+RelayBandwidthRate 1 MB             # Throttle a 1 MB/s
+RelayBandwidthBurst 2 MB            # Burst fino a 2 MB/s
+AccountingMax 500 GB                # Massimo 500 GB al mese
+AccountingStart month 1 00:00
+
+# === Dati e logging ===
+DataDirectory /var/lib/tor
+Log notice file /var/log/tor/notices.log
+
+# === Sicurezza ===
+# Dopo il primo avvio, i fingerprint del bridge sono in:
+#   /var/lib/tor/fingerprint
+#   /var/lib/tor/hashed-fingerprint
+#   /var/lib/tor/pt_state/obfs4_bridgeline.txt  ← linea bridge per i client
+#
+# Per verificare che funzioni:
+#   sudo cat /var/lib/tor/pt_state/obfs4_bridgeline.txt
+#   → Bridge obfs4 <IP>:<PORTA> <FINGERPRINT> cert=... iat-mode=0
