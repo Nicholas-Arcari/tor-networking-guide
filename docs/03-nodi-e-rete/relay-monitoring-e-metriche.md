@@ -601,3 +601,13 @@ Lo script `tor-relay-health.sh` l'ho adattato per il mio uso client: verifico
 periodicamente che il servizio sia attivo, il bootstrap completo, e la connessione
 funzionante. È la base per il monitoring continuo che uso quando Tor deve restare
 attivo per periodi lunghi.
+
+---
+
+## Vedi anche
+
+- [Guard Nodes](guard-nodes.md) — Selezione e monitoraggio dei Guard
+- [Exit Nodes](exit-nodes.md) — Exit policy, rischi e metriche
+- [Consenso e Directory Authorities](../01-fondamenti/consenso-e-directory-authorities.md) — Votazione, flag, bandwidth authorities
+- [Nyx e Monitoraggio](../04-strumenti-operativi/nyx-e-monitoraggio.md) — Monitor TUI per relay locali
+- [Gestione del Servizio](../02-installazione-e-configurazione/gestione-del-servizio.md) — systemd, log, bootstrap
