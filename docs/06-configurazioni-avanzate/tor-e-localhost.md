@@ -578,3 +578,12 @@ La lezione imparata: **non è necessario accedere ai servizi locali via Tor
 Browser**. Sono due casi d'uso diversi che richiedono strumenti diversi. Tentare
 di forzare Tor Browser ad accedere a localhost è sia un rischio di sicurezza
 che un workaround inutile.
+
+---
+
+## Vedi anche
+
+- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) — Alternativa sicura per esporre servizi locali
+- [Multi-Istanza e Stream Isolation](multi-istanza-e-stream-isolation.md) — Istanze Tor per servizi diversi
+- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) — Proteggere servizi locali
+- [Transparent Proxy](transparent-proxy.md) — TransPort e interazione con localhost
