@@ -5,6 +5,18 @@ selezione, il peso della bandwidth, e perché i middle node sono fondamentali pe
 l'anonimato nonostante siano il componente meno "visibile" dell'architettura.
 
 ---
+---
+
+## Indice
+
+- [Ruolo del Middle Relay](#ruolo-del-middle-relay)
+- [Algoritmo di selezione dei Middle Relay](#algoritmo-di-selezione-dei-middle-relay)
+- [Bandwidth Weights e bilanciamento](#bandwidth-weights-e-bilanciamento)
+- [Middle Relay nei circuiti estesi](#middle-relay-nei-circuiti-estesi)
+- [Attacchi che coinvolgono i Middle Relay](#attacchi-che-coinvolgono-i-middle-relay)
+- [Contribuire come Middle Relay](#contribuire-come-middle-relay)
+- [Riepilogo](#riepilogo)
+
 
 ## Ruolo del Middle Relay
 
@@ -240,3 +252,13 @@ una possibilità interessante per contribuire alla rete.
 | Persistenza | Mesi | Nessuna (cambia ogni circuito) | Nessuna |
 | Pool di candidati | ~1500 | ~6000+ | ~1000-1500 |
 | Rischio per l'operatore | Basso | Minimo | Alto (possibili abusi) |
+
+---
+
+## Vedi anche
+
+- [Guard Nodes](guard-nodes.md) — Primo hop del circuito
+- [Exit Nodes](exit-nodes.md) — Terzo hop del circuito
+- [Consenso e Directory Authorities](../01-fondamenti/consenso-e-directory-authorities.md) — Bandwidth weights e selezione
+- [Relay Monitoring e Metriche](relay-monitoring-e-metriche.md) — Monitorare il proprio middle relay
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Relay early tagging dal middle
