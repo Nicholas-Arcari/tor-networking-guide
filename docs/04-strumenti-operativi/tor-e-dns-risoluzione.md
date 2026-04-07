@@ -688,3 +688,13 @@ I problemi che ho incontrato:
 
 La regola d'oro: **mai fidarsi che il DNS passi da Tor — verificare sempre con
 tcpdump**. Un singolo leak DNS annulla tutta la protezione del circuito Tor.
+
+---
+
+## Vedi anche
+
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — Scenari di leak e prevenzione multilivello
+- [ProxyChains — Guida Completa](proxychains-guida-completa.md) — proxy_dns e intercettazione DNS
+- [Transparent Proxy](../06-configurazioni-avanzate/transparent-proxy.md) — DNSPort con TransPort
+- [Verifica IP, DNS e Leak](verifica-ip-dns-e-leak.md) — Test DNS leak con tcpdump
+- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) — systemd-resolved e iptables DNS
