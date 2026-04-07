@@ -9,9 +9,24 @@
 
 set -euo pipefail
 
-INTERVAL=${1:-60}
+INTERVAL="${1:-60}"
 LOG_FILE="${2:-/var/log/tor-health.log}"
 ALERT_COUNT=0
+
+# Validazione input
+if ! [[ "$INTERVAL" =~ ^[0-9]+$ ]] || [ "$INTERVAL" -lt 5 ]; then
+    echo "Errore: intervallo deve essere un numero >= 5 secondi (ricevuto: '$INTERVAL')"
+    echo "Uso: $0 [SECONDI] [LOG_FILE]"
+    exit 1
+fi
+
+# Verificare dipendenze
+for cmd in curl ss systemctl journalctl; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Errore: '$cmd' non trovato. Installarlo prima di continuare."
+        exit 1
+    fi
+done
 
 log() {
     local level="$1"
