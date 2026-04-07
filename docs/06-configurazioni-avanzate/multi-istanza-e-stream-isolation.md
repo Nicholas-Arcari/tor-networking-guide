@@ -534,3 +534,13 @@ professionale), configurerei almeno due istanze:
 Il sistema di template systemd (`tor@istanza.service`) rende la gestione molto
 più semplice rispetto a lanciare processi Tor manualmente. Lo consiglio per chi
 ha bisogno di più di una singola istanza.
+
+---
+
+## Vedi anche
+
+- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Direttive SocksPort e isolamento
+- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Proxare app su istanze diverse
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — NEWNYM per istanza
+- [VPN e Tor Ibrido](vpn-e-tor-ibrido.md) — Routing selettivo per applicazione
+- [Gestione del Servizio](../02-installazione-e-configurazione/gestione-del-servizio.md) — systemd templates
