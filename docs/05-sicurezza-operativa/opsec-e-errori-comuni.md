@@ -1,8 +1,53 @@
 # OPSEC e Errori Comuni — Cosa Può Deanonimizzarti
 
 Questo documento cataloga gli errori di OPSEC (Operational Security) più comuni
-nell'uso di Tor, come evitarli, e casi reali dove utenti sono stati deanonimizzati
-nonostante usassero Tor.
+nell'uso di Tor, le tecniche di deanonimizzazione basate sul comportamento umano,
+casi reali dove utenti sono stati identificati nonostante Tor, e una checklist
+operativa completa.
+
+Nella mia esperienza, la maggior parte delle deanonimizzazioni non avviene per
+vulnerabilità tecniche di Tor, ma per errori umani. Tor è uno strumento: la sua
+efficacia dipende da come lo usi.
+
+---
+
+## Indice
+
+- [Il principio fondamentale dell'OPSEC](#il-principio-fondamentale-dellopsec)
+- [Errori di OPSEC che annullano l'anonimato di Tor](#errori-di-opsec-che-annullano-lanonimato-di-tor)
+- [Errori avanzati: metadata e correlazione](#errori-avanzati-metadata-e-correlazione)
+- [Casi reali di deanonimizzazione](#casi-reali-di-deanonimizzazione)
+- [Pattern comportamentali e stylometry](#pattern-comportamentali-e-stylometry)
+- [Cryptocurrency e tracciamento finanziario](#cryptocurrency-e-tracciamento-finanziario)
+- [Checklist OPSEC completa](#checklist-opsec-completa)
+- [Threat model e autovalutazione](#threat-model-e-autovalutazione)
+- [Nella mia esperienza](#nella-mia-esperienza)
+
+---
+
+## Il principio fondamentale dell'OPSEC
+
+L'OPSEC si basa su un concetto semplice: **un singolo errore può annullare
+mesi di comportamento corretto**. L'anonimato non è uno stato binario ma
+una catena: basta che un anello si rompa per compromettere tutto.
+
+```
+OPSEC = min(sicurezza di ogni singola azione)
+
+100 connessioni anonime + 1 connessione con leak = COMPROMESSO
+1 anno di anonimato + 1 login con account reale = COMPROMESSO
+Setup perfetto + 1 post con informazione personale = COMPROMESSO
+```
+
+L'avversario non deve rompere Tor. Deve solo trovare il tuo errore.
+
+### Le 5 regole d'oro
+
+1. **Mai mescolare identità anonime con identità reali**
+2. **Mai fidarsi di una singola protezione** (defense in depth)
+3. **Il comportamento è un fingerprint** quanto la tecnologia
+4. **Un errore passato può emergere in futuro** (i log esistono)
+5. **L'avversario ha più tempo e risorse di te**
 
 ---
 
@@ -16,9 +61,19 @@ dell'exit node.
 
 **Perché è grave**: l'anonimato di Tor protegge l'IP. Se dici al sito chi sei
 (login), l'IP è irrilevante. Inoltre, il sito può correlare la tua sessione
-anonima con sessioni passate/future.
+anonima con sessioni passate/future tramite cookie, fingerprint del browser,
+o timing.
 
-**Regola**: non accedere MAI ad account personali su Tor.
+**Correlazione cross-session**:
+```
+Sessione 1 (anonima): visiti forum-x.com, leggi thread specifici
+Sessione 2 (stessa ora): login su Gmail dal tuo PC
+→ Google sa che usi Tor e conosce il tuo pattern temporale
+→ Un avversario con accesso ai log di entrambi può correlare
+```
+
+**Regola**: non accedere MAI ad account personali su Tor. Se devi accedere
+a un servizio, crea un account dedicato esclusivamente per l'uso via Tor.
 
 ### 2. Usare Tor e non-Tor contemporaneamente
 
@@ -26,17 +81,38 @@ anonima con sessioni passate/future.
 Visiti lo stesso sito in entrambe. Il sito correla le sessioni tramite cookie,
 fingerprint, o timing.
 
+**Lo scenario specifico**:
+```
+Finestra 1 (Tor): visiti forum.example.com da IP exit 185.220.101.x
+Finestra 2 (normale): visiti forum.example.com dal tuo IP reale 151.x.x.x
+Timing: entrambe le connessioni avvengono alle 14:32
+→ Il server vede due sessioni simultanee dallo stesso browser fingerprint
+→ Correlazione: l'utente con IP 185.220.101.x è 151.x.x.x
+```
+
 **Regola**: se usi Tor per un'attività, NON fare la stessa attività senza Tor
-contemporaneamente.
+contemporaneamente. Idealmente, usa computer o VM separate.
 
 ### 3. Scaricare e aprire file senza precauzioni
 
 **L'errore**: scarichi un PDF via Tor, lo apri con il lettore PDF del sistema.
-Il lettore PDF fa richieste HTTP (per font, immagini esterne) che escono
-SENZA passare da Tor → rivelano il tuo IP reale.
+Il lettore PDF fa richieste HTTP (per font, immagini esterne, tracking pixel)
+che escono SENZA passare da Tor → rivelano il tuo IP reale.
+
+**File pericolosi**:
+```
+PDF:   Può contenere JavaScript, link esterni, tracking pixel
+DOCX:  Può caricare template remoti, immagini da URL
+XLSX:  Può contenere link a dati esterni
+HTML:  Ovviamente può caricare qualsiasi risorsa esterna
+SVG:   Può contenere JavaScript e riferimenti esterni
+ODT:   Può caricare risorse remote
+Torrent: DHT/PEX rivelano l'IP reale (vedi errore #8)
+```
 
 **Regola**: non aprire file scaricati via Tor in applicazioni che fanno rete.
-Oppure aprirli in una VM senza rete.
+Aprirli in una VM disconnessa dalla rete, oppure convertirli in formato
+sicuro (es. PDF → immagine) prima di visualizzarli.
 
 ### 4. Informazioni nell'User-Agent e nei metadata
 
@@ -44,43 +120,108 @@ Oppure aprirli in una VM senza rete.
 versione esatta (Firefox 128). Queste informazioni restringono il pool di
 utenti possibili.
 
+**Cosa rivela il mio Firefox**:
+```
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+→ OS: Linux (minoranza: ~2% degli utenti web)
+→ Arch: x86_64
+→ Browser: Firefox 128 su Linux
+→ Pool stimato: ~0.1% degli utenti web
+
+Tor Browser User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0
+→ Pool: tutti gli utenti Tor Browser (milioni)
+→ Indistinguibile dagli altri utenti TB
+```
+
 **Regola**: usare Tor Browser (user-agent uniformato). O almeno attivare
-`privacy.resistFingerprinting` in Firefox.
+`privacy.resistFingerprinting` in Firefox per spoofing parziale.
 
 ### 5. DNS leak
 
-**L'errore**: le query DNS escono in chiaro verso l'ISP.
+**L'errore**: le query DNS escono in chiaro verso l'ISP, rivelando quali
+siti stai visitando.
 
 **Regola**: `proxy_dns` in proxychains, `--socks5-hostname` con curl,
-`DNSPort` nel torrc.
+`DNSPort` nel torrc. Vedi il documento dedicato sui DNS leak.
 
 ### 6. WebRTC leak
 
-**L'errore**: WebRTC nel browser rivela l'IP locale e pubblico reale.
+**L'errore**: WebRTC nel browser rivela l'IP locale e pubblico reale,
+anche attraverso un proxy SOCKS5.
+
+**Come funziona il leak**:
+```javascript
+// JavaScript nel browser:
+var pc = new RTCPeerConnection({iceServers: []});
+pc.createDataChannel('');
+pc.createOffer().then(offer => pc.setLocalDescription(offer));
+pc.onicecandidate = event => {
+    // event.candidate contiene il tuo IP reale!
+    // Es: "candidate:0 1 UDP 2122252543 192.168.1.100 44323 typ host"
+    // L'IP 192.168.1.100 è il tuo IP locale
+};
+```
 
 **Regola**: `media.peerconnection.enabled = false` in about:config.
+In Tor Browser è già disabilitato.
 
 ### 7. Timezone e lingua del browser
 
 **L'errore**: il browser rivela timezone=Europe/Rome e lingua=it-IT.
-Questo restringe la geolocalizzazione.
+Con 33 bit di entropia si identifica una persona. Timezone + lingua
+aggiungono ~8 bit, restringendo significativamente il pool.
+
+**Calcolo**:
+```
+Utenti Tor stimati: ~2 milioni
+Timezone Europe/Rome: ~3% → 60.000
+Lingua it-IT: ~2% → 1.200
++ Kali Linux: ~0.5% → 6
+→ Con solo timezone + lingua + OS, il pool è di ~6 persone
+```
 
 **Regola**: `privacy.resistFingerprinting = true` (forza UTC e en-US).
 
 ### 8. Torrenting via Tor
 
 **L'errore**: usi BitTorrent via Tor. Il client BitTorrent rivela il tuo IP
-reale nel protocollo DHT/PEX, che non passa dal proxy.
+reale attraverso DHT (Distributed Hash Table) e PEX (Peer Exchange), che
+non passano dal proxy.
 
-**Regola**: non usare MAI BitTorrent via Tor.
+**Il problema tecnico**:
+```
+BitTorrent tracker: comunica via TCP → può passare da Tor
+DHT: comunica via UDP → NON può passare da Tor → leak IP reale
+PEX: scambia IP con altri peer → contiene il tuo IP reale
+uTP: usa UDP → NON può passare da Tor
+
+Anche disabilitando DHT/PEX/uTP, il client potrebbe:
+- Inviare il tuo IP reale nel campo "ip" dell'announce al tracker
+- Fare richieste DNS per il tracker fuori da Tor
+```
+
+**Regola**: non usare MAI BitTorrent via Tor. Oltre al leak, sovraccarica
+la rete Tor (che è pensata per traffico a bassa latenza, non file sharing).
 
 ### 9. Eseguire JavaScript non fidato
 
-**L'errore**: JavaScript di un sito malevolo esegue exploit per ottenere
-il tuo IP reale (via WebRTC, DNS rebinding, o vulnerabilità del browser).
+**L'errore**: JavaScript di un sito malevolo può sfruttare vulnerabilità
+del browser per ottenere il tuo IP reale.
 
-**Regola**: Tor Browser ha un "Security Level" che limita JavaScript.
-Impostarlo su "Safer" o "Safest" per siti non fidati.
+**Vettori di attacco JavaScript**:
+```
+WebRTC → rivela IP (se non disabilitato)
+DNS rebinding → connessione a localhost
+Browser exploit → esecuzione codice arbitrario
+Timing side-channel → deanonimizzazione tramite timing
+Canvas/WebGL → fingerprinting unico
+Audio API → fingerprinting hardware
+```
+
+**Regola**: Tor Browser ha un "Security Level" che limita JavaScript:
+- **Standard**: JavaScript abilitato (meno sicuro, più usabile)
+- **Safer**: JavaScript disabilitato su siti non-HTTPS, no media
+- **Safest**: JavaScript disabilitato ovunque, solo contenuto statico
 
 ### 10. Pattern di comportamento unico
 
@@ -88,7 +229,97 @@ Impostarlo su "Safer" o "Safest" per siti non fidati.
 stesso pattern di navigazione. Anche senza fingerprint tecnico, il tuo
 *comportamento* è un fingerprint.
 
+**Esempio**:
+```
+Pattern osservato su exit Tor (o dal sito):
+- Ogni giorno alle 08:30: news-site-a.com
+- Ogni giorno alle 09:00: forum-b.com, thread specifici
+- Ogni lunedì alle 14:00: service-c.com
+- Lingua: italiano, timezone hints in post
+→ Anche cambiando IP con NEWNYM, il pattern è identificabile
+→ Se lo stesso pattern appare senza Tor → correlazione
+```
+
 **Regola**: variare pattern, non usare Tor per routine prevedibili.
+Usare NEWNYM tra sessioni diverse. Non rivelare timezone nei post.
+
+---
+
+## Errori avanzati: metadata e correlazione
+
+### Metadata nei documenti
+
+I file che carichi contengono metadata invisibili:
+
+```bash
+# Metadata in un documento Word/LibreOffice:
+exiftool documento.docx
+# Author: Nick Arcari
+# Creator: LibreOffice 7.5
+# Create Date: 2024-03-15 14:23:42+01:00  ← timezone!
+# Producer: Kali Linux
+
+# Metadata in un'immagine:
+exiftool foto.jpg
+# GPS Latitude: 44.801485    ← posizione esatta!
+# GPS Longitude: 10.328946   ← Parma!
+# Camera Model: iPhone 15 Pro
+# Date/Time: 2024-03-15 09:45:23
+```
+
+**Regola**: pulire TUTTI i metadata prima di caricare file:
+```bash
+# Rimuovi metadata da immagini
+exiftool -all= foto.jpg
+
+# Rimuovi metadata da PDF
+exiftool -all= documento.pdf
+
+# Per documenti Office: salva come PDF, poi pulisci il PDF
+# Oppure usa mat2 (Metadata Anonymization Toolkit 2):
+mat2 documento.docx
+```
+
+### Correlazione temporale tra sessioni
+
+```
+L'avversario osserva:
+1. Connessione Tor inizia alle 08:30 (visibile dall'ISP)
+2. Post anonimo su forum alle 08:32
+3. Connessione Tor termina alle 09:15
+4. Questo pattern si ripete ogni giorno
+
+L'avversario conosce:
+- L'utente è nel fuso orario CET (+01:00)
+- L'utente è attivo 08:30-09:15 ogni giorno
+- L'ISP registra che 151.x.x.x inizia Tor alle 08:30 ogni giorno
+→ Correlazione: l'utente anonimo è 151.x.x.x
+```
+
+### Correlazione tramite dimensione delle risposte
+
+```
+Un ISP che osserva il traffico Tor può vedere:
+- Volume totale di dati scaricati in una sessione
+- Pattern di burst (es. caricamento pagina = burst rapido)
+
+Se l'ISP ha accesso ai log del server di destinazione:
+- Il server registra dimensione della risposta per ogni richiesta
+- Correlazione: la sessione Tor con volume X corrisponde alla richiesta Y
+```
+
+### Errore di compartimentazione
+
+```
+Identità A (anonima): usa Tor, scrive su forum X
+Identità B (reale): usa email, social media
+
+ERRORE: usa la stessa password per entrambe le identità
+ERRORE: usa lo stesso stile di scrittura
+ERRORE: menziona le stesse informazioni personali
+ERRORE: usa lo stesso provider email (anche con account diverso)
+ERRORE: accede a entrambe dalla stessa rete WiFi
+```
 
 ---
 
@@ -96,56 +327,335 @@ stesso pattern di navigazione. Anche senza fingerprint tecnico, il tuo
 
 ### Ross Ulbricht (Silk Road, 2013)
 
-**Come è stato trovato**: NON tramite vulnerabilità di Tor, ma tramite errori OPSEC:
-- Aveva usato il suo vero nome su Stack Overflow per chiedere aiuto con codice
-  usato in Silk Road
-- Aveva usato un email personale (`rossulbricht@gmail.com`) in post correlati
-- Il server era stato trovato tramite un leak nell'interfaccia di login
+**Chi era**: creatore e operatore di Silk Road, il primo grande mercato
+darknet, operativo dal 2011 al 2013.
 
-**Lezione**: Tor era integro. L'errore era umano.
+**Come è stato trovato**: NON tramite vulnerabilità di Tor, ma tramite
+una catena di errori OPSEC:
 
-### Hector Monsegur (LulzSec, 2012)
+```
+Errore 1 (gennaio 2011):
+  Ulbricht aveva postato su Shroomery.org (con il suo nome reale)
+  chiedendo informazioni su come creare un sito .onion
+
+Errore 2 (marzo 2011):
+  Aveva usato il nickname "altoid" sia su Silk Road che su
+  Stack Overflow, dove era registrato come "Ross Ulbricht"
+  con email rossulbricht@gmail.com
+
+Errore 3 (2012):
+  Aveva ordinato documenti falsi (patenti) che sono stati
+  intercettati dalla dogana → collegati al suo indirizzo reale
+
+Errore 4 (2013):
+  Il server di Silk Road leakava l'IP reale tramite un
+  misconfiguration nell'interfaccia di login (CAPTCHA caricato
+  da IP diretto, non via .onion)
+
+Errore 5 (arresto):
+  È stato arrestato in una biblioteca pubblica mentre era
+  loggato come admin di Silk Road sul suo laptop
+```
+
+**Lezione**: Tor era integro. Ogni errore era umano. La combinazione
+di errori su un arco di 2+ anni ha permesso l'identificazione.
+
+### Alexandre Cazes (AlphaBay, 2017)
+
+**Chi era**: fondatore e admin di AlphaBay, il più grande mercato darknet
+successore di Silk Road.
+
+**Come è stato trovato**:
+
+```
+Errore 1:
+  L'email di recovery del forum di AlphaBay era "pimp_alex_91@hotmail.com"
+  → "Alex" + "91" (anno di nascita)
+  → Email personale collegata al suo vero nome
+
+Errore 2:
+  Il messaggio di benvenuto di AlphaBay conteneva "Welcome to AlphaBay"
+  → Lo stesso header era stato usato in un sito web personale di Cazes
+  → Stesse configurazioni PHP/MySQL
+
+Errore 3:
+  Cazes viveva in Thailandia con uno stile di vita lussuoso
+  (Lamborghini, ville) senza un lavoro noto
+  → Le autorità hanno correlato il profilo finanziario
+
+Errore 4:
+  Il server aveva una configurazione che leakava l'IP in
+  caso di errore del web server (pagina di default Apache)
+```
+
+**Lezione**: un singolo indirizzo email personale usato per errore ha
+iniziato l'intera catena investigativa.
+
+### Hector Monsegur (LulzSec/Anonymous, 2012)
 
 **Come è stato trovato**: si è connesso a un server IRC **una volta senza Tor**
 (aveva dimenticato di attivare la VPN). Una singola connessione ha rivelato il
 suo IP reale.
 
+**Dettagli**:
+```
+Monsegur usava Tor per tutte le comunicazioni con LulzSec
+Ma una sera, stanco, si è connesso al server IRC senza Tor
+Il server ha loggato il suo IP reale: un indirizzo di New York
+L'FBI ha correlato l'IP con il suo appartamento
+→ Una singola connessione = identificazione completa
+```
+
 **Lezione**: basta una singola connessione senza Tor per essere identificati.
+L'OPSEC deve essere mantenuta al 100%, non al 99.99%.
 
 ### Freedom Hosting (2013)
 
 **Come è stato trovato**: l'FBI ha sfruttato una vulnerabilità nel browser
-(Firefox ESR) per iniettare JavaScript che inviava l'IP reale e il MAC address
-a un server FBI.
+(Firefox ESR 17) per iniettare JavaScript che inviava l'IP reale e il MAC
+address a un server FBI.
 
-**Lezione**: il browser è la superficie di attacco. Mantenere Tor Browser
-aggiornato è critico.
+**Dettagli tecnici dell'exploit**:
+```javascript
+// L'exploit era iniettato nelle pagine ospitate su Freedom Hosting
+// Sfruttava CVE-2013-1690 (Firefox ESR 17)
+// Il payload:
+// 1. Bypassava la sandbox del browser
+// 2. Eseguiva codice nativo
+// 3. Recuperava l'IP reale e il MAC address
+// 4. Inviava i dati a un server FBI (fuori da Tor)
+// 5. Funzionava solo su Windows (il payload era un PE)
+```
+
+**Lezione**: il browser è la superficie di attacco principale. Mantenere
+Tor Browser aggiornato è critico. Su Tails/Whonix, anche un exploit del
+browser non rivela l'IP (il traffico è forzato via Tor a livello firewall).
+
+### Eldo Kim (minaccia bomba Harvard, 2013)
+
+**Come è stato trovato**:
+
+```
+Kim ha usato Tor per inviare email di minaccia bomba a Harvard
+per evitare un esame.
+
+Errore: ha usato Tor dalla rete WiFi di Harvard
+→ Harvard aveva i log di chi era connesso a Tor in quel momento
+→ Solo 1-2 persone sulla rete Harvard usavano Tor alle 08:30
+→ Kim era l'unico studente connesso a Tor in quel momento
+
+L'FBI lo ha interrogato e ha confessato immediatamente.
+```
+
+**Lezione**: se sei l'unico utente Tor sulla tua rete locale, il semplice
+fatto di usare Tor ti rende sospetto. Bridge obfs4 nascondono l'uso di Tor.
+
+### Jeremy Hammond (Anonymous/Stratfor, 2012)
+
+**Come è stato trovato**: tradimento da parte di un informatore (Sabu/Monsegur,
+che collaborava con l'FBI) e correlazione dei log di chat.
+
+**Lezione**: la fiducia nelle persone è un vettore di attacco.
+Nessuna tecnologia protegge da un infiltrato.
 
 ---
 
-## Checklist OPSEC per l'uso di Tor
+## Pattern comportamentali e stylometry
 
-### Prima di iniziare
+### Cos'è la stylometry
+
+La stylometry analizza lo stile di scrittura per identificare l'autore.
+Ogni persona ha un "fingerprint linguistico" unico:
+
+```
+Elementi analizzati:
+- Lunghezza media delle frasi
+- Distribuzione della punteggiatura (uso di — vs - vs ... )
+- Parole comuni usate (es. "comunque" vs "tuttavia" vs "però")
+- Errori grammaticali ricorrenti
+- Struttura dei paragrafi
+- Uso di emoticon/emoji
+- Vocabolario tecnico specifico
+- Formattazione (markdown, HTML, spazi)
+```
+
+### Accuratezza della stylometry
+
+```
+- Con 5.000 parole di campione: ~80% accuratezza su 50 autori
+- Con 10.000 parole: ~90% accuratezza
+- Con analisi cross-lingua (stesso autore, lingue diverse): ~60%
+- Machine learning (BERT, GPT): >95% su campioni sufficienti
+```
+
+### Mitigazione
+
+```
+1. Scrivere in modo diverso per ogni identità
+   → Difficile da mantenere nel tempo
+   
+2. Usare un traduttore automatico come "filtro di stile"
+   → Scrivi in italiano → traduci in inglese → ri-traduci in italiano
+   → Lo stile viene "appiattito"
+   
+3. Usare un LLM per riscrivere
+   → "Riscrivi questo testo in uno stile neutro e generico"
+   → Rimuove le caratteristiche stilistiche personali
+   
+4. Usare solo inglese per attività anonime
+   → Pool più grande (lingua più diffusa online)
+   → Meno identificabile rispetto all'italiano
+```
+
+### Pattern temporali come fingerprint
+
+```
+Analisi di post anonimi su un forum:
+- L'utente posta tra le 08:00 e le 23:00 CET
+- Mai di domenica (probabile lavoratore regolare)
+- Picchi di attività alle 13:00 e alle 21:00
+- Vacanze a agosto e dicembre (pattern italiano)
+→ Timezone: CET
+→ Professione: lavoro regolare con pausa pranzo
+→ Nazionalità: probabilmente italiano
+```
+
+---
+
+## Cryptocurrency e tracciamento finanziario
+
+### Bitcoin non è anonimo
+
+```
+Bitcoin è PSEUDONIMO, non anonimo:
+- Ogni transazione è pubblica sulla blockchain
+- Gli indirizzi sono collegabili tramite analisi dei flussi
+- Gli exchange richiedono KYC (Know Your Customer)
+- Una singola transazione da un exchange KYC a un indirizzo
+  "anonimo" compromette l'intera catena di indirizzi
+
+Strumenti di analisi blockchain:
+- Chainalysis (usato da FBI, IRS, Europol)
+- Elliptic
+- CipherTrace
+→ Possono correlare indirizzi, mixer, e movimenti
+```
+
+### Errori comuni con crypto
+
+```
+Errore 1: comprare BTC su exchange con il proprio nome,
+          poi usarli per transazioni anonime
+          → Tracciabili al 100%
+
+Errore 2: usare lo stesso wallet per transazioni
+          anonime e non anonime
+          → Collegamento diretto
+
+Errore 3: non usare Tor per accedere al wallet
+          → L'exchange/nodo vede il tuo IP reale
+
+Errore 4: importi specifici (es. 0.12345678 BTC)
+          → Tracciabili come importo unico
+```
+
+### Mitigazione parziale
+
+```
+- Monero (XMR): privacy by default (ring signatures, stealth addresses)
+- CoinJoin/Wasabi Wallet: mixing di transazioni Bitcoin
+- Mai riutilizzare indirizzi
+- Mai collegare wallet anonimi a exchange KYC
+- Accedere ai wallet solo via Tor
+- Non usare importi specifici riconoscibili
+```
+
+---
+
+## Checklist OPSEC completa
+
+### Prima di iniziare una sessione anonima
 
 - [ ] Tor è attivo e bootstrap al 100%?
 - [ ] ProxyChains è configurato con `proxy_dns`?
-- [ ] WebRTC è disabilitato nel browser?
-- [ ] IPv6 è disabilitato (`ClientUseIPv6 0`)?
-- [ ] Il profilo browser è dedicato a Tor (non condiviso)?
+- [ ] WebRTC è disabilitato nel browser (`media.peerconnection.enabled = false`)?
+- [ ] IPv6 è disabilitato (`net.ipv6.conf.all.disable_ipv6=1`)?
+- [ ] Il profilo browser è dedicato a Tor (non condiviso con navigazione normale)?
+- [ ] `privacy.resistFingerprinting = true` nel profilo Tor?
+- [ ] DNS prefetch disabilitato (`network.dns.disablePrefetch = true`)?
+- [ ] Nessun account personale è loggato nel browser Tor?
+- [ ] Nessun altro browser/app usa la stessa rete per attività non anonime?
+- [ ] Bridge obfs4 attivo se necessario (nascondere uso di Tor all'ISP)?
 
 ### Durante l'uso
 
 - [ ] NON fare login con account personali
 - [ ] NON aprire file scaricati con applicazioni di rete
-- [ ] NON usare lo stesso sito via Tor e non-Tor
-- [ ] NON rivelare informazioni personali
+- [ ] NON usare lo stesso sito via Tor e non-Tor contemporaneamente
+- [ ] NON rivelare informazioni personali (nome, città, lavoro, etc.)
+- [ ] NON usare lo stesso stile di scrittura dell'identità reale
+- [ ] NON caricare file con metadata non puliti
+- [ ] NON usare Bitcoin da exchange KYC per transazioni anonime
+- [ ] NON postare a orari prevedibili che rivelano la timezone
 - [ ] Verificare periodicamente l'IP con `proxychains curl https://api.ipify.org`
+- [ ] Usare NEWNYM tra attività diverse/non correlate
 
 ### Dopo l'uso
 
 - [ ] Chiudere tutte le applicazioni Tor
 - [ ] Pulire la cronologia del browser (o usare navigazione privata)
-- [ ] Se necessario, NEWNYM per invalidare i circuiti
+- [ ] NEWNYM per invalidare i circuiti
+- [ ] Se alto rischio: spegnere il computer (RAM contiene tracce)
+- [ ] Se Tails: riavviare (la RAM viene sovrascritta)
+
+### Errori da non fare MAI
+
+| Errore | Conseguenza | Reversibile? |
+|--------|-------------|-------------|
+| Login account personale | Identità rivelata al sito | NO — i log esistono |
+| Una connessione senza Tor | IP reale loggato | NO |
+| File con metadata personali | Nome/posizione esposti | NO — se salvati da altri |
+| Stesso wallet crypto anonimo/reale | Collegamento finanziario | NO — blockchain è permanente |
+| Post con info personale | Correlazione possibile | PARZIALE — se eliminato velocemente |
+| DNS leak | Domini visitati noti all'ISP | NO — ISP logga per legge |
+
+---
+
+## Threat model e autovalutazione
+
+### Definire il tuo avversario
+
+L'OPSEC necessario dipende dal tuo threat model:
+
+| Avversario | Capacità | OPSEC necessario |
+|-----------|----------|-----------------|
+| Tracker web (Google, Facebook) | Cookie, fingerprint, pixel | Tor Browser, FPI |
+| ISP (nel mio caso: Comeser) | Vede destinazioni, timing, volume | Tor + bridge obfs4 |
+| Amministratore rete locale | Come ISP + DHCP, ARP | Tor + bridge + MAC spoofing |
+| Forze dell'ordine nazionali | Ordini giudiziari a ISP, exchange | Tor + OPSEC rigoroso |
+| Intelligence (NSA, GCHQ) | Sorveglianza globale, correlazione | Tails/Whonix + OPSEC perfetto |
+| Avversario con accesso fisico | Forensics su disco e RAM | Full disk encryption + Tails |
+
+### Il mio threat model
+
+```
+Avversario: ISP + tracker web
+Obiettivo: privacy dalla profilazione commerciale, test di sicurezza
+Rischio: basso (attività legali, nessun avversario attivo)
+
+OPSEC adeguato:
+✓ Tor + proxychains (nasconde destinazioni dall'ISP)
+✓ Bridge obfs4 (nasconde uso di Tor dall'ISP)
+✓ Profilo Firefox dedicato (separa navigazione Tor da normale)
+✓ proxy_dns + DNSPort (previene DNS leak)
+✓ WebRTC disabilitato (previene IP leak)
+
+NON necessario per il mio threat model:
+✗ Tails/Whonix (il mio avversario non fa forensics)
+✗ Compartimentazione estrema (non ho identità anonime da proteggere)
+✗ MAC spoofing (non mi connetto a reti sconosciute)
+✗ Stylometry defense (non scrivo post anonimi)
+```
 
 ---
 
@@ -159,7 +669,29 @@ di fingerprinting. Lo uso per:
 
 NON lo uso per:
 - Attività che richiedano anonimato assoluto
-- Login su account personali
+- Login su account personali via Tor
 - Attività illegali
 
 Per scenari che richiedano anonimato reale, userei Tor Browser su Tails o Whonix.
+
+L'errore OPSEC più comune che ho visto (non che ho commesso, fortunatamente):
+dimenticare che `curl` senza `--socks5-hostname` fa leak DNS. È un errore
+facile, silenzioso, e devastante. Per questo ho creato alias:
+
+```bash
+# Nel mio .zshrc:
+alias curltor='curl --socks5-hostname 127.0.0.1:9050'
+alias pcurl='proxychains curl'
+```
+
+---
+
+## Vedi anche
+
+- [DNS Leak](dns-leak.md) — Prevenzione completa dei DNS leak
+- [Fingerprinting](fingerprinting.md) — Vettori di fingerprinting browser, rete, OS
+- [Traffic Analysis](traffic-analysis.md) — Correlazione end-to-end, website fingerprinting
+- [Isolamento e Compartimentazione](isolamento-e-compartimentazione.md) — Whonix, Tails, Qubes
+- [Analisi Forense e Artefatti](analisi-forense-e-artefatti.md) — Cosa lasci sul disco e in RAM
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — CMU/FBI, Freedom Hosting, exploit
+- [Etica e Responsabilità](../08-aspetti-legali-ed-etici/etica-e-responsabilita.md) — Uso responsabile di Tor
