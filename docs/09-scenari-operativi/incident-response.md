@@ -453,3 +453,13 @@ sudo tcpdump -i eth0 -n port 53 -c 5 &
 proxychains curl https://example.com > /dev/null 2>&1
 # Se tcpdump mostra pacchetti → leak, fixare prima di usare
 ```
+
+---
+
+## Vedi anche
+
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Prevenire gli incidenti
+- [Analisi Forense e Artefatti](../05-sicurezza-operativa/analisi-forense-e-artefatti.md) — Cosa resta dopo un incidente
+- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) — Test completi post-incidente
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Recovery dei circuiti
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Scenari di attacco documentati
