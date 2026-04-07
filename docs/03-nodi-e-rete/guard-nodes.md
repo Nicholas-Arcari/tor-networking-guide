@@ -9,6 +9,19 @@ Include osservazioni dalla mia esperienza con guard selection, cambio di guard d
 reset, e impatto sulle prestazioni.
 
 ---
+---
+
+## Indice
+
+- [Ruolo del Guard Node](#ruolo-del-guard-node)
+- [Entry Guard: il meccanismo di persistenza](#entry-guard-il-meccanismo-di-persistenza)
+- [Il file state e la persistenza dei Guard](#il-file-state-e-la-persistenza-dei-guard)
+- [Requisiti per essere un Guard Node](#requisiti-per-essere-un-guard-node)
+- [Path Bias Detection](#path-bias-detection)
+- [Vanguards — Protezione avanzata per Hidden Services](#vanguards-protezione-avanzata-per-hidden-services)
+- [Attacchi specifici ai Guard Nodes](#attacchi-specifici-ai-guard-nodes)
+- [Impatto dei Guard sulla performance](#impatto-dei-guard-sulla-performance)
+
 
 ## Ruolo del Guard Node
 
@@ -326,3 +339,13 @@ Nei miei test:
 
 Il trade-off è chiaro: maggiore privacy (nascondere l'uso di Tor all'ISP) vs.
 prestazioni peggiori.
+
+---
+
+## Vedi anche
+
+- [Middle Relay](middle-relay.md) — Secondo hop del circuito
+- [Exit Nodes](exit-nodes.md) — Terzo hop e uscita dalla rete
+- [Architettura di Tor](../01-fondamenti/architettura-tor.md) — Ruolo del Guard nell'architettura
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Attacchi ai Guard (Sybil, correlazione)
+- [Onion Services v3](onion-services-v3.md) — Vanguards come Guard persistenti per HS
