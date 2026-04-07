@@ -8,6 +8,20 @@ Non è un elenco di opzioni: è una guida ragionata su cosa ogni direttiva fa in
 e perché certi valori sono migliori di altri.
 
 ---
+---
+
+## Indice
+
+- [Il file torrc — Struttura e sintassi](#il-file-torrc-struttura-e-sintassi)
+- [Sezione 1: Porte e interfacce di rete](#sezione-1-porte-e-interfacce-di-rete)
+- [Sezione 2: Logging](#sezione-2-logging)
+- [Sezione 3: Bridge e Pluggable Transports](#sezione-3-bridge-e-pluggable-transports)
+- [Sezione 4: Direttive di sicurezza avanzate](#sezione-4-direttive-di-sicurezza-avanzate)
+- [Sezione 5: Performance e tuning](#sezione-5-performance-e-tuning)
+- [Sezione 6: Configurazione come relay (opzionale)](#sezione-6-configurazione-come-relay-opzionale)
+- [Sezione 7: Hidden Services (Onion Services v3)](#sezione-7-hidden-services-onion-services-v3)
+- [La mia configurazione completa](#la-mia-configurazione-completa)
+
 
 ## Il file torrc — Struttura e sintassi
 
@@ -574,3 +588,33 @@ Questa configurazione:
 - Previene IPv6 leak (ClientUseIPv6 0)
 - Permette rotazione IP via ControlPort (NEWNYM)
 - Logga a livello notice per troubleshooting senza compromettere privacy
+
+---
+
+## Vedi anche
+
+- [Installazione e Verifica](installazione-e-verifica.md) — Setup iniziale prima del torrc
+- [Gestione del Servizio](gestione-del-servizio.md) — Riavviare Tor dopo modifiche al torrc
+- [Bridges e Pluggable Transports](../03-nodi-e-rete/bridges-e-pluggable-transports.md) — Configurazione bridge nel torrc
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — SocksPort multipli e isolamento
+- [Tor e DNS — Risoluzione](../04-strumenti-operativi/tor-e-dns-risoluzione.md) — DNSPort e AutomapHosts
+
+---
+
+## Cheat Sheet — Direttive torrc essenziali
+
+| Direttiva | Valore | Descrizione |
+|-----------|--------|-------------|
+| `SocksPort` | `9050` | Porta SOCKS5 per le applicazioni |
+| `DNSPort` | `5353` | Porta DNS locale (risolve via Tor) |
+| `ControlPort` | `9051` | Porta per controllare Tor (Stem, nyx) |
+| `CookieAuthentication` | `1` | Autenticazione cookie per ControlPort |
+| `TransPort` | `9040` | Porta per transparent proxy |
+| `AutomapHostsOnResolve` | `1` | Mappa hostname a IP fittizi |
+| `ClientUseIPv6` | `0` | Disabilita IPv6 per i client |
+| `UseBridges` | `1` | Abilita l'uso di bridge |
+| `Bridge` | `obfs4 IP:PORT ...` | Configura un bridge obfs4 |
+| `MaxCircuitDirtiness` | `600` | Secondi prima del rinnovo circuito |
+| `ExitNodes` | `{cc}` | Forza exit da un paese (sconsigliato) |
+| `StrictNodes` | `1` | Forza la selezione (sconsigliato) |
+| `Log` | `notice file /var/log/tor/tor.log` | File di log |
