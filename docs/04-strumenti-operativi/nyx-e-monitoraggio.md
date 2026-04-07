@@ -833,3 +833,13 @@ mostra esattamente dove si blocca e per quanto tempo — tipicamente al 10%
 L'installazione è banale (`sudo apt install nyx`) e non richiede configurazione
 se il ControlPort è attivo con CookieAuthentication e l'utente è nel gruppo
 `debian-tor`. Lo consiglio come primo strumento da installare dopo Tor stesso.
+
+---
+
+## Vedi anche
+
+- [Controllo Circuiti e NEWNYM](controllo-circuiti-e-newnym.md) — ControlPort e Stem scripting
+- [Relay Monitoring e Metriche](../03-nodi-e-rete/relay-monitoring-e-metriche.md) — Monitoraggio relay con Prometheus
+- [Gestione del Servizio](../02-installazione-e-configurazione/gestione-del-servizio.md) — systemd, log, debug
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Visualizzare guard in nyx
+- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione ControlPort
