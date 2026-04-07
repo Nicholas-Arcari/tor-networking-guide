@@ -3,6 +3,19 @@
 #
 # Confronta l'IP reale con l'IP Tor e verifica che il traffico
 # esca correttamente dalla rete Tor.
+#
+# Uso: ./check-dns-leak.sh
+
+set -euo pipefail
+
+# Verificare dipendenze
+for cmd in curl proxychains; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Errore: '$cmd' non trovato."
+        [ "$cmd" = "proxychains" ] && echo "Installa con: sudo apt install proxychains4"
+        exit 1
+    fi
+done
 
 echo "=== Test DNS Leak ==="
 echo ""
