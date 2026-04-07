@@ -481,3 +481,12 @@ perfettamente.
 di un progetto. Risultato: il rate limiter basato su IP funzionava, ma era
 facilmente aggirabile con la rotazione IP di Tor. Questo mi ha portato a
 implementare anche rate limiting basato su token/sessione.
+
+---
+
+## Vedi anche
+
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — Circuiti separati per test paralleli
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Rotazione IP per test
+- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Proxare strumenti di sviluppo
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Cosa funziona e cosa no via Tor
