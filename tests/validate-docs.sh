@@ -36,6 +36,7 @@ EXPECTED_DIRS=(
     "docs/07-limitazioni-e-attacchi"
     "docs/08-aspetti-legali-ed-etici"
     "docs/09-scenari-operativi"
+    "docs/10-laboratorio-pratico"
     "config-examples/torrc"
     "config-examples/proxychains"
     "config-examples/iptables"
@@ -95,6 +96,12 @@ EXPECTED_DOCS=(
     "docs/09-scenari-operativi/comunicazione-sicura.md"
     "docs/09-scenari-operativi/sviluppo-e-test.md"
     "docs/09-scenari-operativi/incident-response.md"
+    "docs/10-laboratorio-pratico/lab-01-setup-e-verifica.md"
+    "docs/10-laboratorio-pratico/lab-02-analisi-circuiti.md"
+    "docs/10-laboratorio-pratico/lab-03-dns-leak-testing.md"
+    "docs/10-laboratorio-pratico/lab-04-onion-service.md"
+    "docs/10-laboratorio-pratico/lab-05-stream-isolation.md"
+    "docs/glossario.md"
 )
 
 for doc in "${EXPECTED_DOCS[@]}"; do
@@ -155,6 +162,8 @@ EXPECTED_CONFIGS=(
     "config-examples/torrc/torrc.example"
     "config-examples/torrc/torrc-relay.example"
     "config-examples/torrc/torrc-hidden-service.example"
+    "config-examples/torrc/torrc-bridge.example"
+    "config-examples/torrc/torrc-exit.example"
     "config-examples/proxychains/proxychains4.conf.example"
     "config-examples/iptables/transparent-proxy.sh.example"
 )
@@ -225,7 +234,7 @@ for doc in "${EXPECTED_DOCS[@]}"; do
     if [ -f "$filepath" ]; then
         docdir=$(dirname "$filepath")
         # Estrai link markdown relativi: [text](../path/file.md)
-        grep -oP '\]\(\K[^)]+\.md' "$filepath" 2>/dev/null | while read -r link; do
+        { grep -oP '\]\(\K[^)]+\.md' "$filepath" 2>/dev/null || true; } | while read -r link; do
             # Ignora URL http
             if [[ "$link" == http* ]]; then continue; fi
             # Risolvi percorso relativo
