@@ -8,6 +8,18 @@ Basato sulla mia esperienza diretta con i limiti di Tor su Kali Linux,
 dove ho toccato con mano l'impossibilità di usare certi protocolli e servizi.
 
 ---
+---
+
+## Indice
+
+- [Limitazione fondamentale: Solo TCP](#limitazione-fondamentale-solo-tcp)
+- [Latenza — Il costo dei 3 hop](#latenza-il-costo-dei-3-hop)
+- [Bandwidth — Imprevedibile e limitata](#bandwidth-imprevedibile-e-limitata)
+- [Limitazioni del protocollo SOCKS5](#limitazioni-del-protocollo-socks5)
+- [Circuiti multipli e IP variabili](#circuiti-multipli-e-ip-variabili)
+- [Protocolli e applicazioni problematiche — Riepilogo](#protocolli-e-applicazioni-problematiche-riepilogo)
+- [Possibili sviluppi futuri](#possibili-sviluppi-futuri)
+
 
 ## Limitazione fondamentale: Solo TCP
 
@@ -292,3 +304,13 @@ Il lavoro è in fase iniziale e non ancora disponibile nelle versioni stabili.
 
 Conflux permette a un singolo stream di usare più circuiti simultaneamente,
 migliorando throughput e affidabilità. Disponibile a partire da Tor 0.4.8.
+
+---
+
+## Vedi anche
+
+- [Architettura di Tor](../01-fondamenti/architettura-tor.md) — Design choices che causano le limitazioni
+- [Limitazioni nelle Applicazioni](limitazioni-applicazioni.md) — Impatto pratico delle limitazioni
+- [VPN e Tor Ibrido](../06-configurazioni-avanzate/vpn-e-tor-ibrido.md) — VPN per superare alcune limitazioni
+- [Attacchi Noti](attacchi-noti.md) — Attacchi che sfruttano le limitazioni
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Limiti della protezione dalla correlazione
