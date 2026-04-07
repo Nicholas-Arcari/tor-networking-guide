@@ -716,3 +716,13 @@ soluzione è il transparent proxy con iptables o un network namespace dedicato.
 Il consiglio: usare proxychains per il lavoro interattivo quotidiano (browser,
 curl manuale, debug), e torsocks per automazione e script dove la sicurezza
 UDP è prioritaria.
+
+---
+
+## Vedi anche
+
+- [ProxyChains — Guida Completa](proxychains-guida-completa.md) — Confronto dettagliato con torsocks
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — torsocks e prevenzione DNS leak
+- [Verifica IP, DNS e Leak](verifica-ip-dns-e-leak.md) — Test con torsocks
+- [Controllo Circuiti e NEWNYM](controllo-circuiti-e-newnym.md) — IsolatePID e circuiti
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Quali app funzionano con torsocks
