@@ -1,0 +1,75 @@
+# torrc — Configurazione exit node (reduced exit policy)
+# Per operare un exit relay con policy restrittiva
+#
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  ATTENZIONE: operare un exit node ha implicazioni legali.      ║
+# ║  Il tuo IP apparirà come sorgente del traffico degli utenti.   ║
+# ║  Leggi docs/08-aspetti-legali-ed-etici/aspetti-legali.md       ║
+# ║  PRIMA di attivare questa configurazione.                      ║
+# ║                                                                ║
+# ║  Raccomandazioni:                                              ║
+# ║  - Usa un VPS dedicato (non la tua connessione domestica)      ║
+# ║  - Configura una pagina HTML sulla porta 80 con il Tor Exit    ║
+# ║    Notice (https://community.torproject.org/relay/community-   ║
+# ║    resources/tor-exit-notice/)                                  ║
+# ║  - Contatta il tuo ISP/hosting per informarli                  ║
+# ║  - Registrati sulla mailing list tor-relays@                   ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+# === Relay settings ===
+ORPort 9001
+ORPort 443 NoListen                 # Advertise 443 per client dietro firewall
+DirPort 9030                        # Directory cache (opzionale, aiuta la rete)
+
+Nickname MyTorExit
+ContactInfo your-email@example.com  # OBBLIGATORIO per exit — per ricevere reclami
+
+# === Reduced Exit Policy ===
+# Permette solo porte comuni e sicure. Basata su:
+# https://gitlab.torproject.org/legacy/trac/-/wikis/doc/ReducedExitPolicy
+#
+# Questa policy blocca: SMTP (spam), BitTorrent, porte riservate.
+# Permette: HTTP, HTTPS, SSH, IMAP, POP3, XMPP, IRC, DNS, Git.
+
+ExitPolicy accept *:20-21           # FTP
+ExitPolicy accept *:22              # SSH
+ExitPolicy accept *:43              # WHOIS
+ExitPolicy accept *:53              # DNS
+ExitPolicy accept *:80              # HTTP
+ExitPolicy accept *:110             # POP3
+ExitPolicy accept *:143             # IMAP
+ExitPolicy accept *:443             # HTTPS
+ExitPolicy accept *:465             # SMTPS (solo submission)
+ExitPolicy accept *:587             # SMTP submission
+ExitPolicy accept *:993             # IMAPS
+ExitPolicy accept *:995             # POP3S
+ExitPolicy accept *:5222-5223       # XMPP
+ExitPolicy accept *:6660-6669       # IRC
+ExitPolicy accept *:6697            # IRC over TLS
+ExitPolicy accept *:8080            # HTTP alternativo
+ExitPolicy accept *:8443            # HTTPS alternativo
+ExitPolicy accept *:9418            # Git
+ExitPolicy reject *:*               # Blocca tutto il resto
+
+# === Bandwidth ===
+RelayBandwidthRate 5 MB             # Exit necessita più banda
+RelayBandwidthBurst 10 MB
+AccountingMax 2 TB                  # Exit usa più traffico
+AccountingStart month 1 00:00
+
+# === Dati e logging ===
+DataDirectory /var/lib/tor
+Log notice file /var/log/tor/notices.log
+
+# === Se gestisci più relay ===
+#MyFamily $FINGERPRINT1,$FINGERPRINT2
+
+# === DNS dell'exit ===
+# L'exit risolve DNS per conto degli utenti. Usa un resolver affidabile.
+# Tor usa il resolver di sistema (/etc/resolv.conf).
+# Raccomandazione: configura un resolver locale (unbound) per privacy.
+#
+# Non usare il DNS del tuo ISP: logga le query e compromette la privacy.
+# Opzioni:
+#   1. unbound locale (migliore)
+#   2. Cloudflare 1.1.1.1 o Quad9 9.9.9.9 (accettabile)
