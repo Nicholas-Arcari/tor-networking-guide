@@ -8,6 +8,18 @@ Include troubleshooting basato sulla mia esperienza reale con problemi di bootst
 bridge, permessi e configurazione.
 
 ---
+---
+
+## Indice
+
+- [systemd e Tor — Come funziona](#systemd-e-tor-come-funziona)
+- [Log e monitoraggio](#log-e-monitoraggio)
+- [Debug dei problemi comuni](#debug-dei-problemi-comuni)
+- [Segnali del processo Tor](#segnali-del-processo-tor)
+- [Monitoraggio della salute di Tor](#monitoraggio-della-salute-di-tor)
+- [Procedure di manutenzione](#procedure-di-manutenzione)
+- [Verifica completa post-installazione](#verifica-completa-post-installazione)
+
 
 ## systemd e Tor — Come funziona
 
@@ -455,3 +467,31 @@ COOKIE=$(xxd -p /run/tor/control.authcookie | tr -d '\n')
 RESULT=$(printf "AUTHENTICATE %s\r\nGETINFO version\r\nQUIT\r\n" "$COOKIE" | nc 127.0.0.1 9051 | head -3)
 echo "ControlPort: $RESULT"
 ```
+
+---
+
+## Vedi anche
+
+- [Installazione e Verifica](installazione-e-verifica.md) — Setup iniziale
+- [torrc — Guida Completa](torrc-guida-completa.md) — Configurazione da ricaricare
+- [Nyx e Monitoraggio](../04-strumenti-operativi/nyx-e-monitoraggio.md) — Monitor TUI per il servizio
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — ControlPort e segnali
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — Template systemd per istanze multiple
+
+---
+
+## Cheat Sheet — Comandi systemd per Tor
+
+| Comando | Descrizione |
+|---------|-------------|
+| `sudo systemctl start tor@default.service` | Avvia Tor |
+| `sudo systemctl stop tor@default.service` | Ferma Tor |
+| `sudo systemctl restart tor@default.service` | Riavvia Tor |
+| `sudo systemctl reload tor@default.service` | Ricarica torrc (SIGHUP) |
+| `sudo systemctl status tor@default.service` | Stato del servizio |
+| `sudo systemctl enable tor@default.service` | Avvio automatico al boot |
+| `sudo journalctl -u tor@default.service -f` | Log in tempo reale |
+| `sudo journalctl -u tor@default.service \| grep Bootstrap` | Stato bootstrap |
+| `sudo kill -HUP $(pidof tor)` | Ricarica torrc (alternativa) |
+| `sudo kill -USR1 $(pidof tor)` | Log delle statistiche |
+| `nyx` | Monitor TUI (richiede ControlPort) |
