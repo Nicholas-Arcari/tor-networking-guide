@@ -2,7 +2,49 @@
 
 Questo documento cataloga gli attacchi documentati contro la rete Tor: attacchi
 di correlazione, Sybil, relay early tagging, HSDir enumeration, website fingerprinting,
-e le contromisure adottate dopo ogni incidente.
+DoS, exploit del browser, supply chain, e attacchi al routing BGP. Per ogni attacco,
+analizzo la tecnica, il caso reale, le conseguenze per Tor, e le contromisure adottate.
+
+---
+
+## Indice
+
+- [Timeline degli attacchi principali](#timeline-degli-attacchi-principali)
+- [Sybil Attack](#1-sybil-attack)
+- [Relay Early Tagging Attack](#2-relay-early-tagging-attack)
+- [Attacco di correlazione end-to-end](#3-attacco-di-correlazione-end-to-end)
+- [Website Fingerprinting](#4-website-fingerprinting)
+- [HSDir Enumeration](#5-hsdir-enumeration)
+- [Denial of Service sulla rete Tor](#6-denial-of-service-dos-sulla-rete-tor)
+- [Attacchi al browser (exploit)](#7-attacchi-al-browser-exploit)
+- [Attacchi alla supply chain](#8-attacchi-alla-supply-chain)
+- [Attacchi al routing BGP (RAPTOR)](#9-attacchi-al-routing-bgp-raptor)
+- [Sniper Attack](#10-sniper-attack)
+- [Attacchi agli Onion Services](#11-attacchi-agli-onion-services)
+- [Matrice degli attacchi e contromisure](#matrice-degli-attacchi-e-contromisure)
+- [Cronologia delle contromisure Tor](#cronologia-delle-contromisure-tor)
+- [Conclusione pratica](#conclusione-pratica)
+
+---
+
+## Timeline degli attacchi principali
+
+```
+2007  |  Egerstad: exit node sniffing (password in chiaro)
+2011  |  Primo paper su website fingerprinting (Panchenko et al.)
+2013  |  Freedom Hosting: FBI exploit nel browser (CVE-2013-1690)
+2013  |  Eldo Kim: deanonimizzazione per correlazione temporale (Harvard)
+2014  |  CMU/FBI: Sybil + relay early tagging (Silk Road 2, etc.)
+2014  |  Operation Onymous: sequestro di decine di hidden services
+2015  |  RAPTOR: BGP routing attacks (paper accademico)
+2015  |  Sniper Attack: DoS mirato ai relay (paper)
+2016  |  HSDir probing: enumerazione hidden services
+2018  |  DeepCorr: correlazione con deep learning (96%+ accuracy)
+2020  |  KAX17: gruppo di relay malevoli scoperto (~10% della rete)
+2021  |  DoS su rete Tor (onion service flooding)
+2023  |  Rimozione massiva di relay malevoli (KAX17 e altri)
+2024  |  PoW anti-DoS implementato per onion services
+```
 
 ---
 
@@ -11,34 +53,111 @@ e le contromisure adottate dopo ogni incidente.
 ### Come funziona
 
 Un avversario gestisce un gran numero di relay nella rete Tor per aumentare
-la probabilità di controllare sia il Guard che l'Exit di un circuito.
+la probabilità di controllare sia il Guard che l'Exit di un circuito:
 
 ```
-Scenario:
-- La rete Tor ha 7000 relay
-- L'avversario ne aggiunge 700 (10% della rete)
-- Probabilità di controllare Guard AND Exit: ~1% per circuito
-- Con migliaia di circuiti, deanonimizzazione probabile per utenti attivi
+Scenario base:
+  Rete Tor: 7000 relay legittimi
+  Avversario aggiunge: 700 relay malevoli (10% della rete)
+  
+  Probabilità di controllare Guard E Exit di un circuito:
+  P(Guard malevolo) × P(Exit malevolo) = 0.1 × 0.1 = 1%
+  
+  Ma la selezione è pesata per bandwidth:
+  Se i relay malevoli hanno alta bandwidth:
+  P(Guard) ≈ 15%, P(Exit) ≈ 15% → P(entrambi) ≈ 2.25%
+  
+  Con migliaia di circuiti creati dall'utente nel tempo:
+  P(almeno un circuito compromesso) = 1 - (1 - 0.0225)^n
+  Dopo 100 circuiti: ~90% di probabilità
+  → Deanonimizzazione quasi certa per utenti attivi
+```
+
+
+### Diagramma: Sybil attack
+
+```mermaid
+flowchart TD
+    A[Avversario inserisce relay malevoli] --> B[Relay ottengono flag Guard + Exit]
+    B --> C{Client crea circuito}
+    C -->|Guard malevolo| D[Avversario vede IP client]
+    C -->|Exit malevolo| E[Avversario vede destinazione]
+    D --> F[Correlazione Guard + Exit]
+    E --> F
+    F --> G[Deanonimizzazione]
+
+    style A fill:#ffcdd2
+    style G fill:#ffcdd2
 ```
 
 ### Caso reale: CMU/FBI (2014)
 
 Ricercatori della Carnegie Mellon University hanno inserito ~115 relay nella rete
 Tor tra gennaio e luglio 2014. Questi relay:
-- Avevano flag HSDir (per intercettare descriptor di hidden service)
-- Usavano la tecnica "relay early tagging" per marcare i circuiti
-- Hanno raccolto informazioni su utenti di hidden services specifici
 
-Le informazioni sono state condivise con l'FBI, che le ha usate per identificare
-operatori di mercati darknet.
+```
+Caratteristiche dei relay CMU:
+  - Avevano flag HSDir (per intercettare descriptor di hidden service)
+  - Avevano flag Guard (per essere scelti come primo hop)
+  - Usavano la tecnica "relay early tagging" per marcare i circuiti
+  - Operavano da IP in range della CMU (128.2.0.0/16)
+  - Alta bandwidth → selezione frequente
 
-### Contromisure adottate
+Obiettivi:
+  - Raccogliere informazioni su utenti di hidden services specifici
+  - Identificare la posizione degli hidden services
+  - Le informazioni sono state condivise con l'FBI
 
-- Le Directory Authorities ora monitorano l'aggiunta di relay in massa
-- I relay nella stessa /16 subnet non vengono usati nello stesso circuito
-- `MyFamily` obbliga i relay co-gestiti a dichiararsi
-- Le bandwidth authorities limitano l'influenza di relay nuovi
-- Le celle RELAY_EARLY sono ora monitorate e limitate
+Risultato:
+  - Deanonimizzazione di utenti e operatori di mercati darknet
+  - Arresti collegati a Silk Road 2.0, Agora, e altri
+  - Il Tor Project ha scoperto e rimosso i relay a luglio 2014
+```
+
+### Contromisure adottate dopo CMU/FBI
+
+```
+1. Monitoring delle Directory Authorities:
+   - Allarme per aggiunta di molti relay dalla stessa subnet
+   - Controllo manuale di relay sospetti
+   - Analisi delle proprietà dei relay (uptime, bandwidth)
+
+2. Regola della /16 subnet:
+   - Relay nella stessa /16 non vengono usati nello stesso circuito
+   - Es: 128.2.1.1 e 128.2.2.1 non saranno Guard+Exit insieme
+
+3. MyFamily:
+   - Relay co-gestiti DEVONO dichiararsi nella stessa "family"
+   - Relay della stessa family non usati nello stesso circuito
+   - Se non si dichiarano → rilevamento e rimozione
+
+4. Bandwidth Authorities:
+   - Limitano l'influenza di relay nuovi (rampa graduale)
+   - Un relay appena aggiunto non ottiene subito alta bandwidth weight
+   - Periodo di "warm-up" prima di essere scelto frequentemente
+
+5. Celle RELAY_EARLY:
+   - Monitorate e limitate (vedi sezione successiva)
+```
+
+### KAX17 (2020-2023)
+
+```
+Un gruppo sconosciuto (identificato come "KAX17") ha operato
+centinaia di relay per anni:
+  - ~900 relay a un certo punto (~10% della rete)
+  - Prevalentemente middle relay (non exit)
+  - Distribuiti su molti AS diversi (difficili da rilevare)
+  - Nessun MyFamily dichiarato
+
+Scopo sospetto:
+  - Deanonimizzazione tramite correlazione
+  - Raccolta di metadati di traffico
+  - Possibile operazione di un'agenzia di intelligence
+
+Il Tor Project ha rimosso i relay KAX17 nel 2021-2023
+dopo analisi approfondite della rete.
+```
 
 ---
 
@@ -47,28 +166,70 @@ operatori di mercati darknet.
 ### Come funziona
 
 Un relay malevolo (middle) inserisce informazioni in celle `RELAY_EARLY`
-che normalmente non dovrebbero contenere dati:
+che normalmente non dovrebbero contenere dati utente:
 
 ```
-1. Client → Guard → Middle malevolo → Exit malevolo
-2. Il Middle inserisce tag nelle celle RELAY_EARLY
-3. L'Exit riconosce il tag
-4. L'Exit può ora correlare: questo circuito viene dal Guard X
-5. Se l'Exit conosce anche la destinazione → deanonimizzazione
+Protocollo normale:
+  Le celle RELAY_EARLY sono usate SOLO durante la creazione del circuito
+  Limite: max 8 celle RELAY_EARLY per circuito
+  Dopo la creazione: solo celle RELAY normali
+
+Attacco:
+  1. Client → Guard → Middle malevolo → Exit malevolo
+  2. Il Middle codifica informazioni nel campo delle celle RELAY_EARLY:
+     - IP del Guard da cui proviene il circuito
+     - Timestamp
+     - Identificatore del circuito
+  3. L'Exit (controllato dallo stesso avversario) decodifica il tag
+  4. L'Exit ora sa:
+     - Da quale Guard proviene il circuito
+     - Quale destinazione sta raggiungendo
+     → Se l'avversario conosce l'IP del Guard, può restringere
+       l'insieme di possibili utenti
+
+Per hidden services:
+  1. Client → Guard → Middle malevolo → Introduction Point
+  2. Il Middle taga il circuito
+  3. L'avversario (che controlla anche HSDir o Rend Point)
+     vede il tag nell'altro punto del circuito
+  → Correlazione: questo client sta accedendo a questo hidden service
 ```
 
 ### Caso reale: CMU/FBI (2014)
 
 Questo è lo stesso attacco del caso Sybil sopra. I relay CMU usavano
-relay early tagging per "marcare" circuiti verso hidden services specifici,
-poi raccoglievano le risposte sugli exit che controllavano.
+relay early tagging per marcare circuiti verso hidden services specifici.
+
+```
+Tecnica dettagliata:
+  1. I relay CMU erano posizionati come Guard e HSDir
+  2. Quando un client si connetteva a un HS monitorato:
+     a. Il Guard malevolo vedeva la connessione dal client
+     b. L'HSDir malevolo vedeva la richiesta del descriptor
+     c. Il relay early tagging correlava i due punti
+  3. Risultato: l'IP del client collegato all'HS visitato
+```
 
 ### Contromisure adottate (Tor 0.2.4.23+)
 
-- I client contano le celle RELAY_EARLY: max 8 per circuito
-- I relay che inviano RELAY_EARLY anomali vengono segnalati e rimossi
-- Il guard non inoltra celle RELAY_EARLY verso il middle/exit
-  (le converte in celle RELAY normali)
+```
+1. I client contano le celle RELAY_EARLY:
+   - Massimo 8 per circuito (durante la creazione)
+   - Se un relay invia più di 8 → circuito chiuso + relay segnalato
+
+2. I relay che inviano RELAY_EARLY anomali:
+   - Segnalati alle Directory Authorities
+   - Rimossi dal consenso
+
+3. Conversione RELAY_EARLY → RELAY:
+   - Il Guard non inoltra celle RELAY_EARLY verso il middle/exit
+   - Le converte in celle RELAY normali
+   - Il middle non può più usare RELAY_EARLY per tagging
+
+4. Monitoring continuo:
+   - Il Tor Project analizza il traffico per pattern anomali
+   - Alert automatici per relay con comportamento sospetto
+```
 
 ---
 
@@ -91,11 +252,54 @@ Correlazione statistica → stesso flusso con ~95% di confidenza
 
 ### Efficacia documentata
 
-La ricerca accademica mostra:
-- >90% true positive rate
-- <6% false positive rate
-- Funziona anche con padding moderato
-- Richiede pochi minuti di osservazione per confermare la correlazione
+```
+Ricerca accademica (evoluzione nel tempo):
+
+2004 — Levine et al.: "Timing Attacks in Low-Latency Mix Systems"
+  - >80% true positive con osservazione passiva
+  - Padding a livello di celle insufficiente
+
+2005 — Murdoch & Danezis: primi attacchi pratici
+  - ~50% true positive in pochi minuti
+
+2013 — Johnson et al.: "Users Get Routed"
+  - Simulazione su rete Tor reale con dati AS
+  - >80% utenti deanonimizzati in 6 mesi di uso
+  - Il Guard persistente aiuta ma non elimina il rischio
+
+2018 — Nasr et al.: "DeepCorr"
+  - Deep learning (CNN) per correlazione
+  - >96% true positive con <0.1% false positive
+  - Funziona con soli 25 secondi di osservazione
+  - Resiste a Tor circuit padding
+
+2020+ — Continuano miglioramenti con transformer e attention
+```
+
+### Chi può fare questo attacco
+
+```
+1. Agenzie di intelligence con capacità di sorveglianza globale
+   - NSA (XKeyscore, PRISM)
+   - GCHQ (Tempora)
+   - Cooperazione Five Eyes
+
+2. ISP che collaborano
+   - L'ISP del client + l'ISP della destinazione
+   - Possibile con ordine giudiziario
+
+3. Organizzazioni che controllano relay guard + exit
+   - Attacco Sybil (vedi sopra)
+   - Richiede risorse significative
+
+4. CDN con ampia visibilità
+   - Cloudflare vede ~15-20% del traffico web
+   - Se il tuo ISP collabora E il sito usa Cloudflare → correlazione
+
+5. Internet Exchange Points (IXP)
+   - Un IXP grande può osservare traffico di molti ISP
+   - Punto di osservazione privilegiato
+```
 
 ### Limitazione fondamentale
 
@@ -103,14 +307,7 @@ Tor **non è progettato** per resistere a un avversario che controlla entrambi
 gli endpoint. Questa è una limitazione dichiarata nel threat model di Tor.
 
 Le contromisure (padding, connection padding) rendono l'attacco più costoso
-ma non lo prevengono.
-
-### Chi può fare questo attacco
-
-- Agenzie di intelligence con capacità di sorveglianza globale
-- ISP che collaborano (l'ISP del client + l'ISP della destinazione)
-- Organizzazioni che controllano relay guard + exit
-- CDN che vedono il traffico di uscita (Cloudflare vede ~15% del web)
+ma non lo prevengono. È una limitazione intrinseca delle reti a bassa latenza.
 
 ---
 
@@ -122,26 +319,83 @@ Un avversario locale (es. ISP) osserva solo il traffico client→guard e
 determina quale sito sta visitando l'utente analizzando i pattern:
 
 ```
-Sito A: [300 celle in] [100 celle out] [500 celle in] [50 celle out]
-Sito B: [150 celle in] [200 celle out] [100 celle in] [300 celle out]
+Training phase:
+  L'avversario visita migliaia di siti via Tor
+  Registra per ogni sito: sequenza di (direzione, dimensione, timing) per pacchetto
+  Allena un classificatore ML
 
-Pattern osservato: [300 celle in] [100 celle out] [500 celle in] [50 celle out]
-Conclusione: l'utente sta visitando il Sito A
+Attack phase:
+  Osserva il traffico della vittima
+  Estrae le stesse feature
+  Il classificatore restituisce: "Sito X con probabilità Y%"
 ```
 
 ### Stato dell'arte
 
-Ricerche recenti (2020-2025) usando deep learning:
-- >95% accuratezza in condizioni di laboratorio (mondo chiuso)
-- 60-80% in condizioni reali (mondo aperto, rumore, multi-tab)
-- La difesa più efficace è il padding randomizzato
+```
+Evoluzione dei classificatori:
 
-### Contromisure in sviluppo
+2011 — Panchenko et al.: SVM
+  - ~90% accuracy, 100 siti monitorati (mondo chiuso)
 
-Il Tor Project sta sviluppando "circuit padding frameworks" che implementano
-macchine a stati per generare padding specifico anti-website-fingerprinting.
-Attualmente usate per hidden service rendezvous, in futuro potrebbero essere
-estese a circuiti generali.
+2016 — Panchenko et al.: "Website Fingerprinting at Internet Scale"
+  - Random Forest + feature engineering
+  - 90%+ su 100 siti
+
+2018 — Sirinam et al.: "Deep Fingerprinting"
+  - CNN (deep learning)
+  - >98% accuracy (mondo chiuso, 95 siti)
+  - ~95% con multi-tab browsing
+
+2019 — Bhat et al.: "Var-CNN"
+  - Variational CNN
+  - Performance migliorate in mondo aperto
+
+2020 — Rahman et al.: "Tik-Tok"
+  - Include timing features
+  - >96% accuracy
+
+2022+ — Transformer-based models
+  - Attention mechanisms per catturare dipendenze a lungo raggio
+  - Performance state-of-the-art
+```
+
+### Condizioni che degradano l'attacco
+
+```
+In condizioni reali, l'accuracy degrada significativamente:
+
+1. Multi-tab browsing: traffico da tab diversi si mescola → rumore
+2. Background traffic: download, aggiornamenti → alterano il pattern
+3. CDN e cache: la stessa pagina servita diversamente → variabilità
+4. A/B testing: versioni diverse della pagina → fingerprint diversi
+5. Contenuti dinamici: pubblicità, contenuti personalizzati
+6. HTTP/2 multiplexing: richieste mescolate in un singolo stream
+7. Variabilità di rete: jitter, loss, congestion
+
+Accuracy in mondo aperto realistico:
+  - 60-80% true positive
+  - 5-15% false positive
+  - Costo computazionale alto per monitoraggio su larga scala
+```
+
+### Contromisure in Tor
+
+```
+1. Circuit padding framework:
+   - Macchine a stati che aggiungono padding
+   - Attualmente proteggono HS rendezvous
+   - In sviluppo per circuiti generali
+
+2. Connection padding:
+   - Celle dummy periodiche sulle connessioni TLS tra relay
+   - Overhead ~5%
+
+3. Ricerca in corso:
+   - WTF-PAD: padding adattivo (~30% riduzione accuracy)
+   - FRONT: padding solo nella parte iniziale (~40% riduzione)
+   - TrafficSliver: splitting del traffico su circuiti paralleli
+```
 
 ---
 
@@ -152,17 +406,48 @@ estese a circuiti generali.
 Gli HSDir (Hidden Service Directory) sono relay che memorizzano i descriptor
 degli onion service. Un avversario che controlla HSDir può:
 
-1. Vedere quali descriptor vengono richiesti (quale .onion è popolare)
-2. Vedere quando vengono aggiornati
-3. Correlare richieste con circuiti per restringere la posizione dell'HS
+```
+Onion Services v2 (deprecato):
+  1. L'HSDir è determinato dalla combinazione di:
+     indirizzo .onion + data corrente + posizione nel DHT
+  2. Un avversario può calcolare QUALI HSDir conterranno
+     il descriptor di un dato .onion
+  3. Posizionando relay in quelle posizioni:
+     → Vede le richieste per quel descriptor
+     → Sa quando il descriptor viene aggiornato
+     → Può correlare richieste con circuiti
+
+2016 — Ricercatori hanno enumerato ~110.000 onion services v2
+  analizzando le richieste agli HSDir
+```
 
 ### Contromisure (Onion Service v3)
 
-- I descriptor sono indirizzati con una funzione hash che include il time period
-  → gli HSDir cambiano ogni 24 ore
-- I descriptor sono cifrati → l'HSDir non può leggerli
-- Il client deve conoscere l'indirizzo .onion per calcolare quale HSDir contattare
-  → l'HSDir non sa quale .onion sta servendo
+```
+v3 ha risolto molte vulnerabilità di v2:
+
+1. Descriptor cifrati:
+   - Il descriptor è cifrato con la chiave pubblica dell'HS
+   - L'HSDir NON può leggere il contenuto del descriptor
+   - Non sa quale .onion sta servendo
+
+2. Rotazione degli HSDir:
+   - Gli HSDir cambiano ogni 24 ore (time period based)
+   - L'avversario deve riposizionare i relay continuamente
+
+3. Blinding della chiave:
+   - La chiave usata per il DHT è derivata (blinded)
+   - Non è possibile risalire all'indirizzo .onion dal DHT
+
+4. Richiesta autenticata:
+   - Il client deve conoscere l'indirizzo .onion per calcolare
+     quale HSDir contattare
+   - Un HSDir casuale non può scoprire nuovi .onion
+
+5. Client authorization:
+   - L'HS può richiedere autenticazione del client
+   - Solo client autorizzati possono scaricare il descriptor
+```
 
 ---
 
@@ -170,23 +455,64 @@ degli onion service. Un avversario che controlla HSDir può:
 
 ### Attacchi ai relay
 
+```
 Un avversario può:
-- DDoS-are relay specifici per forzare il cambio di guard degli utenti
-- Sovraccaricare exit node per ridurre le opzioni di uscita
-- Sovraccaricare le Directory Authorities per impedire l'aggiornamento del consenso
+1. DDoS-are relay specifici per forzare il cambio di guard
+   - L'utente deve scegliere un nuovo guard
+   - Se il nuovo guard è malevolo → compromissione
+   - "Guard rotation attack"
 
-### Attacchi agli hidden services
+2. Sovraccaricare exit node
+   - Riduce le opzioni di uscita → meno anonimato
+   - Forza il traffico su exit ancora disponibili → congestione
 
-- DDoS degli Introduction Points per rendere l'HS irraggiungibile
-- Richieste massive al descriptor per sovraccaricare gli HSDir
+3. Sovraccaricare le Directory Authorities
+   - Impedisce l'aggiornamento del consenso
+   - I client non possono ottenere informazioni sulla rete
+```
+
+### Attacchi agli hidden services (2021-2023)
+
+```
+Dal 2021, la rete Tor ha subito attacchi DoS significativi
+mirati agli onion services:
+
+Tecnica:
+  - Flood di richieste verso gli Introduction Points
+  - L'HS deve processare ogni richiesta (costoso)
+  - L'attaccante non deve pagare alcun costo
+  → Asimmetria: poco costo per l'attaccante, alto per l'HS
+
+Impatto:
+  - Molti .onion irraggiungibili per ore/giorni
+  - Degradazione performance della rete intera
+  - Impatto su servizi legittimi (.onion di giornali, SecureDrop)
+```
 
 ### Contromisure
 
-- Proof-of-Work (PoW) per le connessioni agli onion service (Tor 0.4.8+):
-  i client devono risolvere un puzzle computazionale per connettersi,
-  rendendo il DDoS molto più costoso
-- Rate limiting sulle DA
-- Diversificazione degli Introduction Points
+```
+1. Proof-of-Work (PoW) per onion services (Tor 0.4.8+):
+   - I client devono risolvere un puzzle computazionale
+   - Il puzzle scala con il carico dell'HS
+   - Sotto carico: il puzzle diventa più difficile
+   - L'attaccante deve spendere CPU per ogni richiesta
+   - Implementazione: EquiX (Equihash-based)
+
+2. Rate limiting sulle Directory Authorities:
+   - Limita le richieste per IP
+   - Previene flooding del consenso
+
+3. Diversificazione degli Introduction Points:
+   - L'HS può avere più Introduction Points
+   - Se uno è sotto attacco, gli altri funzionano
+
+4. Vanguards:
+   - Relay persistenti multi-livello per proteggere il percorso
+     verso gli Introduction Points
+   - Previene che l'avversario scopra l'IP dell'HS tramite DoS
+     selettivo degli Introduction Points
+```
 
 ---
 
@@ -197,20 +523,71 @@ Un avversario può:
 L'FBI ha compromesso il server di Freedom Hosting (che ospitava hidden services)
 e ha iniettato un exploit JavaScript nel Tor Browser (basato su Firefox ESR 17):
 
-```javascript
-// L'exploit sfruttava una vulnerabilità Firefox per:
-// 1. Bypassare la sandbox del browser
-// 2. Eseguire codice nativo
-// 3. Inviare l'IP reale e il MAC address a un server FBI
+```
+Tecnica:
+  1. L'FBI ha ottenuto il controllo del server Freedom Hosting
+  2. Ha iniettato codice JavaScript malevolo nelle pagine servite
+  3. L'exploit sfruttava CVE-2013-1690 (Firefox ESR 17)
+  4. Il payload:
+     a. Bypassava la sandbox del browser
+     b. Eseguiva codice nativo (shellcode)
+     c. Recuperava l'IP reale della vittima
+     d. Recuperava il MAC address
+     e. Recuperava l'hostname del computer
+     f. Inviava i dati a un server FBI (IP: 65.222.202.54)
+  5. Funzionava solo su Windows (il payload era un PE)
+  6. Su Linux/macOS: l'exploit non aveva effetto
+
+Risultato:
+  - Centinaia di utenti di Freedom Hosting identificati
+  - Arresti multipli per possesso di materiale CSAM
+  - Eric Eoin Marques (operatore Freedom Hosting) arrestato
+```
+
+### Playpen (2015)
+
+```
+L'FBI ha usato una tecnica simile per identificare utenti di Playpen:
+  1. Ha preso il controllo del server Playpen (hidden service CSAM)
+  2. Ha operato il sito per 13 giorni
+  3. Ha distribuito un NIT (Network Investigative Technique)
+     tramite exploit del browser
+  4. Il NIT recuperava IP reale, MAC, hostname
+  5. ~8.700 IP raccolti, 137 incriminati
+
+Controversia legale:
+  - L'FBI ha operato un sito CSAM per 13 giorni
+  - Dibattito sulla legalità dell'operazione
+  - I NIT sono stati contestati in tribunale
+  - Alcuni casi archiviati per violazione del quarto emendamento
 ```
 
 ### Contromisure
 
-- Tor Browser è aggiornato frequentemente per patchare vulnerabilità
-- Il "Security Level" di Tor Browser limita JavaScript
-- Sandboxing del processo browser
-- Su Tails/Whonix, anche un exploit del browser non rivela l'IP
-  (il traffico è forzato attraverso Tor a livello di firewall)
+```
+1. Aggiornamenti frequenti:
+   - Tor Browser segue il ciclo di Firefox ESR (~6 settimane)
+   - Patch di sicurezza applicate immediatamente
+   - REGOLA: aggiornare SEMPRE appena disponibile
+
+2. Security Level:
+   - "Safest" disabilita JavaScript → elimina la superficie di attacco
+   - "Safer" disabilita JIT → elimina exploit JIT-based
+
+3. Sandboxing:
+   - Tor Browser usa il sandboxing di Firefox (seccomp-bpf su Linux)
+   - Limita le syscall disponibili all'exploit
+   - Non è impenetrabile ma alza la barra
+
+4. Isolamento del sistema:
+   - Su Tails/Whonix: anche un exploit del browser non rivela l'IP
+   - Il firewall del sistema forza tutto il traffico via Tor
+   - L'exploit non può bypassare il firewall del Gateway
+
+5. NoScript:
+   - Blocca JavaScript per default ai livelli Safer/Safest
+   - Riduce drasticamente la superficie di attacco
+```
 
 ---
 
@@ -221,28 +598,222 @@ e ha iniettato un exploit JavaScript nel Tor Browser (basato su Firefox ESR 17):
 Un avversario compromette il processo di build di Tor o Tor Browser per inserire
 backdoor nel software distribuito.
 
+```
+Vettori possibili:
+  1. Compromissione del repository Git
+  2. Compromissione del build server
+  3. Compromissione dei maintainer (social engineering, coercizione)
+  4. Compromissione del canale di distribuzione (mirror, CDN)
+  5. Inserimento di dipendenze malevole (dependency confusion)
+```
+
 ### Contromisure
 
-- **Reproducible builds**: Tor Browser supporta build riproducibili — chiunque
-  può ricompilare il codice sorgente e verificare che il binario distribuito
-  corrisponda
-- **Firme GPG**: tutti i download sono firmati con le chiavi del Tor Project
-- **Codice open source**: il codice è auditabile pubblicamente
+```
+1. Reproducible builds:
+   - Tor Browser supporta build riproducibili
+   - Chiunque può ricompilare il codice sorgente
+   - Il binario risultante deve essere identico bit-per-bit
+   - Se non corrisponde → il build è stato compromesso
+
+2. Firme GPG:
+   - Tutti i download sono firmati con le chiavi del Tor Project
+   - Le chiavi sono pubblicate e verificabili
+   - Il download manager di Tor Browser verifica la firma
+
+3. Codice open source:
+   - Il codice è pubblico e auditabile
+   - Community di sviluppatori che revisiona i cambiamenti
+   - Bug bounty program
+
+4. Build process documentato:
+   - Il processo di build è documentato pubblicamente
+   - Usa container Docker per isolamento
+   - Log di build verificabili
+```
+
+---
+
+## 9. Attacchi al routing BGP (RAPTOR)
+
+### Come funziona
+
+```
+Sun et al. (2015): "RAPTOR: Routing Attacks on Privacy in Tor"
+
+L'avversario sfrutta il protocollo BGP per osservare traffico Tor:
+
+Attacco 1 — BGP Hijacking:
+  1. L'avversario annuncia rotte BGP più specifiche
+     per il range IP di un Guard Tor
+  2. Il traffico client→Guard viene rediretto attraverso
+     l'AS dell'avversario (man-in-the-middle a livello di routing)
+  3. L'avversario osserva il traffico in ingresso
+  4. Combinato con osservazione lato uscita → correlazione
+
+Attacco 2 — Asymmetric routing:
+  1. I percorsi BGP sono spesso asimmetrici
+     (A→B passa per AS diversi da B→A)
+  2. L'avversario può osservare solo una direzione
+  3. Ma anche una direzione è sufficiente per correlazione
+
+Attacco 3 — BGP interception:
+  1. L'avversario ridirige il traffico, lo osserva, e lo rilascia
+  2. Il client non nota nulla (latenza leggermente aumentata)
+  3. Attacco completamente passivo dalla prospettiva della vittima
+```
+
+### Efficacia
+
+```
+- >90% dei circuiti Tor vulnerabili a routing attacks
+- Un singolo AS in posizione strategica può osservare
+  una percentuale significativa del traffico Tor
+- Non richiede il controllo di relay Tor
+- Difficile da rilevare dal client
+```
+
+### Contromisure
+
+```
+- Guard persistente: riduce la finestra di vulnerabilità
+  (l'avversario deve mantenere il BGP hijack per settimane)
+- RPKI (Resource Public Key Infrastructure):
+  - Firma crittografica delle rotte BGP
+  - Previene BGP hijacking non autorizzato
+  - Adozione in crescita ma non universale
+- Monitoring BGP:
+  - RIPE RIS, RouteViews monitorano le rotte BGP
+  - Anomalie di routing possono essere rilevate
+- Selezione relay basata su diversità AS:
+  - Tor seleziona relay in AS diversi
+  - Riduce la probabilità che un singolo AS osservi tutto il circuito
+```
+
+---
+
+## 10. Sniper Attack
+
+### Come funziona
+
+```
+Jansen et al. (2014): "The Sniper Attack"
+
+L'avversario forza un relay Tor a esaurire la memoria (OOM kill):
+
+1. L'avversario crea un circuito attraverso il relay vittima
+2. Invia dati al relay ma NON legge la risposta
+3. I dati si accumulano nei buffer del relay
+4. Il relay esaurisce la memoria → crash o OOM kill
+5. Se il relay è il Guard della vittima:
+   → La vittima deve scegliere un nuovo Guard
+   → Se il nuovo Guard è malevolo → compromissione
+
+Costo per l'avversario: minimo (invia dati, non legge)
+Costo per la vittima: crash del relay, perdita di circuiti
+```
+
+### Contromisure
+
+```
+- Flow control migliorato (SENDME cells):
+  - I relay non inviano più dati di quanti il ricevente confermi
+  - Previene l'accumulo infinito di dati nei buffer
+  
+- OOM handler:
+  - Tor rileva l'esaurimento della memoria
+  - Chiude i circuiti più problematici invece di crashare
+  
+- Circuit-level flow control (Prop #324):
+  - Congestion control a livello di circuito
+  - Previene che un singolo circuito monopolizzi le risorse
+```
+
+---
+
+## 11. Attacchi agli Onion Services
+
+### Vanguards
+
+```
+Problema:
+  Un avversario che controlla l'HS Directory può osservare
+  le richieste e correlare con i circuiti.
+  DoS selettivo degli Introduction Points può rivelare
+  la posizione dell'HS.
+
+Soluzione — Vanguards (Tor 0.4.1+):
+  L'HS usa relay "vanguard" persistenti per i circuiti
+  verso gli Introduction Points:
+
+  HS → [Layer 1 Vanguard] → [Layer 2 Vanguard] → [Introduction Point]
+  
+  - Layer 1: persiste per mesi (come un Guard)
+  - Layer 2: persiste per giorni
+  - L'avversario deve compromettere entrambi i livelli
+  - Molto più difficile che compromettere un singolo relay
+
+Vanguards-lite (Tor 0.4.7+):
+  - Versione semplificata attivata di default
+  - Protegge tutti gli onion services
+  - Un solo livello di vanguard
+```
+
+### Onion Service Directory (HSDirs) Attack
+
+```
+L'avversario posiziona relay come HSDir per un dato .onion:
+
+v2 (vulnerabile):
+  - L'avversario calcola quali relay saranno HSDir per un .onion
+  - Posiziona relay in quelle posizioni
+  - Vede ogni richiesta per quel .onion
+  → Enumerazione e surveillance possibili
+
+v3 (mitigato):
+  - Descriptor cifrati (HSDir non può leggere)
+  - Blinded keys (HSDir non sa quale .onion)
+  - Rotazione basata su time period
+  → L'attacco è molto più difficile/costoso
+```
 
 ---
 
 ## Matrice degli attacchi e contromisure
 
-| Attacco | Avversario necessario | Contromisura Tor | Efficacia contromisura |
-|---------|----------------------|-----------------|----------------------|
-| Sybil | Risorse per ~100+ relay | Monitoring DA, family, /16 rule | Media |
-| Relay Early Tagging | Controllo di relay middle+exit | Counting RELAY_EARLY, conversione | Alta |
-| Correlazione end-to-end | Osservazione di ingresso+uscita | Padding (limitato) | Bassa |
-| Website Fingerprinting | Osservazione locale (ISP) | Circuit padding (in sviluppo) | Media |
-| HSDir Enumeration | Controllo di HSDir relay | v3 descriptor cifrati, rotazione | Alta |
-| DoS su relay | Bandwidth per DDoS | PoW, rate limiting | Media |
-| Browser exploit | 0-day nel browser | Aggiornamenti, Security Level | Media |
-| Supply chain | Accesso al build system | Reproducible builds, GPG | Alta |
+| Attacco | Avversario necessario | Contromisura Tor | Efficacia contromisura | Anno scoperta |
+|---------|----------------------|-----------------|----------------------|--------------|
+| Sybil | Risorse per ~100+ relay | Monitoring DA, family, /16 rule | Media | 2014 |
+| Relay Early Tagging | Controllo di relay middle+exit | Counting RELAY_EARLY, conversione | Alta | 2014 |
+| Correlazione end-to-end | Osservazione di ingresso+uscita | Padding (limitato) | Bassa | 2004 |
+| Website Fingerprinting | Osservazione locale (ISP) | Circuit padding (in sviluppo) | Media | 2011 |
+| HSDir Enumeration | Controllo di HSDir relay | v3 descriptor cifrati, rotazione | Alta | 2016 |
+| DoS su relay | Bandwidth per DDoS | PoW, rate limiting | Media | 2021 |
+| Browser exploit | 0-day nel browser | Aggiornamenti, Security Level | Media | 2013 |
+| Supply chain | Accesso al build system | Reproducible builds, GPG | Alta | — |
+| BGP routing | Controllo di AS/IXP | Guard persistente, diversità AS | Bassa | 2015 |
+| Sniper attack | Circuito malevolo | Flow control, OOM handler | Alta | 2014 |
+| HS enumeration | Relay HSDir | Onion Services v3 | Alta | 2016 |
+
+---
+
+## Cronologia delle contromisure Tor
+
+```
+2012  Guard persistente (riduce esposizione a relay malevoli)
+2014  Counting RELAY_EARLY (anti-tagging)
+2014  Rimozione relay CMU/FBI
+2015  Miglioramento selezione Guard (path bias tracking)
+2017  Onion Services v3 (descriptor cifrati, blinded keys)
+2018  Connection padding (celle dummy tra relay)
+2019  Vanguards per onion services
+2020  Circuit padding framework
+2021  Rimozione relay KAX17
+2021  Vanguards-lite (default per tutti gli HS)
+2022  Congestion control (Prop #324)
+2023  Proof-of-Work per onion services (anti-DoS)
+2024  Continuazione rimozione relay malevoli
+```
 
 ---
 
@@ -250,11 +821,36 @@ backdoor nel software distribuito.
 
 Nessun sistema è invulnerabile. Tor offre protezione significativa contro la
 sorveglianza di massa e gli avversari locali, ma ha limiti documentati contro
-avversari con risorse significative (agenzie di intelligence, ISP collaboranti).
+avversari con risorse significative.
 
-Per il mio caso d'uso (privacy dall'ISP, test di sicurezza), le protezioni di
-Tor sono più che sufficienti. L'avversario più probabile (ISP, tracker web) non
-ha le risorse per gli attacchi descritti sopra.
+### Per il mio caso d'uso
 
-Per scenari ad alto rischio (giornalismo in regime autoritario, whistleblowing),
-le contromisure aggiuntive (Tails, Whonix, OPSEC rigoroso) sono necessarie.
+Per privacy dall'ISP e test di sicurezza, le protezioni di Tor sono più che
+sufficienti. L'avversario più probabile (ISP, tracker web) non ha le risorse
+per gli attacchi descritti sopra.
+
+### Per scenari ad alto rischio
+
+Per giornalismo in regimi autoritari, whistleblowing, o attivismo, le
+contromisure aggiuntive sono necessarie:
+- Tails o Whonix (protezione da exploit del browser)
+- OPSEC rigoroso (la tecnologia non compensa errori umani)
+- Tor Browser a livello Safest (no JavaScript)
+- Bridge obfs4 o Snowflake (nascondere uso di Tor)
+- Aggiornamenti immediati (patch di sicurezza)
+
+La lezione più importante dalla storia degli attacchi: **nella maggioranza dei
+casi, la deanonimizzazione avviene per errori OPSEC, non per vulnerabilità
+tecniche di Tor**.
+
+---
+
+## Vedi anche
+
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Correlazione end-to-end, website fingerprinting
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Errori umani che causano deanonimizzazione
+- [Limitazioni del Protocollo](limitazioni-protocollo.md) — Limiti architetturali di Tor
+- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) — Protezioni v3 contro HSDir attacks
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Selezione persistente come difesa
+- [Bridges e Pluggable Transports](../03-nodi-e-rete/bridges-e-pluggable-transports.md) — Difesa da censura e DPI
+- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Whonix/Tails come difesa da exploit
