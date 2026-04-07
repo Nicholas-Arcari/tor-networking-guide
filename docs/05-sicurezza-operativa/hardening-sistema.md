@@ -566,3 +566,13 @@ da Tor, eseguo il lavoro, poi lo rimuovo.
 Il consiglio: partire dalle basi (IPv6, DNS, WebRTC) e aggiungere hardening
 progressivamente. Ogni misura aggiuntiva ha un costo in usabilità — trovare il
 proprio equilibrio è parte del processo.
+
+---
+
+## Vedi anche
+
+- [DNS Leak](dns-leak.md) — Prevenzione DNS leak con firewall
+- [Isolamento e Compartimentazione](isolamento-e-compartimentazione.md) — Whonix, Tails, network namespaces
+- [Transparent Proxy](../06-configurazioni-avanzate/transparent-proxy.md) — iptables/nftables per Tor system-wide
+- [OPSEC e Errori Comuni](opsec-e-errori-comuni.md) — Hardening come parte dell'OPSEC
+- [Analisi Forense e Artefatti](analisi-forense-e-artefatti.md) — Ridurre artefatti con hardening
