@@ -9,6 +9,17 @@ Non ho configurato un onion service nel mio setup, ma la comprensione del loro
 funzionamento è fondamentale per capire l'architettura Tor nella sua interezza.
 
 ---
+---
+
+## Indice
+
+- [Cos'è un Onion Service](#cosè-un-onion-service)
+- [Architettura di un Onion Service](#architettura-di-un-onion-service)
+- [Crittografia degli Onion Services v3](#crittografia-degli-onion-services-v3)
+- [Configurazione di un Onion Service](#configurazione-di-un-onion-service)
+- [Sicurezza degli Onion Services](#sicurezza-degli-onion-services)
+- [Onion Services e il mondo reale](#onion-services-e-il-mondo-reale)
+
 
 ## Cos'è un Onion Service
 
@@ -238,6 +249,30 @@ echo "abc123...xyz:descriptor:x25519:CHIAVE_BASE32" > /var/lib/tor/onion_auth/se
 
 ---
 
+
+### Diagramma: connessione a un Onion Service
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant IP as Introduction Point
+    participant HS as Hidden Service
+    participant RP as Rendezvous Point
+
+    HS->>IP: Circuito Tor + ESTABLISH_INTRO
+    Note over HS,IP: HS registra 3-6 Introduction Points
+    C->>RP: Circuito Tor + ESTABLISH_RENDEZVOUS
+    C->>IP: INTRODUCE1 (contiene RP + cookie)
+    IP->>HS: INTRODUCE2 (inoltro cifrato)
+    HS->>RP: Circuito Tor + RENDEZVOUS1 (cookie)
+    RP-->>C: RENDEZVOUS2 (connessione stabilita)
+    Note over C,HS: Comunicazione E2E attraverso il Rendezvous Point
+    C->>RP: Dati cifrati E2E
+    RP->>HS: Inoltro dati
+    HS-->>RP: Risposta cifrata E2E
+    RP-->>C: Inoltro risposta
+```
+
 ## Sicurezza degli Onion Services
 
 ### Cosa protegge
@@ -302,3 +337,13 @@ A causa del numero di hop elevato (fino a 7), le connessioni .onion sono:
 
 La latenza tipica per una connessione .onion è 2-10 secondi per il setup iniziale,
 poi il throughput dipende dal nodo più lento nella catena.
+
+---
+
+## Vedi anche
+
+- [Circuiti, Crittografia e Celle](../01-fondamenti/circuiti-crittografia-e-celle.md) — Celle e crittografia nei circuiti HS
+- [Tor e Localhost](../06-configurazioni-avanzate/tor-e-localhost.md) — Onion service per servizi locali
+- [Comunicazione Sicura](../09-scenari-operativi/comunicazione-sicura.md) — Onion service per comunicazione anonima
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — HSDir enumeration, DoS su HS
+- [Guard Nodes](guard-nodes.md) — Vanguards per protezione HS
