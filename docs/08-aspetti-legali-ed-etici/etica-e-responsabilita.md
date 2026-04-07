@@ -682,3 +682,12 @@ Se vuoi approfondire gli aspetti legali specifici per l'Italia, vedi
 node, vedi [exit-nodes.md](../03-nodi-e-rete/exit-nodes.md). Per gli
 errori di OPSEC che possono deanonimizzarti, vedi
 [opsec-e-errori-comuni.md](../05-sicurezza-operativa/opsec-e-errori-comuni.md).
+
+---
+
+## Vedi anche
+
+- [Aspetti Legali](aspetti-legali.md) — Quadro legale Italia/UE, precedenti giuridici
+- [Exit Nodes](../03-nodi-e-rete/exit-nodes.md) — Responsabilità dell'operatore exit
+- [Bridges e Pluggable Transports](../03-nodi-e-rete/bridges-e-pluggable-transports.md) — Contribuire alla rete anti-censura
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Uso responsabile e consapevole
