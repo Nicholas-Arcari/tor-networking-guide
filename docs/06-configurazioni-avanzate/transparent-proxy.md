@@ -90,6 +90,29 @@ Kernel flow:
 [Tor: RELAY_BEGIN "93.184.216.34:443" via circuito]
 ```
 
+### Diagramma: flusso netfilter/iptables
+
+```mermaid
+flowchart TD
+    A[Applicazione: connect 93.184.216.34:443] --> B{netfilter<br/>OUTPUT chain}
+    B -->|owner = debian-tor| C[ACCEPT — traffico Tor<br/>esce direttamente]
+    B -->|owner ≠ debian-tor<br/>TCP SYN| D[REDIRECT → 127.0.0.1:9040]
+    B -->|UDP porta 53| E[REDIRECT → 127.0.0.1:5353<br/>DNSPort Tor]
+    B -->|altro UDP| F[DROP — blocca leak]
+
+    D --> G[conntrack salva<br/>dst originale]
+    G --> H[TransPort Tor :9040]
+    H --> I[getsockopt SO_ORIGINAL_DST<br/>→ 93.184.216.34:443]
+    I --> J[RELAY_BEGIN via circuito Tor]
+    J --> K[Exit Node → Server destinazione]
+
+    E --> L[Tor risolve DNS<br/>via circuito]
+
+    style F fill:#f66,color:#fff
+    style C fill:#6b6,color:#fff
+    style K fill:#6b6,color:#fff
+```
+
 ### Differenza con SocksPort
 
 | Aspetto | SocksPort | TransPort |
@@ -774,3 +797,13 @@ dopo un'esperienza negativa: avevo attivato il transparent proxy senza verificar
 che Tor avesse completato il bootstrap. Risultato: nessuna connettività per 2
 minuti, il tempo che Tor finisse il bootstrap. Ora lo script verifica tutto prima
 di attivare le regole.
+
+---
+
+## Vedi anche
+
+- [VPN e Tor Ibrido](vpn-e-tor-ibrido.md) — TransPort come alternativa quasi-VPN
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — Prevenzione DNS leak con TransPort
+- [Multi-Istanza e Stream Isolation](multi-istanza-e-stream-isolation.md) — Isolamento circuiti
+- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) — nftables e regole firewall
+- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Namespace e container come alternative
