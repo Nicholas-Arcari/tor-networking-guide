@@ -1,0 +1,98 @@
+# Validazione automatica documentazione e script
+# Esegue validate-docs.sh, shellcheck, verifica permessi su ogni push e pull request
+name: Valida documentazione
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-docs:
+    name: Struttura documentazione
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Valida struttura documentazione
+        run: bash tests/validate-docs.sh
+
+  shellcheck:
+    name: Lint script Bash
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Installa ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: ShellCheck su script e test
+        run: |
+          echo "=== Script ==="
+          for f in scripts/*.example; do
+            # Controlla solo file con shebang bash
+            if head -1 "$f" | grep -q "bash"; then
+              echo "Checking $f..."
+              shellcheck -s bash -S warning "$f" || true
+            fi
+          done
+
+          echo ""
+          echo "=== Test ==="
+          shellcheck -s bash -S warning tests/validate-docs.sh
+          shellcheck -s bash -S warning tests/smoke-test-tor.sh
+
+          echo ""
+          echo "=== setup.sh ==="
+          shellcheck -s bash -S warning setup.sh
+
+  verify-permissions:
+    name: Verifica permessi eseguibili
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verifica bit eseguibile
+        run: |
+          FAIL=0
+          for f in setup.sh tests/validate-docs.sh tests/smoke-test-tor.sh; do
+            if [ -x "$f" ]; then
+              echo "OK: $f è eseguibile"
+            else
+              echo "ERRORE: $f non è eseguibile"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+  check-links:
+    name: Verifica link interni
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verifica cross-reference tra documenti
+        run: |
+          BROKEN=0
+          for doc in $(find docs -name '*.md'); do
+            dir=$(dirname "$doc")
+            grep -oP '\]\(\K[^)]+\.md' "$doc" 2>/dev/null | while read -r link; do
+              # Ignora URL http
+              case "$link" in http*) continue ;; esac
+              resolved=$(cd "$dir" && realpath -m "$link" 2>/dev/null || echo "")
+              if [ -n "$resolved" ] && [ ! -f "$resolved" ]; then
+                echo "ROTTO: $doc -> $link"
+                BROKEN=1
+              fi
+            done
+          done
+          if [ "$BROKEN" -eq 0 ]; then
+            echo "Tutti i link interni sono validi."
+          else
+            exit 1
+          fi
