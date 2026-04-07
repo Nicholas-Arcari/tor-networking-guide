@@ -1,0 +1,27 @@
+# Editor e OS
+*.swp
+*.swo
+*~
+*.bak
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Credenziali e file sensibili
+.env
+*.key
+*.pem
+credentials.json
+
+# Log
+*.log
+
+# File temporanei di test
+/tmp/
+*.pcap
