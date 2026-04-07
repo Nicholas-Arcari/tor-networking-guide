@@ -8,6 +8,16 @@ Basato sulla mia esperienza nel verificare l'IP di uscita, nel confrontare l'IP 
 (Parma, Italia) con l'IP Tor, e nel diagnosticare problemi di leak.
 
 ---
+---
+
+## Indice
+
+- [Verifica dell'IP — Metodi completi](#verifica-dellip-metodi-completi)
+- [Test DNS Leak](#test-dns-leak)
+- [Verifica delle porte in ascolto](#verifica-delle-porte-in-ascolto)
+- [Tipi di leak e come prevenirli](#tipi-di-leak-e-come-prevenirli)
+- [Nella mia esperienza](#nella-mia-esperienza)
+
 
 ## Verifica dell'IP — Metodi completi
 
@@ -276,3 +286,30 @@ IsTor:    true
 L'IP via Tor è sempre diverso dal mio IP reale, in un paese diverso, con un
 operatore diverso. Questo conferma che il traffico passa correttamente attraverso
 la rete Tor.
+
+---
+
+## Vedi anche
+
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — Analisi approfondita dei DNS leak
+- [ProxyChains — Guida Completa](proxychains-guida-completa.md) — Configurazione proxy_dns
+- [Tor e DNS — Risoluzione](tor-e-dns-risoluzione.md) — DNSPort e risoluzione via Tor
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — WebRTC leak e fingerprint
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Leak come errore OPSEC
+
+---
+
+## Cheat Sheet — Verifica rapida
+
+| Test | Comando |
+|------|---------|
+| IP via Tor | `curl --socks5-hostname 127.0.0.1:9050 -s https://api.ipify.org` |
+| IsTor check | `curl --socks5-hostname 127.0.0.1:9050 -s https://check.torproject.org/api/ip` |
+| DNS leak (tcpdump) | `sudo tcpdump -i eth0 port 53 -n` |
+| IP con proxychains | `proxychains curl -s https://api.ipify.org` |
+| WebRTC check | Visitare `https://browserleaks.com/webrtc` via Tor |
+| IPv6 check | `curl --socks5-hostname 127.0.0.1:9050 -s https://api6.ipify.org` (deve fallire) |
+| Bootstrap | `sudo journalctl -u tor@default.service \| grep "Bootstrapped 100%"` |
+| Porte Tor | `ss -tlnp \| grep -E '905[01]\|5353'` |
+| tor-resolve | `tor-resolve example.com` |
+| DNS via Tor | `proxychains dig example.com` |
