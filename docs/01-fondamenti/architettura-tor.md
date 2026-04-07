@@ -10,6 +10,20 @@ Include note dalla mia esperienza diretta nell'uso di Tor su Kali Linux (Debian)
 proxychains, ControlPort, bridge obfs4 e script personalizzati.
 
 ---
+---
+
+## Indice
+
+- [Visione d'insieme: cosa succede quando lanci Tor](#visione-dinsieme-cosa-succede-quando-lanci-tor)
+- [I componenti dell'architettura Tor](#i-componenti-dellarchitettura-tor)
+- [Come Tor costruisce un circuito — Dettaglio protocollo](#come-tor-costruisce-un-circuito-dettaglio-protocollo)
+- [Celle Tor — L'unità di trasporto](#celle-tor-lunità-di-trasporto)
+- [Connessioni TLS tra relay](#connessioni-tls-tra-relay)
+- [Stream Isolation — Separazione del traffico](#stream-isolation-separazione-del-traffico)
+- [Il ciclo di vita di un circuito](#il-ciclo-di-vita-di-un-circuito)
+- [Architettura di sicurezza — Il modello di minaccia di Tor](#architettura-di-sicurezza-il-modello-di-minaccia-di-tor)
+- [Riepilogo dell'architettura](#riepilogo-dellarchitettura)
+
 
 ## Visione d'insieme: cosa succede quando lanci Tor
 
@@ -531,6 +545,40 @@ Per anonimato massimo: Tor Browser (o Whonix/Tails).
 
 ---
 
+
+### Diagramma: flusso di un circuito Tor
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant G as Guard Node
+    participant M as Middle Relay
+    participant E as Exit Node
+    participant S as Server
+
+    C->>G: TLS + CREATE2 (ntor handshake)
+    G-->>C: CREATED2 (shared key K1)
+    C->>G: RELAY_EARLY{EXTEND2 → M}
+    G->>M: CREATE2 (ntor handshake)
+    M-->>G: CREATED2 (shared key K2)
+    G-->>C: RELAY{EXTENDED2}
+    C->>G: RELAY_EARLY{EXTEND2 → E}
+    G->>M: RELAY{EXTEND2 → E}
+    M->>E: CREATE2 (ntor handshake)
+    E-->>M: CREATED2 (shared key K3)
+    M-->>G: RELAY{EXTENDED2}
+    G-->>C: RELAY{EXTENDED2}
+    Note over C,E: Circuito stabilito: 3 chiavi simmetriche
+    C->>G: E(K1, E(K2, E(K3, RELAY_BEGIN)))
+    G->>M: E(K2, E(K3, RELAY_BEGIN))
+    M->>E: E(K3, RELAY_BEGIN)
+    E->>S: TCP connection
+    S-->>E: HTTP response
+    E-->>M: E(K3, RELAY_DATA)
+    M-->>G: E(K2, E(K3, RELAY_DATA))
+    G-->>C: E(K1, E(K2, E(K3, RELAY_DATA)))
+```
+
 ## Riepilogo dell'architettura
 
 ```
@@ -563,3 +611,13 @@ Per anonimato massimo: Tor Browser (o Whonix/Tails).
 Questa architettura garantisce che **nessun singolo nodo conosca contemporaneamente
 origine e destinazione del traffico**. Il Guard conosce il client ma non la destinazione.
 L'Exit conosce la destinazione ma non il client. Il Middle non conosce nessuno dei due.
+
+---
+
+## Vedi anche
+
+- [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md) — Celle 514 byte, crittografia strato per strato
+- [Consenso e Directory Authorities](consenso-e-directory-authorities.md) — Votazione, flag, selezione relay
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Primo hop del circuito, persistenza
+- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione di tutte le componenti
+- [Limitazioni del Protocollo](../07-limitazioni-e-attacchi/limitazioni-protocollo.md) — TCP-only, latenza, bandwidth
