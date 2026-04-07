@@ -8,6 +8,22 @@ Include osservazioni dalla mia esperienza pratica nell'analisi dei circuiti tram
 ControlPort, Nyx e log di debug.
 
 ---
+---
+
+## Indice
+
+- [Gerarchia del protocollo Tor](#gerarchia-del-protocollo-tor)
+- [Celle — L'unità atomica del protocollo Tor](#celle-lunità-atomica-del-protocollo-tor)
+- [Celle RELAY — Il cuore del trasporto dati](#celle-relay-il-cuore-del-trasporto-dati)
+- [Crittografia dei circuiti — Strato per strato](#crittografia-dei-circuiti-strato-per-strato)
+- [Flow Control — SENDME cells](#flow-control-sendme-cells)
+- [Handshake ntor — Dettaglio crittografico](#handshake-ntor-dettaglio-crittografico)
+- [Apertura di uno stream — RELAY_BEGIN → RELAY_CONNECTED](#apertura-di-uno-stream-relaybegin-relayconnected)
+- [Padding e resistenza alla traffic analysis](#padding-e-resistenza-alla-traffic-analysis)
+- [Distruzione di un circuito](#distruzione-di-un-circuito)
+- [Osservare i circuiti nella pratica](#osservare-i-circuiti-nella-pratica)
+- [Riepilogo delle garanzie crittografiche](#riepilogo-delle-garanzie-crittografiche)
+
 
 ## Gerarchia del protocollo Tor
 
@@ -552,3 +568,13 @@ nyx
 | Anti traffic analysis (parziale) | Celle fisse 514 byte + padding | Dimensione costante, padding configurabile |
 | Non-correlazione CircID | CircID locali per connessione | Non correlabili tra hop diversi |
 | Limiti di estensione | RELAY_EARLY counter (max 8) | Previene circuiti eccessivamente lunghi |
+
+---
+
+## Vedi anche
+
+- [Architettura di Tor](architettura-tor.md) — Visione d'insieme dei componenti
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Primo hop, handshake ntor
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Osservare circuiti attivi
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Attacchi ai circuiti e padding
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Relay early tagging, correlazione
