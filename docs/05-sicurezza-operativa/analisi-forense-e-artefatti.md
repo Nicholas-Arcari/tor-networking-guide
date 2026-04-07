@@ -542,3 +542,13 @@ avrebbe trovato.
 Per uno scenario dove l'evidenza di uso di Tor è un problema (giornalisti in
 paesi ostili, attivisti), la risposta è Tails: nessun artefatto su disco, tutto
 in RAM, shutdown = cancellazione totale.
+
+---
+
+## Vedi anche
+
+- [OPSEC e Errori Comuni](opsec-e-errori-comuni.md) — Errori che lasciano tracce forensi
+- [Hardening di Sistema](hardening-sistema.md) — Ridurre la superficie forense con sysctl e AppArmor
+- [Isolamento e Compartimentazione](isolamento-e-compartimentazione.md) — Tails, Whonix, Qubes per amnesia
+- [DNS Leak](dns-leak.md) — Artefatti DNS nei log di sistema
+- [Tor Browser e Applicazioni](../04-strumenti-operativi/tor-browser-e-applicazioni.md) — Artefatti browser
