@@ -8,6 +8,17 @@ Basato sulla mia esperienza diretta nella creazione dello script `newnym`,
 nel debug dell'autenticazione cookie, e nell'uso quotidiano della rotazione IP.
 
 ---
+---
+
+## Indice
+
+- [Il protocollo ControlPort](#il-protocollo-controlport)
+- [SIGNAL NEWNYM — Rotazione IP](#signal-newnym-rotazione-ip)
+- [Comandi del ControlPort — Catalogo completo](#comandi-del-controlport-catalogo-completo)
+- [Automazione con Python Stem](#automazione-con-python-stem)
+- [Script avanzati](#script-avanzati)
+- [Sicurezza del ControlPort](#sicurezza-del-controlport)
+
 
 ## Il protocollo ControlPort
 
@@ -68,6 +79,35 @@ pkill -KILL -u $USER   # riavvio sessione
 ```
 
 Dopo il re-login, il cookie era leggibile e il mio script funzionava.
+
+### Diagramma: protocollo ControlPort e NEWNYM
+
+```mermaid
+sequenceDiagram
+    participant Script
+    participant CP as ControlPort (9051)
+    participant Tor as Tor daemon
+
+    Script->>CP: TCP connect 127.0.0.1:9051
+    CP-->>Script: 250 OK (banner)
+    Script->>CP: AUTHENTICATE <cookie_hex>
+    CP->>Tor: Verifica cookie
+    Tor-->>CP: Cookie valido
+    CP-->>Script: 250 OK
+
+    Note over Script,Tor: Autenticato — ora può inviare comandi
+
+    Script->>CP: SIGNAL NEWNYM
+    CP->>Tor: Invalida circuiti esistenti
+    Tor->>Tor: Marca circuiti come "dirty"<br/>Costruisce nuovi circuiti
+    CP-->>Script: 250 OK
+
+    Script->>CP: GETINFO circuit-status
+    CP-->>Script: 250+circuit-status=<br/>ID BUILT Guard,Middle,Exit
+
+    Script->>CP: QUIT
+    CP-->>Script: 250 closing connection
+```
 
 ---
 
@@ -358,3 +398,35 @@ Il ControlPort permette di:
 2. **Cookie authentication**: il cookie è leggibile solo da debian-tor
 3. **Non esporre MAI il ControlPort su rete**: `ControlListenAddress 127.0.0.1`
 4. **Permessi del cookie**: `chmod 640 /run/tor/control.authcookie`
+
+---
+
+## Vedi anche
+
+- [Nyx e Monitoraggio](nyx-e-monitoraggio.md) — Visualizzare circuiti in tempo reale
+- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione ControlPort
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — NEWNYM per istanza
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Perché NEWNYM non cambia il Guard
+- [Incident Response](../09-scenari-operativi/incident-response.md) — NEWNYM come recovery dopo leak
+
+---
+
+## Cheat Sheet — Comandi ControlPort
+
+| Comando ControlPort | Descrizione |
+|--------------------|-------------|
+| `AUTHENTICATE "password"` | Autenticazione con password |
+| `AUTHENTICATE <cookie_hex>` | Autenticazione con cookie |
+| `SIGNAL NEWNYM` | Nuova identità (nuovi circuiti) |
+| `SIGNAL RELOAD` | Ricarica torrc |
+| `SIGNAL SHUTDOWN` | Shutdown pulito |
+| `GETINFO version` | Versione di Tor |
+| `GETINFO circuit-status` | Lista circuiti attivi |
+| `GETINFO stream-status` | Lista stream attivi |
+| `GETINFO address` | IP esterno rilevato |
+| `GETINFO traffic/read` | Byte letti totali |
+| `GETINFO traffic/written` | Byte scritti totali |
+| `GETINFO ns/all` | Tutti i relay nel consenso |
+| `SETCONF MaxCircuitDirtiness=1800` | Modifica runtime del torrc |
+| `CLOSECIRCUIT <id>` | Chiudi un circuito specifico |
+| `EXTENDCIRCUIT 0` | Crea un nuovo circuito |
