@@ -390,3 +390,12 @@ SASL auth e richiedere un'eccezione. Alternativa: usare il .onion di OFTC.
 Il takeaway: Tor è ottimo per proteggere l'IP del mittente, ma non è sufficiente
 da solo. Serve crittografia E2E per il contenuto, OPSEC rigorosa per i metadati,
 e separazione delle identità per prevenire correlazione.
+
+---
+
+## Vedi anche
+
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Errori nella comunicazione anonima
+- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) — Protocollo rendezvous per servizi nascosti
+- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Tails per comunicazione ad alto rischio
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — Rischi di fingerprinting nelle comunicazioni
