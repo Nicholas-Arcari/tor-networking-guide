@@ -8,6 +8,17 @@ Basato sulla mia esperienza diretta con `proxychains4` su Kali Linux, dove lo us
 quotidianamente per instradare `curl`, `firefox` e altri strumenti attraverso Tor.
 
 ---
+---
+
+## Indice
+
+- [Cos'è ProxyChains e come funziona internamente](#cosè-proxychains-e-come-funziona-internamente)
+- [Il file di configurazione — Analisi completa](#il-file-di-configurazione-analisi-completa)
+- [Uso pratico — Comandi quotidiani](#uso-pratico-comandi-quotidiani)
+- [Debugging di ProxyChains](#debugging-di-proxychains)
+- [ProxyChains vs alternative](#proxychains-vs-alternative)
+- [La mia configurazione proxychains4.conf](#la-mia-configurazione-proxychains4conf)
+
 
 ## Cos'è ProxyChains e come funziona internamente
 
@@ -36,6 +47,30 @@ Quando esegui `proxychains curl https://example.com`:
 4. ProxyChains apre una connessione SOCKS5 verso `127.0.0.1:9050`
 5. Invia il comando SOCKS5 CONNECT con la destinazione originale
 6. Tor riceve la richiesta SOCKS5 e la instrada attraverso il circuito
+
+### Diagramma: flusso LD_PRELOAD
+
+```mermaid
+sequenceDiagram
+    participant App as Applicazione (curl)
+    participant PC as libproxychains.so
+    participant Tor as Tor SOCKS5 (9050)
+    participant Net as Rete Tor
+
+    App->>PC: connect("93.184.216.34", 443)
+    Note over PC: LD_PRELOAD intercetta<br/>la syscall connect()
+    PC->>Tor: SOCKS5 CONNECT 93.184.216.34:443
+    Tor->>Net: RELAY_BEGIN via circuito
+    Net-->>Tor: RELAY_CONNECTED
+    Tor-->>PC: SOCKS5 reply: success
+    PC-->>App: connect() returns 0 (successo)
+    App->>PC: send(HTTP request)
+    PC->>Tor: forward dati
+    Tor->>Net: RELAY_DATA via circuito
+    Net-->>Tor: RELAY_DATA (risposta)
+    Tor-->>PC: forward risposta
+    PC-->>App: recv(HTTP response)
+```
 
 ### Cosa significa nella pratica
 
@@ -383,3 +418,29 @@ Questa configurazione:
 - Previene DNS leak (proxy_dns)
 - Ha timeout ragionevoli per Tor
 - Usa Tor come unico proxy SOCKS5
+
+---
+
+## Vedi anche
+
+- [torsocks](torsocks.md) — Alternativa a proxychains con blocco UDP
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — proxy_dns e prevenzione leak
+- [Tor Browser e Applicazioni](tor-browser-e-applicazioni.md) — Matrice compatibilità applicazioni
+- [Verifica IP, DNS e Leak](verifica-ip-dns-e-leak.md) — Test dopo configurazione proxychains
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Cosa funziona con proxychains
+
+---
+
+## Cheat Sheet — Comandi rapidi ProxyChains
+
+| Comando | Descrizione |
+|---------|-------------|
+| `proxychains curl -s https://api.ipify.org` | Verifica IP via Tor |
+| `proxychains curl --socks5-hostname 127.0.0.1:9050 URL` | curl diretto via SOCKS5 |
+| `proxychains firefox -no-remote -P tor-proxy` | Firefox con profilo Tor |
+| `proxychains nmap -sT -Pn -p 80,443 target` | Port scan TCP via Tor |
+| `proxychains git clone https://url` | Git clone anonimo |
+| `proxychains ssh user@host` | SSH via Tor |
+| `proxychains wget https://url` | Download via Tor |
+| `proxychains pip install pkg` | pip via Tor |
+| `PROXYCHAINS_CONF_FILE=/path proxychains cmd` | Config file custom |
