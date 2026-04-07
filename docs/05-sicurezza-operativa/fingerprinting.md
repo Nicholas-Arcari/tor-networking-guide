@@ -2,89 +2,269 @@
 
 Questo documento analizza tutti i vettori di fingerprinting che possono compromettere
 l'anonimato di un utente Tor: dal browser fingerprinting al TLS fingerprinting,
-passando per OS fingerprinting e tecniche di tracking avanzate.
+passando per OS fingerprinting, HTTP/2 fingerprinting, e tecniche di tracking avanzate
+senza cookie. Per ogni vettore, analizzo come funziona, quanta entropia contribuisce,
+e come Tor Browser lo mitiga rispetto al mio setup Firefox+proxychains.
 
 Basato sulla mia consapevolezza che il mio setup (Firefox+proxychains) NON protegge
 dal fingerprinting, a differenza di Tor Browser.
 
 ---
 
+## Indice
+
+- [Cos'è il fingerprinting](#cosè-il-fingerprinting)
+- [Browser Fingerprinting](#browser-fingerprinting)
+- [TLS Fingerprinting (JA3/JA4)](#tls-fingerprinting-ja3ja4)
+- [HTTP/2 Fingerprinting](#http2-fingerprinting)
+- [OS Fingerprinting](#os-fingerprinting)
+- [Tracking avanzato senza cookie](#tracking-avanzato-senza-cookie)
+- [Server-side fingerprinting](#server-side-fingerprinting)
+- [Fingerprinting attivo vs passivo](#fingerprinting-attivo-vs-passivo)
+- [Il mio livello di protezione reale](#il-mio-livello-di-protezione-reale)
+- [Strumenti di verifica](#strumenti-di-verifica)
+- [Configurazioni per ridurre il fingerprinting](#configurazioni-per-ridurre-il-fingerprinting)
+- [Nella mia esperienza](#nella-mia-esperienza)
+
+---
+
+## Cos'è il fingerprinting
+
+Il fingerprinting è una tecnica che identifica univocamente un browser (e quindi
+un utente) basandosi sulle sue caratteristiche tecniche, **senza usare cookie,
+localStorage o alcun meccanismo di storage esplicito**.
+
+### Perché è efficace
+
+```
+Entropia necessaria per identificare una persona:
+  - Popolazione mondiale: 8 miliardi → 33 bit di entropia
+  - Utenti internet: 5 miliardi → 32.2 bit
+  - Utenti Tor: ~2-4 milioni → 21-22 bit
+
+Un browser fingerprint tipico: 50-70 bit di entropia
+→ Più che sufficienti per identificare UNIVOCAMENTE
+  qualsiasi persona sulla Terra
+
+Il problema: ogni "scelta" del browser aggiunge entropia
+  - OS: Linux → ~2% degli utenti web → 5.6 bit
+  - Lingua: it-IT → ~2% → 5.6 bit
+  - Timezone: CET → ~3% → 5 bit
+  - Font installati: combinazione unica → 8-12 bit
+  - Canvas: rendering unico → 8-10 bit
+  Totale parziale: già ~30 bit con 5 caratteristiche
+```
+
+### Due approcci al fingerprinting
+
+```
+1. Rendere il fingerprint UNICO (il problema):
+   Ogni browser ha caratteristiche diverse
+   → Identificazione univoca possibile
+   → Tracking persistente senza cookie
+
+2. Rendere il fingerprint UNIFORME (la soluzione Tor Browser):
+   Tutti gli utenti Tor Browser hanno lo STESSO fingerprint
+   → L'utente si "nasconde nella folla"
+   → Il fingerprint identifica "utente Tor Browser" ma non QUALE utente
+```
+
+---
+
 ## Browser Fingerprinting
-
-### Cos'è
-
-Il browser fingerprinting è una tecnica che identifica univocamente un browser
-basandosi sulle sue caratteristiche tecniche, senza usare cookie o storage.
 
 ### Vettori principali
 
 **1. User-Agent**
-```
-Firefox normale:  Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
-Tor Browser:      Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0
-```
-Tor Browser si maschera come Windows anche su Linux, per essere indistinguibile
-dagli altri utenti Tor Browser su Windows.
 
-Il mio Firefox su Kali rivela: Linux, x86_64, versione specifica → identificabile.
+```
+Firefox normale (il mio):
+  Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+  → Rivela: Linux, x86_64, Firefox 128
+  → Pool: ~0.1% degli utenti web
+
+Tor Browser:
+  Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0
+  → Si maschera come Windows anche su Linux
+  → Pool: tutti gli utenti Tor Browser (milioni)
+  → Indistinguibile dagli altri utenti TB
+
+Entropia: 10-12 bit
+```
 
 **2. Canvas Fingerprinting**
+
 Un sito può chiedere al browser di renderizzare un'immagine su un elemento `<canvas>`.
-Il risultato dipende da: GPU, driver, OS, font rendering engine. Due computer
-producono canvas diversi → fingerprint unico.
+Il risultato dipende da: GPU, driver, OS, font rendering engine, antialiasing.
 
 ```javascript
 // Il sito esegue:
 var canvas = document.createElement('canvas');
 var ctx = canvas.getContext('2d');
-ctx.fillText('Hello World', 0, 0);
+ctx.textBaseline = "top";
+ctx.font = "14px 'Arial'";
+ctx.fillStyle = "#f60";
+ctx.fillRect(125, 1, 62, 20);
+ctx.fillStyle = "#069";
+ctx.fillText("Cwm fjordbank", 2, 15);
 var hash = canvas.toDataURL().hashCode();
-// hash è unico per combinazione GPU+driver+OS
+// hash è UNICO per combinazione GPU+driver+OS+rendering
+
+// Due computer con la stessa GPU ma driver diversi
+// producono canvas DIVERSI → fingerprint unico
 ```
 
-Tor Browser: randomizza il canvas o chiede conferma.
-Il mio Firefox: non protegge.
+```
+Tor Browser: randomizza il canvas output o chiede conferma
+  → Ogni sessione produce un hash diverso → no tracking
+  → Prompt: "Questo sito vuole estrarre dati dal canvas. Permettere?"
+
+Il mio Firefox: nessuna protezione
+  → Il canvas hash è costante → tracking persistente
+
+Entropia: 8-10 bit
+```
 
 **3. WebGL Fingerprinting**
-Simile al canvas ma usa il rendering 3D. Rivela:
-- Modello GPU
+
+Simile al canvas ma usa il rendering 3D:
+
+```javascript
+var gl = canvas.getContext('webgl');
+var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+var vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+// vendor: "Intel Inc."
+// renderer: "Intel(R) UHD Graphics 630"
+// → Identifica esattamente la GPU
+```
+
+Informazioni rivelate:
+- Modello GPU esatto
 - Versione driver
-- Estensioni WebGL supportate
-- Performance characteristics
+- Estensioni WebGL supportate (lista unica per GPU)
+- Performance characteristics (timing del rendering)
+- Shader precision format
+
+```
+Tor Browser: WebGL disabilitato o spoofato
+Il mio Firefox: completamente esposto
+
+Entropia: 6-8 bit
+```
 
 **4. Font Fingerprinting**
-Il sito misura la dimensione di rendering di testo in font specifici. I font
-installati variano per OS e per utente → fingerprint unico.
+
+Il sito misura la dimensione di rendering di testo in centinaia di font:
+
+```javascript
+// Il sito crea un elemento <span> con testo di riferimento
+// Lo rende in un font di fallback (es. monospace)
+// Poi cambia il font a uno specifico (es. "Courier New")
+// Se le dimensioni cambiano → il font è installato
+// La LISTA dei font installati è un fingerprint
+
+// Font comuni su Linux (il mio caso):
+// DejaVu Sans, Liberation Mono, Cantarell, etc.
+// Font comuni su Windows:
+// Arial, Calibri, Cambria, Comic Sans, etc.
+// → La lista è diversa per OS → fingerprint unico
+```
+
+```
+Tor Browser: carica solo un set limitato di font bundled
+  → Tutti gli utenti TB hanno gli stessi font → no fingerprint
+Il mio Firefox: tutti i font di sistema sono visibili
+
+Entropia: 8-12 bit
+```
 
 **5. Audio Fingerprinting (AudioContext)**
-Il sito genera un segnale audio e lo elabora con AudioContext. Il risultato
-dipende dall'hardware audio → fingerprint.
+
+```javascript
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+var oscillator = audioCtx.createOscillator();
+var analyser = audioCtx.createAnalyser();
+var gain = audioCtx.createGain();
+
+oscillator.connect(analyser);
+analyser.connect(gain);
+gain.connect(audioCtx.destination);
+
+// L'output audio dipende dall'hardware audio
+// Il fingerprint è un hash dell'output elaborato
+// Diverso per ogni combinazione hardware/driver
+```
+
+```
+Tor Browser: AudioContext API neutralizzata
+Il mio Firefox: completamente esposto
+
+Entropia: 4-6 bit
+```
 
 **6. Dimensioni della finestra**
-La dimensione della finestra del browser (inclusa la differenza tra inner e outer)
-rivela: risoluzione dello schermo, barre degli strumenti, DPI scaling.
 
-Tor Browser: usa "letterboxing" (aggiunge bordi grigi) per arrotondare le
-dimensioni a multipli standard.
+```
+La dimensione della finestra del browser rivela:
+- Risoluzione dello schermo
+- Barre degli strumenti attive
+- DPI scaling
+- Numero di monitor (con window.screen)
+- Posizione della finestra
 
-### Entropia del fingerprint
+Tor Browser: "letterboxing" — aggiunge bordi grigi per arrotondare
+  Finestra reale: 1367 × 843
+  Riportata al sito: 1200 × 800 (multiplo di 200 × 100)
+  → Tutti gli utenti con finestre simili hanno lo stesso valore
 
-Ogni vettore contribuisce bit di entropia al fingerprint totale:
+Il mio Firefox: dimensioni reali esposte
 
-| Vettore | Bit di entropia (circa) |
-|---------|------------------------|
-| User-Agent | 10-12 bit |
-| Canvas | 8-10 bit |
-| WebGL | 6-8 bit |
-| Font | 8-12 bit |
-| Screen resolution | 4-6 bit |
-| Timezone | 3-5 bit |
-| Language | 3-4 bit |
-| Installed plugins | 4-8 bit |
-| **Totale** | **~50-70 bit** |
+Entropia: 4-6 bit
+```
 
-Con 33 bit di entropia si può identificare univocamente ogni persona sulla Terra.
-50-70 bit sono più che sufficienti per un fingerprint unico.
+**7. Navigator properties**
+
+```javascript
+navigator.hardwareConcurrency  // Numero di CPU logiche
+// Il mio: 8 → rivela classe di CPU
+// Tor Browser: sempre 2
+
+navigator.deviceMemory         // RAM in GB (approssimata)
+// Il mio: 16 → rivela classe di computer
+// Tor Browser: non esposta
+
+navigator.maxTouchPoints       // Touchscreen
+// Desktop: 0, Tablet: 5-10
+// Tor Browser: sempre 0
+
+navigator.languages            // Lingue preferite
+// Il mio: ["it-IT", "it", "en-US", "en"]
+// Tor Browser: ["en-US", "en"]
+
+navigator.platform             // Piattaforma
+// Il mio: "Linux x86_64"
+// Tor Browser: "Win32" (anche su Linux!)
+```
+
+### Entropia totale del fingerprint
+
+| Vettore | Bit di entropia (circa) | Tor Browser | Il mio Firefox |
+|---------|------------------------|-------------|----------------|
+| User-Agent | 10-12 bit | Uniforme | **Esposto** |
+| Canvas | 8-10 bit | Randomizzato | **Esposto** |
+| WebGL | 6-8 bit | Disabilitato | **Esposto** |
+| Font | 8-12 bit | Limitati | **Esposto** |
+| Screen/Window | 4-6 bit | Letterboxing | **Esposto** |
+| Timezone | 3-5 bit | UTC | **Esposto** (CET) |
+| Language | 3-4 bit | en-US | **Esposto** (it-IT) |
+| AudioContext | 4-6 bit | Neutralizzato | **Esposto** |
+| Plugins | 4-8 bit | Nessuno visibile | **Esposto** |
+| navigator.* | 4-6 bit | Valori fissi | **Esposto** |
+| **Totale** | **~55-80 bit** | **~5-8 bit** (uniforme) | **~55-80 bit** (unico) |
+
+Con Tor Browser: ~5-8 bit → "sei un utente Tor Browser" (milioni di persone).
+Con il mio Firefox: ~55-80 bit → "sei TU" (probabilmente unico al mondo).
 
 ---
 
@@ -92,46 +272,133 @@ Con 33 bit di entropia si può identificare univocamente ogni persona sulla Terr
 
 ### Come funziona
 
-Quando un browser apre una connessione HTTPS, invia un TLS ClientHello. Questo
-pacchetto contiene:
-- Versione TLS supportata
-- Cipher suite (lista di algoritmi crittografici)
-- Estensioni TLS
-- Gruppi di curva ellittica
-- Signature algorithms
-
-Ogni browser ha un ClientHello **unico**:
+Quando un browser apre una connessione HTTPS, invia un TLS ClientHello.
+Questo pacchetto contiene parametri unici per ogni browser:
 
 ```
-Firefox 128 (Linux): TLS 1.3, cipher_suites=[0x1301,0x1302,0x1303,...], extensions=[...]
-Chrome 120 (Windows): TLS 1.3, cipher_suites=[0x1301,0x1303,...], extensions=[...]
-Tor Browser: TLS 1.3, cipher_suites=[identico a Firefox ESR su Windows]
+TLS ClientHello contiene:
+- TLS version supportata
+- Cipher suites (lista ordinata di algoritmi crittografici)
+- Extensions TLS (lista ordinata)
+- Supported groups (curve ellittiche)
+- Signature algorithms
+- ALPN (protocolli applicativi: h2, http/1.1)
+- Key share groups
+
+Ogni browser ha un ClientHello UNICO:
+
+Firefox 128 (Linux):
+  TLS 1.3, cipher_suites=[0x1301,0x1302,0x1303,0xc02b,0xc02f,...],
+  extensions=[0x0000,0x0017,0x002b,...], groups=[x25519,secp256r1,...]
+
+Chrome 120 (Windows):
+  TLS 1.3, cipher_suites=[0x1301,0x1303,0xc02b,...],
+  extensions=[0x0000,0x0017,...], groups=[x25519,secp256r1,secp384r1,...]
+
+Tor Browser:
+  TLS 1.3, cipher_suites=[identico a Firefox ESR su Windows]
+  → Coerente con il user-agent dichiarato
 ```
 
 ### JA3 Hash
 
-JA3 è un metodo per calcolare un hash del TLS ClientHello:
-
 ```
-JA3 = MD5(TLSVersion + Ciphers + Extensions + EllipticCurves + EllipticCurveFormats)
-```
+JA3 = MD5(
+    TLSVersion,
+    Ciphers (lista ordinata),
+    Extensions (lista ordinata),
+    EllipticCurves,
+    EllipticCurveFormats
+)
 
-Questo hash identifica il client. Il JA3 di Tor Browser è noto e diverso da
-quello di Firefox normale → un server o un CDN può identificare utenti Tor Browser.
+Esempio:
+  JA3 del mio Firefox su Kali: e7d705a3286e19ea42f587b344ee6865
+  JA3 di Tor Browser: 839bbe3ed07fed922ded5aaf714d6842
+  JA3 di Chrome su Windows: b32309a26951912be7dba376398abc3b
+
+→ Un server che calcola il JA3 può:
+  1. Identificare il tipo di browser
+  2. Verificare coerenza con il User-Agent dichiarato
+  3. Bloccare specifici browser/client
+```
 
 ### JA4 (successore di JA3)
 
-JA4 include più informazioni e usa SHA256. È più preciso ma il principio è lo stesso.
+```
+JA4 è più granulare:
+- Usa SHA256 (non MD5)
+- Include ALPN, signature algorithms
+- Formato leggibile: "t13d1517h2_8daaf6152771_b0da82dd1658"
+  t = TLS, 13 = versione, d = protocollo, 15 = cipher count,
+  17 = extension count, h2 = ALPN
+- Più preciso per fingerprinting
+```
 
 ### Implicazioni per il mio setup
 
-Il mio Firefox su Kali ha un JA3 diverso da Tor Browser:
-- JA3 specifico per Firefox su Linux
-- Diverso dalla popolazione di Tor Browser (che usa Firefox ESR su Windows)
-- Un server può distinguermi dagli utenti Tor Browser
+```
+Il mio Firefox su Kali:
+  JA3: specifico per Firefox su Linux
+  → Diverso dalla popolazione Tor Browser (Firefox ESR su Windows)
+  → Un server/CDN può distinguermi dagli utenti Tor Browser
 
-Non c'è mitigazione semplice per questo: la fingerprint TLS è determinata dal
-browser e dalla piattaforma.
+Il problema della coerenza:
+  User-Agent: "Linux x86_64" (se non spoofato)
+  JA3: Firefox su Linux
+  → Coerente, ma identifica come "Firefox Linux" non "Tor Browser"
+
+Con resistFingerprinting:
+  User-Agent: spoofato a "Windows NT 10.0" (parziale)
+  JA3: resta Firefox Linux (non spoofabile a livello browser)
+  → INCOERENZA: User-Agent dice Windows, JA3 dice Linux
+  → Più sospetto che senza spoofing!
+```
+
+Non c'è mitigazione semplice per il JA3: il fingerprint TLS è determinato dal
+browser e dalla piattaforma a livello di codice compilato.
+
+---
+
+## HTTP/2 Fingerprinting
+
+### Come funziona
+
+HTTP/2 aggiunge un nuovo livello di fingerprinting tramite i parametri della
+connessione:
+
+```
+HTTP/2 SETTINGS frame (inviato all'inizio della connessione):
+- HEADER_TABLE_SIZE
+- ENABLE_PUSH
+- MAX_CONCURRENT_STREAMS
+- INITIAL_WINDOW_SIZE
+- MAX_FRAME_SIZE
+- MAX_HEADER_LIST_SIZE
+
+Ogni browser invia valori diversi:
+
+Firefox: HEADER_TABLE_SIZE=65536, INITIAL_WINDOW_SIZE=131072,
+         MAX_FRAME_SIZE=16384
+Chrome:  HEADER_TABLE_SIZE=65536, INITIAL_WINDOW_SIZE=6291456,
+         MAX_FRAME_SIZE=16384
+Safari:  HEADER_TABLE_SIZE=4096, INITIAL_WINDOW_SIZE=4194304,
+         MAX_FRAME_SIZE=16384
+
+→ I SETTINGS identificano il browser
+→ Combinati con JA3 → fingerprint molto preciso
+```
+
+### HTTP/2 PRIORITY fingerprinting
+
+```
+I browser inviano priorità diverse per le risorse:
+
+Chrome: usa PRIORITY frame con dependency tree complesso
+Firefox: usa PRIORITY con weight-based scheme
+Safari: usa PRIORITY in modo diverso
+
+Il pattern di priorità è un fingerprint aggiuntivo.
+```
 
 ---
 
@@ -140,19 +407,70 @@ browser e dalla piattaforma.
 ### TCP/IP Stack Fingerprinting
 
 Ogni sistema operativo ha caratteristiche uniche nello stack TCP/IP:
-- **TTL iniziale**: Linux=64, Windows=128, macOS=64
-- **Window Size**: diverso per OS
-- **TCP options**: ordine e valori diversi
 
-Un server che analizza i pacchetti TCP può determinare il tuo OS.
+```
+Parametri analizzabili (passivamente, dal server):
+
+TTL iniziale:
+  Linux: 64
+  Windows: 128
+  macOS: 64
+  FreeBSD: 64
+
+TCP Window Size:
+  Linux (kernel 5.x+): 64240
+  Windows 10/11: 64240 o 65535
+  macOS: 65535
+
+TCP Options (ordine e valori):
+  Linux: MSS, SackOK, TS val/ecr, NOP, WScale
+  Windows: MSS, NOP, WScale, NOP, NOP, SackOK
+  macOS: MSS, NOP, WScale, NOP, NOP, TS val/ecr, SackOK, EOL
+
+DF bit (Don't Fragment):
+  Linux: set
+  Windows: set
+  macOS: set
+
+→ Un server che analizza questi parametri può determinare il tuo OS
+  ANCHE se il User-Agent dichiara un OS diverso
+```
 
 ### Implicazione per Tor
 
-L'exit node vede i pacchetti TCP originali (ricostruiti). Se il tuo client Tor
-è su Linux e Tor Browser dichiara di essere Windows (user-agent), c'è una
-discrepanza: il TCP/IP stack dice Linux, il user-agent dice Windows.
+```
+Scenario:
+  Il mio Tor Browser (o Firefox con resistFingerprinting):
+    User-Agent: "Windows NT 10.0"
+    TCP/IP stack: TTL=64, Window=64240, Options=Linux-order
+    → DISCREPANZA: User-Agent dice Windows, TCP dice Linux
 
-Tor Browser mitiga questo parzialmente, ma la mitigazione non è completa.
+Il server vede:
+  "Questo utente dichiara Windows ma ha stack TCP Linux"
+  → Probabile: utente Linux che spoofa l'User-Agent
+  → Riduce il set di anonimato enormemente
+
+Tor Browser mitiga parzialmente:
+  → Normalizza alcuni parametri TCP (WScale, MSS)
+  → Ma il TTL e l'ordine delle opzioni TCP sono difficili da spoofar
+    senza modifica del kernel
+```
+
+### Difesa: network namespace o VM
+
+```
+Su Whonix:
+  La Workstation è una VM → il suo TCP stack è quello della VM
+  Il Gateway trasmette via Tor → il server vede il TCP stack dell'exit
+  → Il TCP fingerprint del CLIENT non raggiunge il server
+  → Protezione completa
+
+Sul mio setup:
+  Il mio TCP stack raggiunge l'exit Tor
+  L'exit ricostruisce la connessione TCP verso il server
+  → Il server vede il TCP stack dell'EXIT, non del mio PC
+  → Parzialmente protetto (ma il guard vede il mio TCP)
+```
 
 ---
 
@@ -160,29 +478,140 @@ Tor Browser mitiga questo parzialmente, ma la mitigazione non è completa.
 
 ### HSTS Supercookie
 
-Un sito può impostare HSTS (HTTP Strict Transport Security) per sottodomini
-specifici. Il pattern di sottodomini HSTS noti al browser diventa un tracking ID.
+```
+Un sito può impostare HSTS per sottodomini specifici:
+  a.example.com → HSTS = ON  (bit 1)
+  b.example.com → HSTS = OFF (bit 0)
+  c.example.com → HSTS = ON  (bit 1)
+  d.example.com → HSTS = OFF (bit 0)
 
-**Mitigazione**: Tor Browser resetta HSTS alla chiusura. In Firefox normale,
-HSTS persiste.
+Il pattern HSTS noti al browser: 1010 = tracking ID univoco
+
+Alla visita successiva:
+  Il browser tenta HTTP per ogni sottodominio
+  a.example.com → redirect HTTPS (HSTS attivo → bit 1)
+  b.example.com → nessun redirect (HSTS non attivo → bit 0)
+  → Ricostruisce il pattern → identifica l'utente
+
+Mitigazione: Tor Browser resetta HSTS alla chiusura.
+Il mio Firefox: HSTS persiste tra sessioni.
+```
 
 ### ETag Tracking
 
-Il server assegna un ETag unico a ogni utente. Il browser lo include nelle
-richieste successive (`If-None-Match`). Funziona come un cookie persistente.
+```
+1. Prima visita: server assegna ETag unico
+   Response: ETag: "user-unique-id-abc123"
+2. Seconda visita: browser include l'ETag
+   Request: If-None-Match: "user-unique-id-abc123"
+   → Il server riconosce l'utente tramite l'ETag
+   → Funziona come un cookie persistente ma invisibile
+```
 
 ### Favicon Caching
 
-Il browser cache le favicon. Un sito può usare URL di favicon unici per ogni
-utente come tracking mechanism.
+```
+Il browser cachea le favicon. Un sito può usare URL unici:
+1. Primo accesso: il sito imposta favicon come /favicon-USER123.ico
+2. Il browser cachea questa favicon specifica
+3. Accesso successivo: il browser richiede /favicon-USER123.ico
+   → Il server vede che USER123 è tornato
+   → Tracking senza cookie
+```
 
 ### TLS Session Resumption
 
-Se il browser riutilizza sessioni TLS (session ID o session ticket), il server
-può correlare visite successive.
+```
+Se il browser riutilizza sessioni TLS (session ID o session ticket):
+1. Prima connessione: handshake TLS completo
+   Server assegna session ticket: "ticket-xyz"
+2. Connessione successiva: browser presenta "ticket-xyz"
+   → Server riconosce il client → tracking cross-session
 
-**Mitigazione**: Tor Browser disabilita la session resumption. Firefox normale
-la mantiene.
+Tor Browser: disabilita session resumption
+Il mio Firefox: session resumption attiva
+```
+
+### DNS Cache Probing
+
+```
+Un sito può determinare quali siti hai visitato recentemente:
+1. Il sito include risorse da domini specifici:
+   <img src="https://visited-site.com/pixel.gif">
+2. Se il DNS per visited-site.com è nella cache → risposta rapida
+3. Se non è nella cache → risposta lenta (round-trip DNS)
+4. La differenza di timing rivela se hai visitato visited-site.com
+
+Mitigazione: DNS via Tor (risolto dall'exit, non localmente)
+→ Il mio setup è parzialmente protetto (con proxy_dns)
+```
+
+---
+
+## Server-side fingerprinting
+
+### Behavioral fingerprinting
+
+```
+Un sito può tracciare il comportamento dell'utente:
+- Velocità di digitazione (keystroke dynamics)
+- Pattern di movimento del mouse
+- Velocità di scroll
+- Pattern di click
+- Tempo di permanenza sulle pagine
+
+Questi pattern sono UNICI per ogni persona
+→ Nessuno strumento tecnico li protegge
+→ Solo la consapevolezza e la variazione del comportamento
+```
+
+### Timing fingerprinting
+
+```
+Il server misura il RTT (round-trip time) delle richieste:
+- RTT costante → stessa posizione di rete
+- RTT variabile in un pattern → ISP/rete specifica
+
+Via Tor: il RTT è dominato dai 3 hop → varia con i circuiti
+→ Meno informativo ma non completamente opaco
+```
+
+---
+
+## Fingerprinting attivo vs passivo
+
+### Passivo (server-side)
+
+```
+Il server raccoglie informazioni senza eseguire codice nel browser:
+- User-Agent header
+- Accept-Language header
+- TLS ClientHello (JA3/JA4)
+- HTTP/2 SETTINGS
+- TCP/IP stack parameters
+- Timing
+
+Difesa: difficile, molte di queste informazioni sono necessarie
+per la comunicazione
+```
+
+### Attivo (JavaScript)
+
+```
+Il server esegue JavaScript nel browser:
+- Canvas fingerprinting
+- WebGL rendering
+- AudioContext
+- Font enumeration
+- Screen dimensions
+- navigator.* properties
+- Battery API
+- Gamepad API
+- Performance.now() timing
+
+Difesa: Tor Browser neutralizza la maggior parte
+        Security Level "Safest" disabilita JavaScript → elimina tutto
+```
 
 ---
 
@@ -195,40 +624,111 @@ la mantiene.
 | WebGL fingerprint | Protetto (disabilitato) | **Esposto** |
 | Font fingerprint | Protetto (font limitati) | **Esposto** |
 | TLS/JA3 fingerprint | Specifico ma uniforme tra utenti TB | **Unico** per il mio setup |
+| HTTP/2 fingerprint | Uniforme | **Specifico** |
 | Screen/Window size | Protetto (letterboxing) | **Esposto** |
 | Timezone | UTC | **Esposta** (Europe/Rome) |
-| Language | en-US | **Esposta** (it-IT o configurazione locale) |
+| Language | en-US | **Esposta** (it-IT) |
 | HSTS tracking | Resettato | **Persistente** |
 | Cookie tracking | Isolato per dominio (FPI) | **Non isolato** |
+| TCP/IP OS fingerprint | Parziale (exit ricostruisce) | Parziale |
+| AudioContext | Neutralizzato | **Esposto** |
+| Behavioral | Non protetto | Non protetto |
 
 **Conclusione**: il mio setup protegge l'IP ma non il fingerprint. Un sito
 sufficientemente sofisticato può correlare le mie visite anche se cambio IP
-con NEWNYM.
-
-Per anonimato reale: usare Tor Browser. Per privacy dall'ISP e test: il mio
-setup è sufficiente.
+con NEWNYM, perché il mio fingerprint è costante e probabilmente unico.
 
 ---
 
-## Configurazioni minime per ridurre il fingerprinting in Firefox
+## Strumenti di verifica
+
+### Siti per testare il proprio fingerprint
+
+```bash
+# AmIUnique — analisi dettagliata del fingerprint
+proxychains firefox https://amiunique.org/fingerprint
+
+# Panopticlick (EFF) — test di unicità
+proxychains firefox https://coveryourtracks.eff.org/
+
+# BrowserLeaks — test per vettore specifico
+proxychains firefox https://browserleaks.com/
+
+# CreepJS — fingerprinting avanzato (canvas, WebGL, etc.)
+proxychains firefox https://abrahamjuliot.github.io/creepjs/
+
+# TLS fingerprint (JA3)
+proxychains firefox https://ja3.io/
+```
+
+### Test da terminale
+
+```bash
+# Verifica User-Agent
+proxychains curl -s https://httpbin.org/headers | grep User-Agent
+
+# Verifica IP e geolocalizzazione
+proxychains curl -s https://ipinfo.io
+
+# Verifica TLS fingerprint
+proxychains curl -s https://ja3.io/json | python3 -m json.tool
+```
+
+---
+
+## Configurazioni per ridurre il fingerprinting
 
 In `about:config` del profilo `tor-proxy`:
 
 ```
-privacy.resistFingerprinting = true          # Protezione base (timezone, locale, etc.)
+# Protezione base (attiva molte mitigazioni)
+privacy.resistFingerprinting = true
+
+# Disabilita API pericolose
 media.peerconnection.enabled = false          # No WebRTC
 webgl.disabled = true                         # No WebGL fingerprint
-network.http.http3.enabled = false            # No QUIC/UDP
 dom.battery.enabled = false                   # No Battery API
 dom.gamepad.enabled = false                   # No Gamepad API
-media.navigator.enabled = false               # No media devices enumeration
+media.navigator.enabled = false               # No media devices
+network.http.http3.enabled = false            # No QUIC/UDP
+
+# Disabilita tracking vectors
+network.http.http3.enabled = false            # No HTTP/3
+browser.send_pings = false                    # No tracking pings
+beacon.enabled = false                        # No Beacon API
 ```
 
 `privacy.resistFingerprinting` attiva molte protezioni:
 - Timezone forzata a UTC
 - Lingua forzata a en-US
 - Screen size spoofata
-- Precision ridotta per timer (anti-timing attack)
+- Precision ridotta per Performance.now() (anti-timing)
 - Canvas readout bloccato (con prompt)
+- navigator.hardwareConcurrency forzato a 2
+- navigator.platform spoofato
 
-Non è equivalente a Tor Browser, ma è meglio di niente.
+**Non è equivalente a Tor Browser**, ma è meglio di niente. Il JA3 e i font
+restano esposti, e l'incoerenza tra User-Agent spoofato e TCP stack reale
+può essere più sospetta del non spoofing.
+
+---
+
+## Nella mia esperienza
+
+Il fingerprinting è il tallone d'Achille del mio setup. Lo accetto
+consapevolmente perché il mio threat model non richiede anonimato dal
+fingerprinting — ho bisogno di privacy dall'ISP (nascondere le destinazioni)
+e dai tracker basati su IP.
+
+Per anonimato reale dal fingerprinting: Tor Browser è l'unica soluzione.
+Per privacy dall'ISP e test: il mio Firefox+proxychains è sufficiente.
+
+---
+
+## Vedi anche
+
+- [Tor Browser e Applicazioni](../04-strumenti-operativi/tor-browser-e-applicazioni.md) — Come Tor Browser mitiga il fingerprinting
+- [OPSEC e Errori Comuni](opsec-e-errori-comuni.md) — Fingerprinting come errore OPSEC
+- [Traffic Analysis](traffic-analysis.md) — Fingerprinting del traffico di rete
+- [DNS Leak](dns-leak.md) — DNS come vettore di fingerprinting
+- [Hardening di Sistema](hardening-sistema.md) — Configurazioni Firefox nel profilo tor-proxy
