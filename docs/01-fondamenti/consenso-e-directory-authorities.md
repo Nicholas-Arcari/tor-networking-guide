@@ -8,6 +8,23 @@ Include osservazioni dalla mia esperienza nell'analisi dei log di Tor durante il
 bootstrap e nella comprensione di perché certi relay vengono selezionati.
 
 ---
+---
+
+## Indice
+
+- [Perché serve un consenso?](#perché-serve-un-consenso)
+- [Directory Authorities — Chi sono e cosa fanno](#directory-authorities-chi-sono-e-cosa-fanno)
+- [Il processo di votazione — Ora per ora](#il-processo-di-votazione-ora-per-ora)
+- [Struttura del documento di consenso](#struttura-del-documento-di-consenso)
+- [Flag del consenso — Analisi approfondita](#flag-del-consenso-analisi-approfondita)
+- [Bandwidth Authorities e misurazione della banda](#bandwidth-authorities-e-misurazione-della-banda)
+- [Server Descriptors — L'identità di un relay](#server-descriptors-lidentità-di-un-relay)
+- [Microdescriptor vs Server Descriptor](#microdescriptor-vs-server-descriptor)
+- [Cache del consenso e persistenza](#cache-del-consenso-e-persistenza)
+- [Attacchi al sistema del consenso](#attacchi-al-sistema-del-consenso)
+- [Consultare il consenso manualmente](#consultare-il-consenso-manualmente)
+- [Riepilogo](#riepilogo)
+
 
 ## Perché serve un consenso?
 
@@ -540,6 +557,22 @@ Non consulto il consenso spesso, ma è stato utile per capire:
 
 ---
 
+
+### Diagramma: processo di votazione del consenso
+
+```mermaid
+flowchart TD
+    A[Relay pubblicano Server Descriptor] --> B[DA raccolgono descriptor]
+    B --> C[Ogni DA calcola il proprio voto]
+    C --> D[DA si scambiano i voti]
+    D --> E{Almeno 5/9 DA concordano?}
+    E -->|Sì| F[Consenso firmato e pubblicato]
+    E -->|No| G[Uso del consenso precedente]
+    F --> H[Client scaricano il consenso]
+    H --> I[Client selezionano relay per i circuiti]
+    F --> J[Validità: 1 ora, refresh ogni 30 min]
+```
+
 ## Riepilogo
 
 | Componente | Ruolo | Frequenza aggiornamento |
@@ -551,3 +584,13 @@ Non consulto il consenso spesso, ma è stato utile per capire:
 | Bandwidth Authorities | Misurano la banda reale | Continuamente |
 | Cache locale | Consenso + descriptor salvati | Ad ogni aggiornamento |
 | File state | Guard selection persistente | Ad ogni cambio |
+
+---
+
+## Vedi anche
+
+- [Architettura di Tor](architettura-tor.md) — Come i componenti usano il consenso
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Flag Guard e selezione
+- [Exit Nodes](../03-nodi-e-rete/exit-nodes.md) — Flag Exit e exit policy
+- [Relay Monitoring e Metriche](../03-nodi-e-rete/relay-monitoring-e-metriche.md) — Tor Metrics, bandwidth authorities
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Sybil attack e manipolazione del consenso
