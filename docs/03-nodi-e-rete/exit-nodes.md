@@ -1,4 +1,4 @@
-# Exit Nodes — L'Ultimo Hop e il Punto di Massimo Rischio
+# Exit Nodes - L'Ultimo Hop e il Punto di Massimo Rischio
 
 Questo documento analizza in profondità gli Exit Node della rete Tor: il loro ruolo
 nel circuito, le exit policy, i rischi di sicurezza (sniffing, injection, MITM),
@@ -13,14 +13,11 @@ blocchi e CAPTCHA, e nel comprendere perché certi siti non funzionano via Tor.
 ## Indice
 
 - [Ruolo dell'Exit Node](#ruolo-dellexit-node)
-- [Exit Policy — Le regole di uscita](#exit-policy-le-regole-di-uscita)
+- [Exit Policy - Le regole di uscita](#exit-policy-le-regole-di-uscita)
 - [Rischi specifici degli Exit Node](#rischi-specifici-degli-exit-node)
 - [Verificare l'IP dell'Exit Node](#verificare-lip-dellexit-node)
-- [Blocchi e CAPTCHA — Come i siti reagiscono agli Exit Node](#blocchi-e-captcha-come-i-siti-reagiscono-agli-exit-node)
-- [Exit Node e DNS — Chi risolve cosa](#exit-node-e-dns-chi-risolve-cosa)
-- [Exit Policy e il principio di selettività](#exit-policy-e-il-principio-di-selettività)
-- [Identificare gli Exit Node nel consenso](#identificare-gli-exit-node-nel-consenso)
-- [Riepilogo dei rischi e mitigazioni](#riepilogo-dei-rischi-e-mitigazioni)
+**Approfondimenti** (file dedicati):
+- [Exit Nodes nella Pratica](exit-nodes-pratica.md) - Blocchi/CAPTCHA, DNS, selettività, identificazione
 
 
 ## Ruolo dell'Exit Node
@@ -38,13 +35,13 @@ destinazione finale come traffico TCP normale.
 
 | Informazione | Visibile all'Exit? |
 |-------------|-------------------|
-| Il tuo IP reale | **NO** — vede solo l'IP del Middle |
-| La destinazione (hostname + porta) | **SI** — è lui che apre la connessione |
-| Il contenuto HTTP in chiaro | **SI** — se il sito non usa HTTPS |
-| Il contenuto HTTPS | **NO** — vede solo il traffico TLS cifrato |
-| I metadati TLS (SNI) | **SI** — il Server Name Indication è in chiaro nel ClientHello |
-| Le query DNS | **SI** — è lui che risolve gli hostname |
-| Il timing delle richieste | **SI** — vede quando ogni stream inizia e finisce |
+| Il tuo IP reale | **NO** - vede solo l'IP del Middle |
+| La destinazione (hostname + porta) | **SI** - è lui che apre la connessione |
+| Il contenuto HTTP in chiaro | **SI** - se il sito non usa HTTPS |
+| Il contenuto HTTPS | **NO** - vede solo il traffico TLS cifrato |
+| I metadati TLS (SNI) | **SI** - il Server Name Indication è in chiaro nel ClientHello |
+| Le query DNS | **SI** - è lui che risolve gli hostname |
+| Il timing delle richieste | **SI** - vede quando ogni stream inizia e finisce |
 
 ### Il punto critico: l'Exit vede il traffico in chiaro
 
@@ -62,7 +59,7 @@ Exit → vede → [GET /login?user=mario&pass=123] → destinazione
 
 ---
 
-## Exit Policy — Le regole di uscita
+## Exit Policy - Le regole di uscita
 
 ### Cos'è l'Exit Policy
 
@@ -105,7 +102,7 @@ reject *:*
 ```
 reject *:*
 ```
-Questo relay non è un exit — è solo un middle/guard.
+Questo relay non è un exit - è solo un middle/guard.
 
 ### Policy nel consenso
 
@@ -128,7 +125,7 @@ maggior parte degli exit accetta 443.
 
 Ma quando ho provato `proxychains ssh user@server.com`, la connessione falliva
 spesso perché molti exit non accettano la porta 22. In quei casi, Tor costruisce
-circuiti e li scarta finché non trova un exit adatto — causando ritardi significativi.
+circuiti e li scarta finché non trova un exit adatto - causando ritardi significativi.
 
 ---
 
@@ -146,7 +143,7 @@ Traffico HTTP (non cifrato):
 - Contenuto delle risposte (pagine HTML, JSON, file)
 
 Traffico HTTPS (cifrato TLS):
-- SNI (Server Name Indication) — il dominio in chiaro nel ClientHello
+- SNI (Server Name Indication) - il dominio in chiaro nel ClientHello
   (es. "api.ipify.org" è visibile anche con HTTPS)
 - Dimensione approssimativa delle risposte
 - Timing delle richieste
@@ -297,177 +294,15 @@ il cui operatore ha deciso di far girare un exit node.
 
 ---
 
-## Blocchi e CAPTCHA — Come i siti reagiscono agli Exit Node
-
-### Perché i siti bloccano Tor
-
-Gli IP degli exit node Tor sono **pubblicamente noti** (sono nel consenso). I siti
-possono:
-
-1. **Scaricare la lista degli exit** da `https://check.torproject.org/torbulkexitlist`
-2. **Bloccare o limitare** le connessioni provenienti da questi IP
-3. **Richiedere CAPTCHA** aggiuntivi
-4. **Ridurre le funzionalità** (no login, no acquisti, no API)
-
-### Siti che ho testato personalmente
-
-| Sito | Comportamento via Tor |
-|------|----------------------|
-| Google Search | CAPTCHA frequenti, a volte blocco totale |
-| Google Maps | Funziona con CAPTCHA occasionali |
-| Amazon | Blocco login, richiesta verifica aggiuntiva |
-| Reddit | Funziona ma richiede login frequente |
-| GitHub | Funziona generalmente bene |
-| Wikipedia | Lettura OK, editing bloccato |
-| PayPal | Login bloccato, "suspicious activity" |
-| Instagram/Meta | Login molto difficile, blocchi frequenti |
-| Stack Overflow | Funziona bene |
-| Banche italiane | Blocco totale o 2FA forzato |
-
-### Strategie per gestire i blocchi
-
-1. **NEWNYM e riprova**: a volte il blocco è sull'exit specifico. Cambiando exit
-   (NEWNYM) potresti ottenere un exit non bloccato.
-
-2. **Non loggarsi**: usare Tor per navigazione anonima, non per account personali.
-   Loggarsi con account personali su Tor è un errore OPSEC (vedi sezione sicurezza).
-
-3. **Accettare i limiti**: certi servizi non funzioneranno mai bene via Tor. È
-   un compromesso dell'anonimato.
-
----
-
-## Exit Node e DNS — Chi risolve cosa
-
-### Il flusso DNS in un circuito Tor
-
-```
-1. L'utente chiede di connettersi a "example.com"
-2. L'hostname viene inviato al SocksPort come DOMAINNAME (non risolto localmente)
-3. Tor crea una cella RELAY_BEGIN con "example.com:443"
-4. L'Exit Node riceve "example.com:443"
-5. L'Exit Node usa il SUO resolver DNS per risolvere "example.com"
-6. L'Exit Node si connette all'IP risultante
-```
-
-### Implicazioni
-
-- **Il DNS non esce MAI dal tuo computer** (se usi proxychains/torsocks correttamente)
-- **L'Exit Node fa la risoluzione DNS** → usa il DNS del datacenter dove si trova
-- **Exit diversi possono risolvere hostname diversamente** (CDN, load balancing, geo-DNS)
-
-### DNS leak
-
-Se un'applicazione risolve l'hostname PRIMA di inviarlo al SocksPort, il DNS
-esce in chiaro verso il tuo ISP. Questo è un **DNS leak**:
-
-```
-CORRETTO (no leak):
-curl --socks5-hostname 127.0.0.1:9050 https://example.com
-  → "example.com" inviato come stringa a Tor → Exit risolve
-
-SBAGLIATO (leak):
-curl --socks5 127.0.0.1:9050 https://example.com
-  → curl risolve "example.com" localmente → DNS leak!
-  → poi invia l'IP a Tor
-
-La differenza è --socks5-hostname (risolve via proxy) vs --socks5 (risolve localmente)
-```
-
-Proxychains con `proxy_dns` attivo gestisce questo automaticamente, intercettando
-le chiamate DNS e inviandole al proxy.
-
----
-
-## Exit Policy e il principio di selettività
-
-### Perché non tutti gli exit permettono tutte le porte
-
-Operare un exit node espone l'operatore a rischi legali:
-- Il traffico che esce dal suo IP può contenere attività illegali
-- Le forze dell'ordine possono risalire all'IP dell'exit (è pubblico)
-- L'operatore potrebbe ricevere notifiche DMCA, richieste legali, etc.
-
-Per questo, molti operatori limitano la exit policy a porte "sicure" (80, 443)
-ed escludono porte associate ad abusi (25 per spam, 6667 per IRC abuse, etc.).
-
-### Exit policy e selezione del circuito
-
-Tor seleziona l'exit PRIMA di costruire il circuito. Il processo è:
-
-1. L'applicazione chiede di connettersi a `example.com:443`
-2. Tor cerca nel consenso un exit con policy `accept *:443`
-3. Seleziona un exit (pesato per bandwidth) dal pool dei candidati
-4. Costruisce il circuito: guard → middle → exit selezionato
-5. Invia RELAY_BEGIN con la destinazione
-
-Se nessun exit supporta la porta richiesta, Tor restituisce un errore al client SOCKS.
-
-### Nella mia esperienza
-
-Per le porte standard (80, 443) non ho mai avuto problemi di exit policy. Per SSH
-(porta 22), occasionalmente Tor impiega più tempo a trovare un exit adatto, e a
-volte fallisce:
-
-```bash
-> proxychains ssh user@myserver.com
-[proxychains] Dynamic chain ... timeout
-```
-
-In quei casi, riprovo dopo NEWNYM (che forza nuovi circuiti con exit potenzialmente
-diversi).
-
----
-
-## Identificare gli Exit Node nel consenso
-
-### Consultare la lista degli exit
-
-```bash
-# Scaricare la lista degli exit via Tor
-proxychains curl -s https://check.torproject.org/torbulkexitlist > /tmp/exit-list.txt
-wc -l /tmp/exit-list.txt
-# Output: ~1200 (numero approssimativo di exit attivi)
-
-# Verificare se un IP è un exit
-grep "185.220.101.143" /tmp/exit-list.txt
-# Se presente → è un exit Tor noto
-```
-
-### Statistiche sugli exit
-
-La rete Tor ha circa:
-- ~7000 relay totali
-- ~1000-1500 relay con flag Exit
-- ~800-1000 exit che accettano la porta 443
-- ~400-600 exit che accettano anche la porta 22
-
-Il numero relativamente basso di exit rispetto ai relay totali è il motivo per cui:
-- Gli exit sono il collo di bottiglia della rete
-- I bandwidth weights nel consenso favoriscono gli exit
-- I siti possono facilmente elencare e bloccare tutti gli exit
-
----
-
-## Riepilogo dei rischi e mitigazioni
-
-| Rischio | Condizione | Mitigazione |
-|---------|-----------|-------------|
-| Sniffing contenuto | Solo se HTTP (non HTTPS) | Usare SEMPRE HTTPS |
-| DNS spoofing | Exit malevolo | Verificare certificati TLS |
-| SSL stripping | Sito raggiunto via HTTP iniziale | HSTS, Tor Browser |
-| Download injection | File scaricato via HTTP | Verificare hash/firma |
-| Logging metadata | Sempre possibile | Tor Browser riduce metadata |
-| MITM su TLS | Exit genera cert falso | Non ignorare errori certificato |
-| Blocchi/CAPTCHA | IP exit è pubblico | NEWNYM, accettare il compromesso |
-| Exit policy restrittiva | Porte non standard | Riprova con NEWNYM |
+> **Continua in**: [Exit Nodes nella Pratica](exit-nodes-pratica.md) per blocchi/CAPTCHA,
+> DNS, exit policy selettive e identificazione degli exit nel consenso.
 
 ---
 
 ## Vedi anche
 
-- [Guard Nodes](guard-nodes.md) — Primo hop del circuito
-- [Middle Relay](middle-relay.md) — Secondo hop del circuito
-- [Aspetti Legali](../08-aspetti-legali-ed-etici/aspetti-legali.md) — Legalità dell'operare un exit node
-- [Etica e Responsabilità](../08-aspetti-legali-ed-etici/etica-e-responsabilita.md) — Responsabilità dell'operatore
-- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Siti che bloccano exit Tor
+- [Exit Nodes nella Pratica](exit-nodes-pratica.md) - Blocchi, DNS, selettività, identificazione
+- [Guard Nodes](guard-nodes.md) - Primo hop del circuito
+- [Middle Relay](middle-relay.md) - Secondo hop del circuito
+- [Aspetti Legali](../08-aspetti-legali-ed-etici/aspetti-legali.md) - Legalità dell'operare un exit node
+- [Scenari Reali](scenari-reali.md) - Casi operativi da pentester
