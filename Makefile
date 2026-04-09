@@ -1,4 +1,4 @@
-# Makefile — Tor Networking Guide
+# Makefile - Tor Networking Guide
 # Comandi rapidi per validazione, test, statistiche e manutenzione
 #
 # Uso: make help
@@ -9,7 +9,7 @@ SHELL := /bin/bash
 .PHONY: help validate smoke test stats lint setup clean
 
 help:  ## Mostra tutti i target disponibili
-	@echo "Tor Networking Guide — Comandi disponibili:"
+	@echo "Tor Networking Guide - Comandi disponibili:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*## "}; {printf "  make %-12s %s\n", $$1, $$2}'
