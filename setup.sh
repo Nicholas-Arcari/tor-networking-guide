@@ -249,6 +249,10 @@ echo "  nyx                                          # Monitor TUI"
 echo "  proxychains firefox -no-remote -P tor-proxy & # Browser anonimo"
 echo ""
 
+if [ "$PORTS_OK" = false ]; then
+    warn "Alcune porte Tor non sono in ascolto. Controllare: sudo journalctl -u tor@default.service"
+fi
+
 if ! id -nG "$REAL_USER" | grep -qw "debian-tor"; then
     warn "IMPORTANTE: fai logout e login per attivare il gruppo debian-tor"
 fi
