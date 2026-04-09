@@ -1,5 +1,5 @@
 #!/bin/bash
-# smoke-test-tor.sh — Smoke test per verificare che Tor funzioni correttamente
+# smoke-test-tor.sh - Smoke test per verificare che Tor funzioni correttamente
 #
 # Verifica: servizio, porte, bootstrap, connessione, ControlPort, NEWNYM, DNS.
 # Richiede: Tor attivo, utente nel gruppo debian-tor
