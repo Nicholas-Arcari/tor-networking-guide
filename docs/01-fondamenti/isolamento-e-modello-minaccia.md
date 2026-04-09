@@ -9,14 +9,14 @@ Estratto dalla sezione [Architettura di Tor](architettura-tor.md) per approfondi
 
 ## Indice
 
-- [Stream Isolation — Separazione del traffico](#stream-isolation--separazione-del-traffico)
+- [Stream Isolation - Separazione del traffico](#stream-isolation--separazione-del-traffico)
 - [Il ciclo di vita di un circuito](#il-ciclo-di-vita-di-un-circuito)
-- [Architettura di sicurezza — Il modello di minaccia di Tor](#architettura-di-sicurezza--il-modello-di-minaccia-di-tor)
+- [Architettura di sicurezza - Il modello di minaccia di Tor](#architettura-di-sicurezza--il-modello-di-minaccia-di-tor)
 - [Riepilogo dell'architettura](#riepilogo-dellarchitettura)
 
 ---
 
-## Stream Isolation — Separazione del traffico
+## Stream Isolation - Separazione del traffico
 
 Tor implementa il concetto di **stream isolation**: stream diversi possono essere
 instradati su circuiti diversi per evitare correlazioni.
@@ -39,7 +39,7 @@ instradati su circuiti diversi per evitare correlazioni.
 ### Configurazione nel torrc
 
 ```ini
-# Porta principale — isolamento di default
+# Porta principale - isolamento di default
 SocksPort 9050
 
 # Porta dedicata per browser con isolamento massimo
@@ -103,7 +103,7 @@ Poi verifico:
 250 closing connection
 
 > proxychains curl https://api.ipify.org
-104.244.76.13      # IP cambiato — nuovo circuito, nuovo exit
+104.244.76.13      # IP cambiato - nuovo circuito, nuovo exit
 ```
 
 Il cooldown tra due NEWNYM è di circa 10 secondi. Se invio NEWNYM troppo presto,
@@ -111,7 +111,7 @@ Tor restituisce comunque `250 OK` ma ignora la richiesta internamente.
 
 ---
 
-## Architettura di sicurezza — Il modello di minaccia di Tor
+## Architettura di sicurezza - Il modello di minaccia di Tor
 
 Tor è progettato per proteggere contro specifici avversari e scenari. È fondamentale
 capire cosa protegge e cosa NON protegge:
@@ -219,8 +219,8 @@ L'Exit conosce la destinazione ma non il client. Il Middle non conosce nessuno d
 
 ## Vedi anche
 
-- [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md) — Celle 514 byte, crittografia strato per strato
-- [Consenso e Directory Authorities](consenso-e-directory-authorities.md) — Votazione, flag, selezione relay
-- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Primo hop del circuito, persistenza
-- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione di tutte le componenti
-- [Limitazioni del Protocollo](../07-limitazioni-e-attacchi/limitazioni-protocollo.md) — TCP-only, latenza, bandwidth
+- [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md) - Celle 514 byte, crittografia strato per strato
+- [Consenso e Directory Authorities](consenso-e-directory-authorities.md) - Votazione, flag, selezione relay
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) - Primo hop del circuito, persistenza
+- [torrc - Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) - Configurazione di tutte le componenti
+- [Limitazioni del Protocollo](../07-limitazioni-e-attacchi/limitazioni-protocollo.md) - TCP-only, latenza, bandwidth
