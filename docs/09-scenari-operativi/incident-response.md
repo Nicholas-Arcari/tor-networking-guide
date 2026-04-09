@@ -1,4 +1,4 @@
-# Incident Response — Compromissione e Recupero
+# Incident Response - Compromissione e Recupero
 
 Questo documento analizza come gestire incidenti di sicurezza legati all'uso di Tor:
 compromissione del guard, leak dell'IP reale, exit node malevoli, e procedure di
@@ -364,7 +364,7 @@ L'identità (onion address, pseudonimo, account) deve essere abbandonata quando:
 
 ```bash
 #!/bin/bash
-# tor-leak-monitor.sh — Monitora leak in background
+# tor-leak-monitor.sh - Monitora leak in background
 
 LOG="/var/log/tor-leak-monitor.log"
 
@@ -442,8 +442,8 @@ di tutti i siti visitati "via Tor" per settimane.
 
 Da quell'esperienza ho imparato:
 1. **Verificare SEMPRE con tcpdump** dopo aver configurato qualcosa
-2. **Non fidarsi che "funziona"** — verificare che funziona CORRETTAMENTE
-3. **Monitorare periodicamente** — i leak possono apparire dopo aggiornamenti
+2. **Non fidarsi che "funziona"** - verificare che funziona CORRETTAMENTE
+3. **Monitorare periodicamente** - i leak possono apparire dopo aggiornamenti
 4. **Il DNS è il vettore di leak più comune** e più pericoloso
 
 Ora il mio workflow include sempre una verifica post-configurazione:
@@ -458,8 +458,8 @@ proxychains curl https://example.com > /dev/null 2>&1
 
 ## Vedi anche
 
-- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Prevenire gli incidenti
-- [Analisi Forense e Artefatti](../05-sicurezza-operativa/analisi-forense-e-artefatti.md) — Cosa resta dopo un incidente
-- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) — Test completi post-incidente
-- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Recovery dei circuiti
-- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Scenari di attacco documentati
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Prevenire gli incidenti
+- [Analisi Forense e Artefatti](../05-sicurezza-operativa/analisi-forense-e-artefatti.md) - Cosa resta dopo un incidente
+- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) - Test completi post-incidente
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) - Recovery dei circuiti
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) - Scenari di attacco documentati
