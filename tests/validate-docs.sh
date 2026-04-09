@@ -1,5 +1,5 @@
 #!/bin/bash
-# validate-docs.sh — Validazione struttura e contenuto della documentazione
+# validate-docs.sh - Validazione struttura e contenuto della documentazione
 #
 # Verifica che tutti i documenti, config, e script esistano e siano ben formati.
 # Uso: ./tests/validate-docs.sh
@@ -53,22 +53,39 @@ for dir in "${EXPECTED_DIRS[@]}"; do
 done
 
 # ============================================================
-section "2. Documenti — esistenza"
+section "2. Documenti - esistenza"
 # ============================================================
 
 EXPECTED_DOCS=(
     "docs/01-fondamenti/architettura-tor.md"
+    "docs/01-fondamenti/costruzione-circuiti.md"
+    "docs/01-fondamenti/isolamento-e-modello-minaccia.md"
     "docs/01-fondamenti/circuiti-crittografia-e-celle.md"
+    "docs/01-fondamenti/crittografia-e-handshake.md"
+    "docs/01-fondamenti/stream-padding-e-pratica.md"
     "docs/01-fondamenti/consenso-e-directory-authorities.md"
+    "docs/01-fondamenti/struttura-consenso-e-flag.md"
+    "docs/01-fondamenti/descriptor-cache-e-attacchi.md"
+    "docs/01-fondamenti/scenari-reali.md"
     "docs/02-installazione-e-configurazione/installazione-e-verifica.md"
+    "docs/02-installazione-e-configurazione/configurazione-iniziale.md"
+    "docs/02-installazione-e-configurazione/troubleshooting-e-struttura.md"
     "docs/02-installazione-e-configurazione/torrc-guida-completa.md"
+    "docs/02-installazione-e-configurazione/torrc-bridge-e-sicurezza.md"
+    "docs/02-installazione-e-configurazione/torrc-performance-e-relay.md"
     "docs/02-installazione-e-configurazione/gestione-del-servizio.md"
+    "docs/02-installazione-e-configurazione/manutenzione-e-monitoraggio.md"
+    "docs/02-installazione-e-configurazione/scenari-reali.md"
     "docs/03-nodi-e-rete/guard-nodes.md"
     "docs/03-nodi-e-rete/middle-relay.md"
     "docs/03-nodi-e-rete/exit-nodes.md"
+    "docs/03-nodi-e-rete/exit-nodes-pratica.md"
     "docs/03-nodi-e-rete/bridges-e-pluggable-transports.md"
+    "docs/03-nodi-e-rete/bridge-configurazione-e-alternative.md"
     "docs/03-nodi-e-rete/onion-services-v3.md"
     "docs/03-nodi-e-rete/relay-monitoring-e-metriche.md"
+    "docs/03-nodi-e-rete/monitoring-avanzato.md"
+    "docs/03-nodi-e-rete/scenari-reali.md"
     "docs/04-strumenti-operativi/proxychains-guida-completa.md"
     "docs/04-strumenti-operativi/torsocks.md"
     "docs/04-strumenti-operativi/controllo-circuiti-e-newnym.md"
@@ -76,6 +93,11 @@ EXPECTED_DOCS=(
     "docs/04-strumenti-operativi/nyx-e-monitoraggio.md"
     "docs/04-strumenti-operativi/tor-browser-e-applicazioni.md"
     "docs/04-strumenti-operativi/tor-e-dns-risoluzione.md"
+    "docs/04-strumenti-operativi/nyx-avanzato.md"
+    "docs/04-strumenti-operativi/applicazioni-via-tor.md"
+    "docs/04-strumenti-operativi/torsocks-avanzato.md"
+    "docs/04-strumenti-operativi/dns-avanzato-e-hardening.md"
+    "docs/04-strumenti-operativi/scenari-reali.md"
     "docs/05-sicurezza-operativa/dns-leak.md"
     "docs/05-sicurezza-operativa/traffic-analysis.md"
     "docs/05-sicurezza-operativa/fingerprinting.md"
@@ -83,24 +105,45 @@ EXPECTED_DOCS=(
     "docs/05-sicurezza-operativa/isolamento-e-compartimentazione.md"
     "docs/05-sicurezza-operativa/hardening-sistema.md"
     "docs/05-sicurezza-operativa/analisi-forense-e-artefatti.md"
+    "docs/05-sicurezza-operativa/dns-leak-prevenzione-e-hardening.md"
+    "docs/05-sicurezza-operativa/fingerprinting-avanzato.md"
+    "docs/05-sicurezza-operativa/isolamento-avanzato.md"
+    "docs/05-sicurezza-operativa/opsec-casi-reali-e-difese.md"
+    "docs/05-sicurezza-operativa/traffic-analysis-attacchi-e-difese.md"
+    "docs/05-sicurezza-operativa/hardening-avanzato.md"
+    "docs/05-sicurezza-operativa/forense-browser-e-mitigazione.md"
+    "docs/05-sicurezza-operativa/scenari-reali.md"
     "docs/06-configurazioni-avanzate/vpn-e-tor-ibrido.md"
     "docs/06-configurazioni-avanzate/transparent-proxy.md"
     "docs/06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md"
     "docs/06-configurazioni-avanzate/tor-e-localhost.md"
+    "docs/06-configurazioni-avanzate/transparent-proxy-avanzato.md"
+    "docs/06-configurazioni-avanzate/vpn-tor-routing-e-dns.md"
+    "docs/06-configurazioni-avanzate/stream-isolation-avanzato.md"
+    "docs/06-configurazioni-avanzate/localhost-docker-e-sviluppo.md"
+    "docs/06-configurazioni-avanzate/scenari-reali.md"
     "docs/07-limitazioni-e-attacchi/limitazioni-protocollo.md"
     "docs/07-limitazioni-e-attacchi/limitazioni-applicazioni.md"
     "docs/07-limitazioni-e-attacchi/attacchi-noti.md"
+    "docs/07-limitazioni-e-attacchi/attacchi-noti-avanzati.md"
+    "docs/07-limitazioni-e-attacchi/limitazioni-applicazioni-pratica.md"
+    "docs/07-limitazioni-e-attacchi/scenari-reali.md"
     "docs/08-aspetti-legali-ed-etici/aspetti-legali.md"
     "docs/08-aspetti-legali-ed-etici/etica-e-responsabilita.md"
+    "docs/08-aspetti-legali-ed-etici/aspetti-legali-relay-e-confronto.md"
+    "docs/08-aspetti-legali-ed-etici/etica-contribuire-e-comunita.md"
+    "docs/08-aspetti-legali-ed-etici/scenari-reali.md"
     "docs/09-scenari-operativi/ricognizione-anonima.md"
     "docs/09-scenari-operativi/comunicazione-sicura.md"
     "docs/09-scenari-operativi/sviluppo-e-test.md"
     "docs/09-scenari-operativi/incident-response.md"
+    "docs/09-scenari-operativi/scenari-reali.md"
     "docs/10-laboratorio-pratico/lab-01-setup-e-verifica.md"
     "docs/10-laboratorio-pratico/lab-02-analisi-circuiti.md"
     "docs/10-laboratorio-pratico/lab-03-dns-leak-testing.md"
     "docs/10-laboratorio-pratico/lab-04-onion-service.md"
     "docs/10-laboratorio-pratico/lab-05-stream-isolation.md"
+    "docs/10-laboratorio-pratico/scenari-reali.md"
     "docs/glossario.md"
 )
 
@@ -113,7 +156,7 @@ for doc in "${EXPECTED_DOCS[@]}"; do
 done
 
 # ============================================================
-section "3. Documenti — dimensione minima"
+section "3. Documenti - dimensione minima"
 # ============================================================
 
 MIN_LINES=80
@@ -131,7 +174,7 @@ for doc in "${EXPECTED_DOCS[@]}"; do
 done
 
 # ============================================================
-section "4. Documenti — intestazione e struttura"
+section "4. Documenti - intestazione e struttura"
 # ============================================================
 
 for doc in "${EXPECTED_DOCS[@]}"; do
