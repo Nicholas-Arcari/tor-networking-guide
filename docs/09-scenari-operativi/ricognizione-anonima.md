@@ -1,4 +1,4 @@
-# Ricognizione Anonima — OSINT via Tor
+# Ricognizione Anonima - OSINT via Tor
 
 Questo documento analizza come utilizzare Tor per attività di ricognizione e
 OSINT (Open Source Intelligence) anonima: raccolta di informazioni da fonti
@@ -12,7 +12,7 @@ pubbliche senza rivelare la propria identità o interesse.
 
 ## Indice
 
-- [OSINT e anonimato — perché serve](#osint-e-anonimato--perché-serve)
+- [OSINT e anonimato - perché serve](#osint-e-anonimato--perché-serve)
 - [Setup per ricognizione anonima](#setup-per-ricognizione-anonima)
 - [Strumenti OSINT via Tor](#strumenti-osint-via-tor)
 - [Ricognizione web](#ricognizione-web)
@@ -26,7 +26,7 @@ pubbliche senza rivelare la propria identità o interesse.
 
 ---
 
-## OSINT e anonimato — perché serve
+## OSINT e anonimato - perché serve
 
 ### Il problema: tipping off
 
@@ -83,7 +83,7 @@ proxychains curl -s https://check.torproject.org/api/ip | grep IsTor
 ### Firewall restrittivo (raccomandato per OSINT)
 
 ```bash
-# Bloccare tutto il traffico diretto — solo Tor può uscire
+# Bloccare tutto il traffico diretto - solo Tor può uscire
 TOR_UID=$(id -u debian-tor)
 iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
 iptables -A OUTPUT -d 127.0.0.0/8 -j ACCEPT
@@ -403,8 +403,8 @@ I problemi principali che ho incontrato:
 
 ## Vedi anche
 
-- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Evitare deanonimizzazione durante OSINT
-- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — Rischi fingerprint durante ricognizione
-- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Proxare strumenti OSINT
-- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Compatibilità tool con Tor
-- [Transparent Proxy](../06-configurazioni-avanzate/transparent-proxy.md) — Forzare tool Go/statici via Tor
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Evitare deanonimizzazione durante OSINT
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) - Rischi fingerprint durante ricognizione
+- [ProxyChains - Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) - Proxare strumenti OSINT
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) - Compatibilità tool con Tor
+- [Transparent Proxy](../06-configurazioni-avanzate/transparent-proxy.md) - Forzare tool Go/statici via Tor
