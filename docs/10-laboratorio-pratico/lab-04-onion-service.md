@@ -1,4 +1,4 @@
-# Lab 04 — Creare e Testare un Onion Service v3
+# Lab 04 - Creare e Testare un Onion Service v3
 
 Esercizio pratico per configurare un Onion Service v3, verificarne il
 funzionamento, implementare autenticazione client, e comprendere la struttura
@@ -82,7 +82,7 @@ curl -s http://127.0.0.1:8080/
 
 **Verifica**: `curl http://127.0.0.1:8080/` restituisce la pagina HTML.
 
-> **Nota di sicurezza**: il server ascolta solo su `127.0.0.1` — non è
+> **Nota di sicurezza**: il server ascolta solo su `127.0.0.1` - non è
 > raggiungibile dall'esterno. Solo Tor può raggiungerlo via Onion Service.
 
 ---
@@ -93,7 +93,7 @@ curl -s http://127.0.0.1:8080/
 # Aggiungere la configurazione al torrc
 sudo tee -a /etc/tor/torrc << 'EOF'
 
-# === Lab 04 — Onion Service ===
+# === Lab 04 - Onion Service ===
 HiddenServiceDir /var/lib/tor/onion-lab/
 HiddenServicePort 80 127.0.0.1:8080
 HiddenServiceVersion 3
@@ -148,7 +148,7 @@ proxychains curl -s --max-time 60 "http://$ONION_ADDR"
 # Apri Tor Browser e visita l'indirizzo .onion
 echo "Apri Tor Browser e visita: http://$ONION_ADDR"
 
-# Test 5: temporizzazione — misura la latenza
+# Test 5: temporizzazione - misura la latenza
 time curl --socks5-hostname 127.0.0.1:9050 -s --max-time 60 \
     -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "http://$ONION_ADDR"
 # Output tipico: HTTP 200 in 2.5-5.0s (6 hop: 3 client + 3 servizio)
@@ -165,9 +165,9 @@ time curl --socks5-hostname 127.0.0.1:9050 -s --max-time 60 \
 # Esaminare i file generati da Tor
 sudo ls -la /var/lib/tor/onion-lab/
 # Output:
-# hostname                — indirizzo .onion pubblico
-# hs_ed25519_public_key   — chiave pubblica ed25519 (32 byte)
-# hs_ed25519_secret_key   — chiave privata ed25519 (64 byte)
+# hostname                - indirizzo .onion pubblico
+# hs_ed25519_public_key   - chiave pubblica ed25519 (32 byte)
+# hs_ed25519_secret_key   - chiave privata ed25519 (64 byte)
 
 # Analizzare le chiavi
 sudo xxd /var/lib/tor/onion-lab/hs_ed25519_public_key | head -5
@@ -254,11 +254,11 @@ except ImportError:
 priv_b32 = base64.b32encode(privkey).decode().rstrip("=")
 pub_b32 = base64.b32encode(pubkey).decode().rstrip("=")
 
-print(f"# Chiave PRIVATA (per il client) — file: client.auth_private")
+print(f"# Chiave PRIVATA (per il client) - file: client.auth_private")
 print(f"# <onion-addr-no-.onion>:descriptor:x25519:<base32-privkey>")
 print(f"PRIVKEY: {priv_b32}")
 print()
-print(f"# Chiave PUBBLICA (per il server) — file: <nome>.auth")
+print(f"# Chiave PUBBLICA (per il server) - file: <nome>.auth")
 print(f"# descriptor:x25519:<base32-pubkey>")
 print(f"PUBKEY: {pub_b32}")
 
@@ -483,7 +483,7 @@ rm -f /tmp/lab04-privkey.txt /tmp/lab04-pubkey.txt
 
 ## Vedi anche
 
-- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) — Architettura e protocollo completo
-- [Tor e Localhost](../06-configurazioni-avanzate/tor-e-localhost.md) — Binding e port forwarding
-- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) — Sandboxing e permessi
-- [Comunicazione Sicura](../09-scenari-operativi/comunicazione-sicura.md) — Scenari d'uso reali
+- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) - Architettura e protocollo completo
+- [Tor e Localhost](../06-configurazioni-avanzate/tor-e-localhost.md) - Binding e port forwarding
+- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) - Sandboxing e permessi
+- [Comunicazione Sicura](../09-scenari-operativi/comunicazione-sicura.md) - Scenari d'uso reali
