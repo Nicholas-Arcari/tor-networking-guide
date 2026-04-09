@@ -1,4 +1,4 @@
-# Lab 05 — Stream Isolation e Multi-Istanza Tor
+# Lab 05 - Stream Isolation e Multi-Istanza Tor
 
 Esercizio pratico per configurare stream isolation con SocksPort multipli,
 istanze Tor separate, e verificare che il traffico di applicazioni diverse
@@ -19,7 +19,7 @@ viaggi su circuiti indipendenti.
 - [Fase 4: Multi-istanza Tor](#fase-4-multi-istanza-tor)
 - [Fase 5: Routing applicazioni su istanze diverse](#fase-5-routing-applicazioni-su-istanze-diverse)
 - [Fase 6: Script di verifica automatica](#fase-6-script-di-verifica-automatica)
-- [Fase 7: Scenario operativo — identità separate](#fase-7-scenario-operativo--identità-separate)
+- [Fase 7: Scenario operativo - identità separate](#fase-7-scenario-operativo--identità-separate)
 - [Checklist finale](#checklist-finale)
 
 ---
@@ -74,7 +74,7 @@ grep "SocksPort" /etc/tor/torrc
 # Configurare SocksPort dedicati per scopi diversi
 sudo tee -a /etc/tor/torrc << 'EOF'
 
-# === Lab 05 — Stream Isolation ===
+# === Lab 05 - Stream Isolation ===
 # Porta generica (isolamento standard)
 # SocksPort 9050 già configurato
 
@@ -84,7 +84,7 @@ SocksPort 9052 IsolateDestAddr IsolateDestPort
 # Porta per comunicazioni (isola per autenticazione SOCKS)
 SocksPort 9054 IsolateSOCKSAuth
 
-# Porta per download (nessun isolamento — massimo riuso circuiti)
+# Porta per download (nessun isolamento - massimo riuso circuiti)
 SocksPort 9056 NoIsolateClientAddr NoIsolateSOCKSAuth NoIsolateClientProtocol NoIsolateDestPort NoIsolateDestAddr
 
 # Porta per operazioni sensibili (isolamento massimo)
@@ -100,7 +100,7 @@ for port in 9050 9052 9054 9056 9058; do
     if ss -tlnp | grep -q ":$port "; then
         echo "SocksPort $port: ATTIVO"
     else
-        echo "SocksPort $port: NON ATTIVO — controllare i log"
+        echo "SocksPort $port: NON ATTIVO - controllare i log"
     fi
 done
 ```
@@ -112,7 +112,7 @@ done
 ## Fase 3: Verificare l'isolamento
 
 ```bash
-# Test 1: SocksPort standard (9050) — stesso circuito per stessa destinazione
+# Test 1: SocksPort standard (9050) - stesso circuito per stessa destinazione
 echo "=== SocksPort 9050 (default) ==="
 IP1=$(curl --socks5-hostname 127.0.0.1:9050 -s --max-time 20 https://api.ipify.org)
 IP2=$(curl --socks5-hostname 127.0.0.1:9050 -s --max-time 20 https://api.ipify.org)
@@ -120,7 +120,7 @@ echo "Richiesta 1: $IP1"
 echo "Richiesta 2: $IP2"
 echo "Stesso IP (stesso circuito riusato): $([ "$IP1" = "$IP2" ] && echo SÌ || echo NO)"
 
-# Test 2: SocksPort 9052 (IsolateDestAddr) — circuiti diversi per host diversi
+# Test 2: SocksPort 9052 (IsolateDestAddr) - circuiti diversi per host diversi
 echo ""
 echo "=== SocksPort 9052 (IsolateDestAddr) ==="
 IP_A=$(curl --socks5-hostname 127.0.0.1:9052 -s --max-time 20 https://api.ipify.org)
@@ -129,7 +129,7 @@ echo "api.ipify.org vede: $IP_A"
 echo "httpbin.org vede:   $IP_B"
 echo "IP diversi (isolamento OK): $([ "$IP_A" != "$IP_B" ] && echo SÌ || echo NO)"
 
-# Test 3: SocksPort 9058 (isolamento massimo) — sempre circuiti diversi
+# Test 3: SocksPort 9058 (isolamento massimo) - sempre circuiti diversi
 echo ""
 echo "=== SocksPort 9058 (max isolation) ==="
 for i in 1 2 3; do
@@ -182,7 +182,7 @@ sudo chmod 700 /var/lib/tor-instances/lab05
 
 # 2. Creare il torrc dedicato
 sudo tee /etc/tor/instances/lab05/torrc << 'EOF'
-# Seconda istanza Tor — indipendente dalla principale
+# Seconda istanza Tor - indipendente dalla principale
 SocksPort 9060
 ControlPort 9061
 CookieAuthentication 1
@@ -231,9 +231,9 @@ for name, port in [("Principale", 9051), ("Lab05", 9061)]:
             for circ in ctrl.get_circuits():
                 if circ.status == "BUILT" and circ.path:
                     guards.add(circ.path[0][1])  # nickname del guard
-            print(f"Istanza {name} (:{port}) — Guard nodes: {guards or 'nessuno ancora'}")
+            print(f"Istanza {name} (:{port}) - Guard nodes: {guards or 'nessuno ancora'}")
     except Exception as e:
-        print(f"Istanza {name} (:{port}) — Errore: {e}")
+        print(f"Istanza {name} (:{port}) - Errore: {e}")
 PYEOF
 # I guard node DEVONO essere diversi (istanze indipendenti)
 ```
@@ -273,10 +273,10 @@ proxychains -f /etc/proxychains-cli.conf curl -s --max-time 20 https://api.ipify
 
 ```bash
 # Esempio pratico: browser e terminale su identità separate
-# Terminale 1 — Firefox su istanza principale
+# Terminale 1 - Firefox su istanza principale
 proxychains -f /etc/proxychains-browser.conf firefox -no-remote -P tor-proxy &
 
-# Terminale 2 — operazioni CLI su istanza separata
+# Terminale 2 - operazioni CLI su istanza separata
 PROXYCHAINS_CONF_FILE=/etc/proxychains-cli.conf proxychains wget -q \
     -O /dev/null https://check.torproject.org
 
@@ -292,7 +292,7 @@ Crea il file `test-stream-isolation.sh`:
 
 ```bash
 #!/bin/bash
-# test-stream-isolation.sh — Verifica stream isolation e multi-istanza
+# test-stream-isolation.sh - Verifica stream isolation e multi-istanza
 set -euo pipefail
 
 PASS=0
@@ -308,7 +308,7 @@ check() {
         green "  ✓ $desc"
         PASS=$((PASS+1))
     else
-        red "  ✗ $desc — $result"
+        red "  ✗ $desc - $result"
         FAIL=$((FAIL+1))
     fi
 }
@@ -361,10 +361,10 @@ chmod +x test-stream-isolation.sh
 
 ---
 
-## Fase 7: Scenario operativo — identità separate
+## Fase 7: Scenario operativo - identità separate
 
 Scenario: un ricercatore deve mantenere due identità online completamente
-separate — una per raccogliere informazioni pubbliche, l'altra per comunicare
+separate - una per raccogliere informazioni pubbliche, l'altra per comunicare
 con le fonti.
 
 ```bash
@@ -416,8 +416,8 @@ for port in 9052 9054 9056 9058; do
     if ss -tlnp | grep -q ":$port "; then
         echo "Porta $port: OK"
     else
-        echo "Porta $port: CONFLITTO — qualcosa la occupa già?"
-        ss -tlnp | grep ":$port " || echo "  (porta libera ma Tor non la usa — controllare torrc)"
+        echo "Porta $port: CONFLITTO - qualcosa la occupa già?"
+        ss -tlnp | grep ":$port " || echo "  (porta libera ma Tor non la usa - controllare torrc)"
     fi
 done
 
@@ -505,7 +505,7 @@ rm -rf ~/.mozilla/firefox/*osint* ~/.mozilla/firefox/*comms*
 
 ## Vedi anche
 
-- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — Configurazione completa
-- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Strategie di separazione
-- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Gestione circuiti
-- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Errori di correlazione
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) - Configurazione completa
+- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) - Strategie di separazione
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) - Gestione circuiti
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Errori di correlazione
