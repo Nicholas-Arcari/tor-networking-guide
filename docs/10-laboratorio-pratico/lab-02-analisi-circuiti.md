@@ -1,4 +1,4 @@
-# Lab 02 — Analisi dei Circuiti Tor con Stem e nyx
+# Lab 02 - Analisi dei Circuiti Tor con Stem e nyx
 
 Esercizio pratico per osservare, analizzare e manipolare i circuiti Tor usando
 il ControlPort, la libreria Python Stem, e il monitor nyx.
@@ -16,7 +16,7 @@ il ControlPort, la libreria Python Stem, e il monitor nyx.
 - [Fase 2: Interrogare i circuiti](#fase-2-interrogare-i-circuiti)
 - [Fase 3: NEWNYM e verifica cambio IP](#fase-3-newnym-e-verifica-cambio-ip)
 - [Fase 4: Monitorare eventi in tempo reale](#fase-4-monitorare-eventi-in-tempo-reale)
-- [Fase 5: nyx — Monitor visuale](#fase-5-nyx--monitor-visuale)
+- [Fase 5: nyx - Monitor visuale](#fase-5-nyx--monitor-visuale)
 - [Fase 6: Esercizio di analisi](#fase-6-esercizio-di-analisi)
 - [Checklist finale](#checklist-finale)
 
@@ -212,7 +212,7 @@ proxychains curl -s https://check.torproject.org > /dev/null
 
 ---
 
-## Fase 5: nyx — Monitor visuale
+## Fase 5: nyx - Monitor visuale
 
 ```bash
 # Avviare nyx
@@ -310,6 +310,6 @@ curl --socks5-hostname 127.0.0.1:9050 -s http://2gzyxa5ihm7nsber... > /dev/null
 
 ## Vedi anche
 
-- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Protocollo ControlPort completo
-- [Nyx e Monitoraggio](../04-strumenti-operativi/nyx-e-monitoraggio.md) — 5 schermate nyx in dettaglio
-- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Perché il Guard è persistente
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) - Protocollo ControlPort completo
+- [Nyx e Monitoraggio](../04-strumenti-operativi/nyx-e-monitoraggio.md) - 5 schermate nyx in dettaglio
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) - Perché il Guard è persistente
