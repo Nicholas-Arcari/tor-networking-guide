@@ -1,5 +1,5 @@
 #!/bin/bash
-# setup.sh — Installa e configura Tor + strumenti su Kali/Debian
+# setup.sh - Installa e configura Tor + strumenti su Kali/Debian
 #
 # Questo script:
 # 1. Installa Tor, obfs4proxy, proxychains4, torsocks, nyx, stem
@@ -38,7 +38,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo -e "${BOLD}"
 echo "╔══════════════════════════════════════════════╗"
-echo "║     Tor Networking Guide — Setup Script      ║"
+echo "║     Tor Networking Guide - Setup Script      ║"
 echo "║     Kali Linux / Debian                      ║"
 echo "╚══════════════════════════════════════════════╝"
 echo -e "${NC}"
@@ -102,7 +102,7 @@ else
         log "torrc copiato da template client"
     else
         cat > "$TORRC" << 'TORRC_CONTENT'
-## torrc — Configurazione client Tor
+## torrc - Configurazione client Tor
 ## Generato da setup.sh
 
 # Porta SOCKS5 per le applicazioni
