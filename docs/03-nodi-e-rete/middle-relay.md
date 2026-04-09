@@ -1,4 +1,4 @@
-# Middle Relay — Il Nodo Invisibile
+# Middle Relay - Il Nodo Invisibile
 
 Questo documento analizza il ruolo dei Middle Relay nel circuito Tor, l'algoritmo di
 selezione, il peso della bandwidth, e perché i middle node sono fondamentali per
@@ -30,13 +30,13 @@ Il Middle Relay è il **secondo nodo** del circuito Tor standard a 3 hop:
 
 | Informazione | Visibile al Middle? |
 |-------------|-------------------|
-| Il tuo IP reale | **NO** — vede solo l'IP del Guard |
-| La destinazione finale | **NO** — vede solo l'IP dell'Exit |
-| Il contenuto del traffico | **NO** — vede celle cifrate con 2 strati |
-| Il volume di traffico | **SI** — vede il numero di celle che transitano |
-| Il timing del traffico | **SI** — vede quando le celle transitano |
-| L'identità del Guard | **SI** — è la connessione TLS diretta |
-| L'identità dell'Exit | **SI** — è la connessione TLS diretta |
+| Il tuo IP reale | **NO** - vede solo l'IP del Guard |
+| La destinazione finale | **NO** - vede solo l'IP dell'Exit |
+| Il contenuto del traffico | **NO** - vede celle cifrate con 2 strati |
+| Il volume di traffico | **SI** - vede il numero di celle che transitano |
+| Il timing del traffico | **SI** - vede quando le celle transitano |
+| L'identità del Guard | **SI** - è la connessione TLS diretta |
+| L'identità dell'Exit | **SI** - è la connessione TLS diretta |
 
 ### La funzione di separazione
 
@@ -101,7 +101,7 @@ Tor applica vincoli per evitare che il circuito sia compromesso:
 I guard hanno il flag `Guard` (richiede stabilità). Gli exit hanno il flag `Exit`
 (richiede exit policy). I middle non hanno requisiti speciali perché:
 
-- La loro funzione è puro transito — non servono proprietà particolari
+- La loro funzione è puro transito - non servono proprietà particolari
 - Avere un pool ampio di middle migliora l'anonimato (più relay possibili)
 - La selezione pesata per bandwidth bilancia automaticamente il carico
 
@@ -257,8 +257,8 @@ una possibilità interessante per contribuire alla rete.
 
 ## Vedi anche
 
-- [Guard Nodes](guard-nodes.md) — Primo hop del circuito
-- [Exit Nodes](exit-nodes.md) — Terzo hop del circuito
-- [Consenso e Directory Authorities](../01-fondamenti/consenso-e-directory-authorities.md) — Bandwidth weights e selezione
-- [Relay Monitoring e Metriche](relay-monitoring-e-metriche.md) — Monitorare il proprio middle relay
-- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Relay early tagging dal middle
+- [Guard Nodes](guard-nodes.md) - Primo hop del circuito
+- [Exit Nodes](exit-nodes.md) - Terzo hop del circuito
+- [Consenso e Directory Authorities](../01-fondamenti/consenso-e-directory-authorities.md) - Bandwidth weights e selezione
+- [Relay Monitoring e Metriche](relay-monitoring-e-metriche.md) - Monitorare il proprio middle relay
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) - Relay early tagging dal middle
