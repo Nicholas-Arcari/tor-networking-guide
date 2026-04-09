@@ -1,4 +1,4 @@
-# Onion Services v3 — Servizi Nascosti sulla Rete Tor
+# Onion Services v3 - Servizi Nascosti sulla Rete Tor
 
 Questo documento analizza il funzionamento degli Onion Services (precedentemente noti
 come Hidden Services) nella versione 3 del protocollo. Copre l'architettura, il
@@ -83,12 +83,12 @@ v2 è stato **deprecato e rimosso** a partire da Tor 0.4.6. Solo v3 è supportat
    dell'onion service. Determinati algoritmicamente dal consenso.
 
 4. **Rendezvous Point (RP)**: un relay scelto dal **client** come punto di incontro.
-   Né il client né l'HS lo controllano direttamente — il client sceglie il relay,
+   Né il client né l'HS lo controllano direttamente - il client sceglie il relay,
    l'HS ci si connette.
 
 5. **Client**: l'utente che vuole raggiungere l'onion service.
 
-### Il protocollo di connessione — Step by step
+### Il protocollo di connessione - Step by step
 
 ```
 Fase 1: Pubblicazione (l'HS si rende "trovabile")
@@ -129,7 +129,7 @@ Fase 4: Introduce (il client chiede all'HS di incontrarlo)
    - cifrato con la chiave dell'HS
    - contiene: IP del Rendezvous Point + rendezvous cookie
 3. L'Introduction Point inoltra INTRODUCE2 all'HS
-   (senza poterlo decifrare — non ha la chiave)
+   (senza poterlo decifrare - non ha la chiave)
 
 Fase 5: L'HS si connette al Rendezvous Point
 ═════════════════════════════════════════════
@@ -176,7 +176,7 @@ Onion Service ────circuito───►├─── Introduction Point 2
 /var/lib/tor/hidden_service/
 ├── hostname              # Indirizzo .onion (derivato dalla chiave pubblica)
 ├── hs_ed25519_public_key # Chiave pubblica Ed25519 (identità del servizio)
-├── hs_ed25519_secret_key # Chiave privata Ed25519 (CRITICA — non condividere)
+├── hs_ed25519_secret_key # Chiave privata Ed25519 (CRITICA - non condividere)
 └── authorized_clients/   # Chiavi di client autorizzati (se autenticazione attiva)
 ```
 
@@ -342,8 +342,8 @@ poi il throughput dipende dal nodo più lento nella catena.
 
 ## Vedi anche
 
-- [Circuiti, Crittografia e Celle](../01-fondamenti/circuiti-crittografia-e-celle.md) — Celle e crittografia nei circuiti HS
-- [Tor e Localhost](../06-configurazioni-avanzate/tor-e-localhost.md) — Onion service per servizi locali
-- [Comunicazione Sicura](../09-scenari-operativi/comunicazione-sicura.md) — Onion service per comunicazione anonima
-- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — HSDir enumeration, DoS su HS
-- [Guard Nodes](guard-nodes.md) — Vanguards per protezione HS
+- [Circuiti, Crittografia e Celle](../01-fondamenti/circuiti-crittografia-e-celle.md) - Celle e crittografia nei circuiti HS
+- [Tor e Localhost](../06-configurazioni-avanzate/tor-e-localhost.md) - Onion service per servizi locali
+- [Comunicazione Sicura](../09-scenari-operativi/comunicazione-sicura.md) - Onion service per comunicazione anonima
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) - HSDir enumeration, DoS su HS
+- [Guard Nodes](guard-nodes.md) - Vanguards per protezione HS
