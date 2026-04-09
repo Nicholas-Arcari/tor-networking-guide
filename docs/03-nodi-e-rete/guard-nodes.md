@@ -1,4 +1,4 @@
-# Guard Nodes — Il Primo Anello della Catena
+# Guard Nodes - Il Primo Anello della Catena
 
 Questo documento analizza in profondità il ruolo, la selezione, la persistenza e i
 rischi dei Guard Node (Entry Node) nella rete Tor. I guard sono il componente più
@@ -18,7 +18,7 @@ reset, e impatto sulle prestazioni.
 - [Il file state e la persistenza dei Guard](#il-file-state-e-la-persistenza-dei-guard)
 - [Requisiti per essere un Guard Node](#requisiti-per-essere-un-guard-node)
 - [Path Bias Detection](#path-bias-detection)
-- [Vanguards — Protezione avanzata per Hidden Services](#vanguards-protezione-avanzata-per-hidden-services)
+- [Vanguards - Protezione avanzata per Hidden Services](#vanguards-protezione-avanzata-per-hidden-services)
 - [Attacchi specifici ai Guard Nodes](#attacchi-specifici-ai-guard-nodes)
 - [Impatto dei Guard sulla performance](#impatto-dei-guard-sulla-performance)
 
@@ -35,13 +35,13 @@ Il Guard Node è il **primo nodo** del circuito Tor:
 
 | Informazione | Visibile al Guard? |
 |-------------|-------------------|
-| Il tuo IP reale | **SI** — è la connessione TCP diretta |
-| La tua posizione geografica | **SI** — derivabile dall'IP |
-| Il tuo ISP | **SI** — derivabile dall'IP |
-| Quando ti connetti | **SI** — vede il timing della connessione |
-| Quanti dati invii | **SI** — vede il volume di traffico |
-| La destinazione finale | **NO** — vede solo l'IP del Middle |
-| Il contenuto del traffico | **NO** — vede solo celle cifrate |
+| Il tuo IP reale | **SI** - è la connessione TCP diretta |
+| La tua posizione geografica | **SI** - derivabile dall'IP |
+| Il tuo ISP | **SI** - derivabile dall'IP |
+| Quando ti connetti | **SI** - vede il timing della connessione |
+| Quanti dati invii | **SI** - vede il volume di traffico |
+| La destinazione finale | **NO** - vede solo l'IP del Middle |
+| Il contenuto del traffico | **NO** - vede solo celle cifrate |
 
 ### Perché il Guard è critico
 
@@ -76,7 +76,7 @@ A partire da Tor 0.2.4, il client seleziona un piccolo numero di guard e li
 riutilizza per un periodo esteso (mesi):
 
 - Se il guard è "buono" (non controllato dall'avversario), sei protetto per mesi
-- Se il guard è "malevolo", sei esposto — ma il rischio è una tantum, non
+- Se il guard è "malevolo", sei esposto - ma il rischio è una tantum, non
   cumulativo nel tempo
 - Con 1 guard, hai ~probabilità_avversario di esposizione, non 1-(1-p)^n
 
@@ -225,7 +225,7 @@ ne seleziona un altro.
 
 ---
 
-## Vanguards — Protezione avanzata per Hidden Services
+## Vanguards - Protezione avanzata per Hidden Services
 
 Per gli onion services (hidden services), i guard sono ancora più critici perché un
 avversario potrebbe provare a enumerare i guard per deanonimizzare il server.
@@ -344,8 +344,8 @@ prestazioni peggiori.
 
 ## Vedi anche
 
-- [Middle Relay](middle-relay.md) — Secondo hop del circuito
-- [Exit Nodes](exit-nodes.md) — Terzo hop e uscita dalla rete
-- [Architettura di Tor](../01-fondamenti/architettura-tor.md) — Ruolo del Guard nell'architettura
-- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) — Attacchi ai Guard (Sybil, correlazione)
-- [Onion Services v3](onion-services-v3.md) — Vanguards come Guard persistenti per HS
+- [Middle Relay](middle-relay.md) - Secondo hop del circuito
+- [Exit Nodes](exit-nodes.md) - Terzo hop e uscita dalla rete
+- [Architettura di Tor](../01-fondamenti/architettura-tor.md) - Ruolo del Guard nell'architettura
+- [Attacchi Noti](../07-limitazioni-e-attacchi/attacchi-noti.md) - Attacchi ai Guard (Sybil, correlazione)
+- [Onion Services v3](onion-services-v3.md) - Vanguards come Guard persistenti per HS
