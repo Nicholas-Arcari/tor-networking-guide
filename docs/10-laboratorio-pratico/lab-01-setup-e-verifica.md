@@ -1,4 +1,4 @@
-# Lab 01 — Setup Completo e Verifica di Tor
+# Lab 01 - Setup Completo e Verifica di Tor
 
 Esercizio pratico per installare, configurare e verificare un setup Tor completo
 su Kali Linux (Debian-based). Ogni passo include il comando, l'output atteso,
@@ -197,7 +197,7 @@ proxychains firefox -no-remote -P tor-proxy &
 # network.proxy.socks_remote_dns = true
 ```
 
-**Verifica**: visitare https://check.torproject.org — deve mostrare "Congratulations. This browser is configured to use Tor."
+**Verifica**: visitare https://check.torproject.org - deve mostrare "Congratulations. This browser is configured to use Tor."
 
 ---
 
@@ -272,6 +272,6 @@ grep -v "^#" /etc/proxychains4.conf | grep socks
 
 ## Vedi anche
 
-- [Installazione e Verifica](../02-installazione-e-configurazione/installazione-e-verifica.md) — Guida completa installazione
-- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Tutte le direttive
-- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) — Test approfonditi
+- [Installazione e Verifica](../02-installazione-e-configurazione/installazione-e-verifica.md) - Guida completa installazione
+- [torrc - Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) - Tutte le direttive
+- [Verifica IP, DNS e Leak](../04-strumenti-operativi/verifica-ip-dns-e-leak.md) - Test approfonditi
