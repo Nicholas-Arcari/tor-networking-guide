@@ -1,4 +1,4 @@
-# Configurazione torrc — Guida Completa a Ogni Direttiva
+# Configurazione torrc - Guida Completa a Ogni Direttiva
 
 Questo documento analizza in profondità il file di configurazione di Tor (`/etc/tor/torrc`),
 spiegando ogni direttiva rilevante con il suo significato a basso livello, le implicazioni
@@ -12,18 +12,15 @@ e perché certi valori sono migliori di altri.
 
 ## Indice
 
-- [Il file torrc — Struttura e sintassi](#il-file-torrc-struttura-e-sintassi)
+- [Il file torrc - Struttura e sintassi](#il-file-torrc-struttura-e-sintassi)
 - [Sezione 1: Porte e interfacce di rete](#sezione-1-porte-e-interfacce-di-rete)
 - [Sezione 2: Logging](#sezione-2-logging)
-- [Sezione 3: Bridge e Pluggable Transports](#sezione-3-bridge-e-pluggable-transports)
-- [Sezione 4: Direttive di sicurezza avanzate](#sezione-4-direttive-di-sicurezza-avanzate)
-- [Sezione 5: Performance e tuning](#sezione-5-performance-e-tuning)
-- [Sezione 6: Configurazione come relay (opzionale)](#sezione-6-configurazione-come-relay-opzionale)
-- [Sezione 7: Hidden Services (Onion Services v3)](#sezione-7-hidden-services-onion-services-v3)
-- [La mia configurazione completa](#la-mia-configurazione-completa)
+**Approfondimenti** (file dedicati):
+- [Bridge e Sicurezza nel torrc](torrc-bridge-e-sicurezza.md) - Bridge, pluggable transports, sicurezza avanzata
+- [Performance, Relay e Configurazione Completa](torrc-performance-e-relay.md) - Tuning, relay, hidden services, torrc completo
 
 
-## Il file torrc — Struttura e sintassi
+## Il file torrc - Struttura e sintassi
 
 Il file `/etc/tor/torrc` è il file di configurazione principale di Tor. La sintassi è:
 
@@ -276,332 +273,23 @@ sudo tail -f /var/log/tor/notices.log
 
 ---
 
-## Sezione 3: Bridge e Pluggable Transports
-
-### UseBridges
-
-```ini
-UseBridges 1
-```
-
-**Cosa fa**: dice a Tor di connettersi alla rete tramite bridge anziché tramite
-relay pubblici. Tor non tenterà di connettersi direttamente ai guard nel consenso.
-
-**Quando attivarlo**:
-- L'ISP blocca le connessioni ai relay Tor noti
-- Si vuole nascondere all'ISP l'uso di Tor
-- La rete ha DPI che identifica e blocca il traffico Tor
-- Si è in un paese con censura attiva
-
-### ClientTransportPlugin
-
-```ini
-ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
-```
-
-**Cosa fa**: registra `obfs4proxy` come pluggable transport disponibile. Quando Tor
-deve connettersi a un bridge obfs4, invoca `/usr/bin/obfs4proxy` come processo
-figlio.
-
-**Dettagli interni**:
-- Tor comunica con obfs4proxy tramite il protocollo PT (Pluggable Transport)
-- obfs4proxy apre una porta locale (scelta dinamicamente)
-- Tor si connette a questa porta locale
-- obfs4proxy offusca il traffico e lo inoltra al bridge remoto
-- Il bridge remoto ha un'istanza di obfs4proxy server-side che deoffusca
-
-### Direttive Bridge
-
-```ini
-Bridge obfs4 <IP>:<PORT> <FINGERPRINT> cert=<CERT> iat-mode=<0|1|2>
-```
-
-**Componenti**:
-- `obfs4` — tipo di pluggable transport
-- `<IP>:<PORT>` — indirizzo del bridge (IPv4 o IPv6)
-- `<FINGERPRINT>` — fingerprint del relay bridge (20 byte hex)
-- `cert=<CERT>` — certificato obfs4 del bridge (base64)
-- `iat-mode` — modalità di timing:
-  - `0` — nessun padding temporale (più veloce, meno sicuro)
-  - `1` — padding temporale moderato (raccomandato)
-  - `2` — padding temporale massimo (più lento, massima resistenza a DPI)
-
-**Nella mia esperienza**:
-```ini
-Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B... cert=... iat-mode=0
-Bridge obfs4 xxx.xxx.xxx.xxx:13630 A3D55AA6178... cert=... iat-mode=2
-```
-
-Ho configurato due bridge con iat-mode diversi. Il primo (iat-mode=0) è più veloce
-e lo uso come primario. Il secondo (iat-mode=2) è il fallback per situazioni dove
-il DPI è aggressivo.
-
-**Come ottenere bridge**:
-1. `https://bridges.torproject.org/options` — sito ufficiale (richiede CAPTCHA)
-2. Email a `bridges@torproject.org` con corpo `get transport obfs4` (da Gmail o Riseup)
-3. Snowflake — bridge tramite browser di volontari (meno stabile)
-
-**Nota dalla mia esperienza**: inizialmente avevo usato un URL errato per i bridge
-(`https://bridges.torproject.org/bridges`, suggerito da ChatGPT). L'URL corretto è
-`https://bridges.torproject.org/options`. I bridge ricevuti vanno inseriti esattamente
-come forniti, incluso il certificato completo.
-
----
-
-## Sezione 4: Direttive di sicurezza avanzate
-
-### ExitNodes, EntryNodes, StrictNodes
-
-```ini
-# Forzare exit in un paese specifico
-ExitNodes {de},{nl}
-StrictNodes 1
-
-# Escludere exit da certi paesi
-ExcludeExitNodes {ru},{cn},{ir}
-
-# Forzare entry specifici
-EntryNodes {se},{ch}
-```
-
-**ATTENZIONE**: usare `ExitNodes` con `StrictNodes 1` è generalmente **sconsigliato**:
-- Riduce drasticamente il pool di exit disponibili
-- Aumenta la probabilità di saturazione dei pochi exit rimasti
-- Rende il traffico più riconoscibile (fingerprinting: "questo utente esce sempre dalla Germania")
-- Se i pochi exit disponibili sono offline, Tor non funziona
-
-**Nella mia esperienza**, ho provato `ExitNodes {it}` per uscire con IP italiano.
-Il risultato è stato:
-- Pochissimi exit italiani disponibili
-- Latenza peggiore (paradossalmente, perché i pochi exit erano sovraccarichi)
-- Circuiti instabili
-- Ho rimosso la direttiva e lasciato che Tor scelga liberamente
-
-### ExcludeNodes
-
-```ini
-ExcludeNodes {cn},{ru},{ir},{kp}
-```
-
-**Cosa fa**: esclude completamente i relay in questi paesi da qualsiasi posizione
-nel circuito (guard, middle, exit). Più ragionevole di `ExitNodes` perché non limita
-a pochi relay ma ne esclude alcuni.
-
-### MapAddress
-
-```ini
-MapAddress www.example.com www.example.com.torproject.org
-MapAddress 10.0.0.0/8 0.0.0.0/8
-```
-
-**Cosa fa**: permette di redirezionare hostname o range IP a livello di Tor. Utile
-per test o per forzare il routing di certe destinazioni.
-
-### ReachableAddresses
-
-```ini
-ReachableAddresses *:80, *:443
-ReachableAddresses reject *:*
-```
-
-**Cosa fa**: limita le porte verso cui Tor può connettersi per raggiungere i relay.
-Utile se sei dietro un firewall che permette solo traffico HTTP/HTTPS.
-
-**Dettaglio**: questo riguarda la connessione Tor→relay, non il traffico applicativo.
-Se il tuo firewall permette solo porta 80 e 443, configuri `ReachableAddresses` di
-conseguenza e Tor selezionerà solo relay con ORPort su quelle porte.
-
-### ConnectionPadding
-
-```ini
-ConnectionPadding 1      # Abilita padding tra relay (default: auto)
-ReducedConnectionPadding 0  # Non ridurre il padding (default)
-```
-
-**Cosa fa**: Tor invia celle di padding sulle connessioni tra relay per mascherare
-i pattern di traffico. `ConnectionPadding 1` forza il padding anche quando non
-sarebbe altrimenti attivato.
-
----
-
-## Sezione 5: Performance e tuning
-
-### CircuitBuildTimeout
-
-```ini
-CircuitBuildTimeout 60
-```
-
-**Cosa fa**: timeout in secondi per la costruzione di un circuito. Se un circuito non
-viene costruito entro questo tempo, viene abbandonato e Tor ne prova un altro.
-
-**Default**: Tor calcola dinamicamente questo valore basandosi sulle esperienze
-passate. Impostarlo manualmente sovrascrive il calcolo adattivo.
-
-### LearnCircuitBuildTimeout
-
-```ini
-LearnCircuitBuildTimeout 1
-```
-
-**Cosa fa**: permette a Tor di adattare il timeout basandosi sulle esperienze reali.
-Se la rete è lenta (es. via bridge obfs4), Tor aumenta il timeout. Se è veloce, lo
-riduce.
-
-### NumEntryGuards
-
-```ini
-NumEntryGuards 1
-```
-
-**Cosa fa**: numero di guard persistenti da mantenere. Il default è 1 (prima era 3).
-
-**Perché 1 è meglio di 3**: con un solo guard, c'è 1 possibilità su ~1000 che il
-guard sia malevolo. Con 3 guard, ci sono 3 possibilità su ~1000. Meno guard = meno
-rischio di avere un guard malevolo nel tempo.
-
-### MaxCircuitDirtiness
-
-```ini
-MaxCircuitDirtiness 600
-```
-
-**Cosa fa**: tempo in secondi dopo il quale un circuito "dirty" (che ha trasportato
-almeno uno stream) non viene riutilizzato per nuovi stream. Default: 600 (10 minuti).
-
-**Implicazione**: dopo 10 minuti, le nuove connessioni useranno un nuovo circuito
-(con potenzialmente un nuovo exit e un nuovo IP). Questo è il motivo per cui il tuo
-IP visibile cambia periodicamente anche senza NEWNYM.
-
----
-
-## Sezione 6: Configurazione come relay (opzionale)
-
-Queste direttive sono per chi vuole contribuire alla rete Tor operando un relay.
-Non le ho attivate nella mia configurazione, ma le documento per completezza.
-
-### ORPort
-
-```ini
-ORPort 9001
-# oppure con binding specifico
-ORPort 443 NoListen
-ORPort 127.0.0.1:9001 NoAdvertise
-```
-
-**Cosa fa**: apre la porta Onion Router, che accetta connessioni da altri relay Tor.
-Attivare ORPort trasforma il tuo sistema in un relay Tor.
-
-### Relay Bandwidth
-
-```ini
-RelayBandwidthRate 1 MB    # Throttle a 1 MB/s
-RelayBandwidthBurst 2 MB   # Burst fino a 2 MB/s
-AccountingMax 500 GB       # Massimo 500 GB per periodo
-AccountingStart month 1 00:00  # Periodo mensile
-```
-
-### Relay come bridge
-
-```ini
-BridgeRelay 1
-PublishServerDescriptor 0   # Non pubblicare nel consenso (bridge privato)
-ServerTransportPlugin obfs4 exec /usr/bin/obfs4proxy
-ServerTransportListenAddr obfs4 0.0.0.0:8443
-ExtORPort auto
-```
-
-### Exit Policy (se il relay è un exit)
-
-```ini
-# Permetti solo web
-ExitPolicy accept *:80
-ExitPolicy accept *:443
-ExitPolicy reject *:*
-
-# Oppure: restrittiva ma permetti servizi comuni
-ExitPolicy accept *:20-23     # FTP, SSH, Telnet
-ExitPolicy accept *:53        # DNS
-ExitPolicy accept *:80        # HTTP
-ExitPolicy accept *:443       # HTTPS
-ExitPolicy accept *:993       # IMAPS
-ExitPolicy accept *:995       # POP3S
-ExitPolicy reject *:*
-```
-
----
-
-## Sezione 7: Hidden Services (Onion Services v3)
-
-```ini
-HiddenServiceDir /var/lib/tor/hidden_service/
-HiddenServicePort 80 127.0.0.1:8080
-```
-
-**Cosa fa**: configura un onion service che rende raggiungibile un servizio locale
-(porta 8080) tramite un indirizzo `.onion` sulla porta 80.
-
-**Dettagli interni**:
-- Tor genera una coppia di chiavi Ed25519 in `HiddenServiceDir`
-- L'indirizzo `.onion` è derivato dalla chiave pubblica (56 caratteri per v3)
-- Tor pubblica dei descriptor cifrati sugli HSDir nella rete Tor
-- I client che conoscono l'indirizzo `.onion` usano il descriptor per stabilire
-  un circuito rendezvous
-
-Questo viene approfondito nel documento dedicato agli onion services.
-
----
-
-## La mia configurazione completa
-
-Ecco il mio torrc completo, con commenti che spiegano ogni scelta:
-
-```ini
-# === Porte client ===
-SocksPort 9050                    # Proxy SOCKS5 principale
-DNSPort 5353                      # DNS via Tor
-AutomapHostsOnResolve 1           # Mapping automatico .onion e hostname
-
-# === Controllo ===
-ControlPort 9051                  # Per NEWNYM e monitoring
-CookieAuthentication 1            # Auth via cookie file
-
-# === Sicurezza ===
-ClientUseIPv6 0                   # No IPv6 (previene leak)
-
-# === Dati ===
-DataDirectory /var/lib/tor
-
-# === Logging ===
-Log notice file /var/log/tor/notices.log
-
-# === Bridge obfs4 ===
-UseBridges 1
-ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
-Bridge obfs4 xxx.xxx.xxx.xxx:4431 F829D395093B... cert=... iat-mode=0
-Bridge obfs4 xxx.xxx.xxx.xxx:13630 A3D55AA6178... cert=... iat-mode=2
-```
-
-Questa configurazione:
-- Instrada il traffico attraverso bridge obfs4 (nasconde l'uso di Tor all'ISP)
-- Previene DNS leak (DNSPort + AutomapHostsOnResolve)
-- Previene IPv6 leak (ClientUseIPv6 0)
-- Permette rotazione IP via ControlPort (NEWNYM)
-- Logga a livello notice per troubleshooting senza compromettere privacy
+> **Continua in**: [Bridge e Sicurezza nel torrc](torrc-bridge-e-sicurezza.md) per bridge,
+> pluggable transports e direttive di sicurezza, e in [Performance, Relay e Configurazione
+> Completa](torrc-performance-e-relay.md) per tuning, configurazione relay e onion services.
 
 ---
 
 ## Vedi anche
 
-- [Installazione e Verifica](installazione-e-verifica.md) — Setup iniziale prima del torrc
-- [Gestione del Servizio](gestione-del-servizio.md) — Riavviare Tor dopo modifiche al torrc
-- [Bridges e Pluggable Transports](../03-nodi-e-rete/bridges-e-pluggable-transports.md) — Configurazione bridge nel torrc
-- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — SocksPort multipli e isolamento
-- [Tor e DNS — Risoluzione](../04-strumenti-operativi/tor-e-dns-risoluzione.md) — DNSPort e AutomapHosts
+- [Bridge e Sicurezza nel torrc](torrc-bridge-e-sicurezza.md) - Bridge, pluggable transports, sicurezza
+- [Performance, Relay e Configurazione Completa](torrc-performance-e-relay.md) - Tuning, relay, hidden services
+- [Installazione e Verifica](installazione-e-verifica.md) - Setup iniziale prima del torrc
+- [Gestione del Servizio](gestione-del-servizio.md) - Riavviare Tor dopo modifiche al torrc
+- [Scenari Reali](scenari-reali.md) - Casi operativi da pentester
 
 ---
 
-## Cheat Sheet — Direttive torrc essenziali
+## Cheat Sheet - Direttive torrc essenziali
 
 | Direttiva | Valore | Descrizione |
 |-----------|--------|-------------|
