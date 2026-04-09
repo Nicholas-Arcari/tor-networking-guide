@@ -1,4 +1,4 @@
-# ProxyChains — Guida Completa e Analisi a Basso Livello
+# ProxyChains - Guida Completa e Analisi a Basso Livello
 
 Questo documento analizza ProxyChains in profondità: come funziona internamente
 (LD_PRELOAD, hook delle syscall), tutte le modalità di chain, la configurazione DNS,
@@ -13,8 +13,8 @@ quotidianamente per instradare `curl`, `firefox` e altri strumenti attraverso To
 ## Indice
 
 - [Cos'è ProxyChains e come funziona internamente](#cosè-proxychains-e-come-funziona-internamente)
-- [Il file di configurazione — Analisi completa](#il-file-di-configurazione-analisi-completa)
-- [Uso pratico — Comandi quotidiani](#uso-pratico-comandi-quotidiani)
+- [Il file di configurazione - Analisi completa](#il-file-di-configurazione-analisi-completa)
+- [Uso pratico - Comandi quotidiani](#uso-pratico-comandi-quotidiani)
 - [Debugging di ProxyChains](#debugging-di-proxychains)
 - [ProxyChains vs alternative](#proxychains-vs-alternative)
 - [La mia configurazione proxychains4.conf](#la-mia-configurazione-proxychains4conf)
@@ -40,9 +40,9 @@ Quando esegui `proxychains curl https://example.com`:
 
 1. Il sistema carica `libproxychains.so.4` PRIMA delle librerie standard (LD_PRELOAD)
 2. La libreria sovrascrive (hook) le funzioni:
-   - `connect()` — redirezionata verso il proxy SOCKS
-   - `getaddrinfo()` / `gethostbyname()` — intercettate per proxy DNS (se `proxy_dns`)
-   - `close()` — per gestire cleanup
+   - `connect()` - redirezionata verso il proxy SOCKS
+   - `getaddrinfo()` / `gethostbyname()` - intercettate per proxy DNS (se `proxy_dns`)
+   - `close()` - per gestire cleanup
 3. Quando curl chiama `connect()`, la chiamata finisce nella funzione di proxychains
 4. ProxyChains apre una connessione SOCKS5 verso `127.0.0.1:9050`
 5. Invia il comando SOCKS5 CONNECT con la destinazione originale
@@ -106,7 +106,7 @@ Riga per riga:
 
 ---
 
-## Il file di configurazione — Analisi completa
+## Il file di configurazione - Analisi completa
 
 ### Percorso del file
 
@@ -228,7 +228,7 @@ tcp_read_time_out 30000
 tcp_connect_time_out 15000
 ```
 
-### Localnet — Esclusioni dal proxy
+### Localnet - Esclusioni dal proxy
 
 ```ini
 # Connessioni a queste range NON passano dal proxy
@@ -241,7 +241,7 @@ Docker) attraverso la stessa shell dove usi proxychains. Senza localnet, anche l
 connessioni locali verrebbero redirezionate a Tor (e fallirebbero, perché l'exit
 node non può raggiungere il tuo localhost).
 
-### ProxyList — I proxy da usare
+### ProxyList - I proxy da usare
 
 ```ini
 [ProxyList]
@@ -251,10 +251,10 @@ socks5 127.0.0.1 9050
 Formato: `<tipo> <IP> <porta> [username password]`
 
 Tipi supportati:
-- `http` — proxy HTTP CONNECT
-- `socks4` — SOCKS4 (non supporta hostname, solo IP)
-- `socks5` — SOCKS5 (supporta hostname → necessario per Tor)
-- `raw` — forwarding diretto senza protocollo proxy
+- `http` - proxy HTTP CONNECT
+- `socks4` - SOCKS4 (non supporta hostname, solo IP)
+- `socks5` - SOCKS5 (supporta hostname → necessario per Tor)
+- `raw` - forwarding diretto senza protocollo proxy
 
 **Perché socks5 e non socks4**: SOCKS5 permette di inviare hostname come stringa
 (DOMAINNAME). Questo è fondamentale per Tor: l'hostname viene risolto dall'exit node,
@@ -262,7 +262,7 @@ non localmente. SOCKS4 richiede un IP numerico → forza la risoluzione DNS loca
 
 ---
 
-## Uso pratico — Comandi quotidiani
+## Uso pratico - Comandi quotidiani
 
 ### Verificare IP
 
@@ -305,16 +305,16 @@ proxychains git clone https://github.com/user/repo.git
 ### Nella mia esperienza
 
 Gli strumenti che funzionano bene con proxychains:
-- `curl` — perfetto, è il mio test principale
-- `wget` — funziona bene per download
-- `firefox` — funziona con profilo dedicato
-- `git` — funziona per clone/pull/push HTTPS
+- `curl` - perfetto, è il mio test principale
+- `wget` - funziona bene per download
+- `firefox` - funziona con profilo dedicato
+- `git` - funziona per clone/pull/push HTTPS
 
 Gli strumenti che funzionano male o non funzionano:
-- `ping` — usa ICMP (non TCP), non funziona
-- `nmap -sS` — SYN scan richiede raw socket, non intercettato da LD_PRELOAD
-- `traceroute` — usa ICMP/UDP, non funziona
-- Applicazioni staticamente compilate — bypassano LD_PRELOAD
+- `ping` - usa ICMP (non TCP), non funziona
+- `nmap -sS` - SYN scan richiede raw socket, non intercettato da LD_PRELOAD
+- `traceroute` - usa ICMP/UDP, non funziona
+- Applicazioni staticamente compilate - bypassano LD_PRELOAD
 
 ---
 
@@ -423,15 +423,15 @@ Questa configurazione:
 
 ## Vedi anche
 
-- [torsocks](torsocks.md) — Alternativa a proxychains con blocco UDP
-- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — proxy_dns e prevenzione leak
-- [Tor Browser e Applicazioni](tor-browser-e-applicazioni.md) — Matrice compatibilità applicazioni
-- [Verifica IP, DNS e Leak](verifica-ip-dns-e-leak.md) — Test dopo configurazione proxychains
-- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Cosa funziona con proxychains
+- [torsocks](torsocks.md) - Alternativa a proxychains con blocco UDP
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) - proxy_dns e prevenzione leak
+- [Tor Browser e Applicazioni](tor-browser-e-applicazioni.md) - Matrice compatibilità applicazioni
+- [Verifica IP, DNS e Leak](verifica-ip-dns-e-leak.md) - Test dopo configurazione proxychains
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) - Cosa funziona con proxychains
 
 ---
 
-## Cheat Sheet — Comandi rapidi ProxyChains
+## Cheat Sheet - Comandi rapidi ProxyChains
 
 | Comando | Descrizione |
 |---------|-------------|
