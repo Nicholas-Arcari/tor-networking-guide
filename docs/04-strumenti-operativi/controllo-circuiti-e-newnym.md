@@ -1,4 +1,4 @@
-# Controllo dei Circuiti e NEWNYM — Gestire Tor via ControlPort
+# Controllo dei Circuiti e NEWNYM - Gestire Tor via ControlPort
 
 Questo documento analizza in profondità il protocollo di controllo di Tor
 (ControlPort 9051), il segnale NEWNYM per la rotazione IP, l'ispezione dei
@@ -13,8 +13,8 @@ nel debug dell'autenticazione cookie, e nell'uso quotidiano della rotazione IP.
 ## Indice
 
 - [Il protocollo ControlPort](#il-protocollo-controlport)
-- [SIGNAL NEWNYM — Rotazione IP](#signal-newnym-rotazione-ip)
-- [Comandi del ControlPort — Catalogo completo](#comandi-del-controlport-catalogo-completo)
+- [SIGNAL NEWNYM - Rotazione IP](#signal-newnym-rotazione-ip)
+- [Comandi del ControlPort - Catalogo completo](#comandi-del-controlport-catalogo-completo)
 - [Automazione con Python Stem](#automazione-con-python-stem)
 - [Script avanzati](#script-avanzati)
 - [Sicurezza del ControlPort](#sicurezza-del-controlport)
@@ -95,7 +95,7 @@ sequenceDiagram
     Tor-->>CP: Cookie valido
     CP-->>Script: 250 OK
 
-    Note over Script,Tor: Autenticato — ora può inviare comandi
+    Note over Script,Tor: Autenticato - ora può inviare comandi
 
     Script->>CP: SIGNAL NEWNYM
     CP->>Tor: Invalida circuiti esistenti
@@ -111,7 +111,7 @@ sequenceDiagram
 
 ---
 
-## SIGNAL NEWNYM — Rotazione IP
+## SIGNAL NEWNYM - Rotazione IP
 
 ### Come funziona
 
@@ -179,7 +179,7 @@ Per verificare, controllare se l'IP è effettivamente cambiato.
 
 ---
 
-## Comandi del ControlPort — Catalogo completo
+## Comandi del ControlPort - Catalogo completo
 
 ### Segnali (SIGNAL)
 
@@ -403,15 +403,15 @@ Il ControlPort permette di:
 
 ## Vedi anche
 
-- [Nyx e Monitoraggio](nyx-e-monitoraggio.md) — Visualizzare circuiti in tempo reale
-- [torrc — Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) — Configurazione ControlPort
-- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — NEWNYM per istanza
-- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) — Perché NEWNYM non cambia il Guard
-- [Incident Response](../09-scenari-operativi/incident-response.md) — NEWNYM come recovery dopo leak
+- [Nyx e Monitoraggio](nyx-e-monitoraggio.md) - Visualizzare circuiti in tempo reale
+- [torrc - Guida Completa](../02-installazione-e-configurazione/torrc-guida-completa.md) - Configurazione ControlPort
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) - NEWNYM per istanza
+- [Guard Nodes](../03-nodi-e-rete/guard-nodes.md) - Perché NEWNYM non cambia il Guard
+- [Incident Response](../09-scenari-operativi/incident-response.md) - NEWNYM come recovery dopo leak
 
 ---
 
-## Cheat Sheet — Comandi ControlPort
+## Cheat Sheet - Comandi ControlPort
 
 | Comando ControlPort | Descrizione |
 |--------------------|-------------|
