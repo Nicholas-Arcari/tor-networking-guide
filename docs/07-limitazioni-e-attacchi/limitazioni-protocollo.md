@@ -1,4 +1,4 @@
-# Limitazioni del Protocollo Tor — Analisi Tecnica Completa
+# Limitazioni del Protocollo Tor - Analisi Tecnica Completa
 
 Questo documento analizza in profondità tutte le limitazioni architetturali e
 protocollari di Tor: perché supporta solo TCP, cosa succede al traffico UDP,
@@ -13,11 +13,11 @@ dove ho toccato con mano l'impossibilità di usare certi protocolli e servizi.
 ## Indice
 
 - [Limitazione fondamentale: Solo TCP](#limitazione-fondamentale-solo-tcp)
-- [Latenza — Il costo dei 3 hop](#latenza-il-costo-dei-3-hop)
-- [Bandwidth — Imprevedibile e limitata](#bandwidth-imprevedibile-e-limitata)
+- [Latenza - Il costo dei 3 hop](#latenza-il-costo-dei-3-hop)
+- [Bandwidth - Imprevedibile e limitata](#bandwidth-imprevedibile-e-limitata)
 - [Limitazioni del protocollo SOCKS5](#limitazioni-del-protocollo-socks5)
 - [Circuiti multipli e IP variabili](#circuiti-multipli-e-ip-variabili)
-- [Protocolli e applicazioni problematiche — Riepilogo](#protocolli-e-applicazioni-problematiche-riepilogo)
+- [Protocolli e applicazioni problematiche - Riepilogo](#protocolli-e-applicazioni-problematiche-riepilogo)
 - [Possibili sviluppi futuri](#possibili-sviluppi-futuri)
 
 
@@ -44,7 +44,7 @@ su UDP richiederebbe reimplementare TCP dentro Tor, vanificando il vantaggio di 
 
 ### Conseguenze concrete
 
-#### DNS nativo (UDP porta 53) — Bloccato
+#### DNS nativo (UDP porta 53) - Bloccato
 
 Il DNS standard usa UDP. Senza configurazione speciale, le query DNS non passano
 da Tor:
@@ -62,7 +62,7 @@ oppure:
 Nella mia esperienza, la configurazione `DNSPort 5353` + `proxy_dns` in proxychains
 risolve completamente questo problema per le applicazioni che uso.
 
-#### VoIP / RTP (UDP) — Non funzionante
+#### VoIP / RTP (UDP) - Non funzionante
 
 ```
 Protocollo: RTP over UDP (porte dinamiche)
@@ -72,7 +72,7 @@ Motivo: Tor non trasporta UDP. Anche con encapsulation TCP, la latenza di
 Impatto: niente chiamate vocali, niente VoIP, niente SIP
 ```
 
-#### WebRTC (UDP + STUN/TURN) — Disabilitato per sicurezza
+#### WebRTC (UDP + STUN/TURN) - Disabilitato per sicurezza
 
 ```
 Protocollo: WebRTC usa UDP per media, STUN/TURN per NAT traversal
@@ -86,7 +86,7 @@ Impatto: niente videochiamate nel browser (Google Meet, Zoom web, Discord web)
 Nella mia configurazione Firefox tor-proxy, ho disabilitato manualmente WebRTC
 in about:config per prevenire IP leak.
 
-#### HTTP/3 (QUIC — UDP) — Bloccato
+#### HTTP/3 (QUIC - UDP) - Bloccato
 
 ```
 Protocollo: QUIC (HTTP/3 over UDP porta 443)
@@ -101,7 +101,7 @@ Impatto:
 In Firefox tor-proxy: `network.http.http3.enabled = false` per evitare
 tentativi falliti di QUIC.
 
-#### Gaming online (UDP + bassa latenza) — Impossibile
+#### Gaming online (UDP + bassa latenza) - Impossibile
 
 ```
 Protocolli: UDP game protocol, anti-cheat, NAT traversal
@@ -114,7 +114,7 @@ Motivi:
   5. NAT traversal (STUN/TURN) non funziona
 ```
 
-#### NTP (UDP porta 123) — Bloccato
+#### NTP (UDP porta 123) - Bloccato
 
 ```
 Protocollo: NTP (Network Time Protocol, UDP porta 123)
@@ -125,7 +125,7 @@ Soluzione: usare ntpdate occasionalmente senza Tor, o configurare
   chrony con supporto NTS (che usa TCP)
 ```
 
-#### ICMP (ping, traceroute) — Non supportato
+#### ICMP (ping, traceroute) - Non supportato
 
 ```
 Protocollo: ICMP (non è né TCP né UDP)
@@ -137,7 +137,7 @@ Soluzione: nessuna. Per verificare raggiungibilità via Tor, usare:
 
 ---
 
-## Latenza — Il costo dei 3 hop
+## Latenza - Il costo dei 3 hop
 
 ### Analisi della latenza
 
@@ -189,7 +189,7 @@ real    0m4.567s
 
 ---
 
-## Bandwidth — Imprevedibile e limitata
+## Bandwidth - Imprevedibile e limitata
 
 ### Perché la bandwidth è bassa
 
@@ -266,7 +266,7 @@ Amazon, PayPal e banche italiane bloccano direttamente il login.
 
 ---
 
-## Protocolli e applicazioni problematiche — Riepilogo
+## Protocolli e applicazioni problematiche - Riepilogo
 
 | Protocollo/App | Problema | Funziona via Tor? | Alternativa |
 |---------------|----------|------------------|-------------|
@@ -309,8 +309,8 @@ migliorando throughput e affidabilità. Disponibile a partire da Tor 0.4.8.
 
 ## Vedi anche
 
-- [Architettura di Tor](../01-fondamenti/architettura-tor.md) — Design choices che causano le limitazioni
-- [Limitazioni nelle Applicazioni](limitazioni-applicazioni.md) — Impatto pratico delle limitazioni
-- [VPN e Tor Ibrido](../06-configurazioni-avanzate/vpn-e-tor-ibrido.md) — VPN per superare alcune limitazioni
-- [Attacchi Noti](attacchi-noti.md) — Attacchi che sfruttano le limitazioni
-- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Limiti della protezione dalla correlazione
+- [Architettura di Tor](../01-fondamenti/architettura-tor.md) - Design choices che causano le limitazioni
+- [Limitazioni nelle Applicazioni](limitazioni-applicazioni.md) - Impatto pratico delle limitazioni
+- [VPN e Tor Ibrido](../06-configurazioni-avanzate/vpn-e-tor-ibrido.md) - VPN per superare alcune limitazioni
+- [Attacchi Noti](attacchi-noti.md) - Attacchi che sfruttano le limitazioni
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) - Limiti della protezione dalla correlazione
