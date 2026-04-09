@@ -1,4 +1,4 @@
-# Verifica IP, DNS e Leak — Test Completi per la Sicurezza di Tor
+# Verifica IP, DNS e Leak - Test Completi per la Sicurezza di Tor
 
 Questo documento copre tutti i metodi per verificare che il traffico stia effettivamente
 passando attraverso Tor, che non ci siano DNS leak, e che l'identità reale non sia
@@ -12,20 +12,20 @@ Basato sulla mia esperienza nel verificare l'IP di uscita, nel confrontare l'IP 
 
 ## Indice
 
-- [Verifica dell'IP — Metodi completi](#verifica-dellip-metodi-completi)
+- [Verifica dell'IP - Metodi completi](#verifica-dellip-metodi-completi)
 - [Test DNS Leak](#test-dns-leak)
 - [Verifica delle porte in ascolto](#verifica-delle-porte-in-ascolto)
 - [Tipi di leak e come prevenirli](#tipi-di-leak-e-come-prevenirli)
 - [Nella mia esperienza](#nella-mia-esperienza)
 
 
-## Verifica dell'IP — Metodi completi
+## Verifica dell'IP - Metodi completi
 
 ### 1. IP reale (senza Tor)
 
 ```bash
 > curl https://api.ipify.org
-xxx.xxx.xxx.xxx    # il mio IP reale (censurato — ISP Comeser, Parma)
+xxx.xxx.xxx.xxx    # il mio IP reale (censurato - ISP Comeser, Parma)
 ```
 
 ### 2. IP via Tor (curl diretto)
@@ -39,7 +39,7 @@ La flag `--socks5-hostname` è **fondamentale**: invia l'hostname al proxy SOCKS
 (Tor), che lo risolve via la rete Tor. Senza `hostname`:
 
 ```bash
-# SBAGLIATO — causa DNS leak
+# SBAGLIATO - causa DNS leak
 > curl --socks5 127.0.0.1:9050 https://api.ipify.org
 # curl risolve "api.ipify.org" LOCALMENTE prima di inviare a Tor → DNS leak
 ```
@@ -74,9 +74,9 @@ Con `proxy_dns` attivo in proxychains.conf, il DNS è risolto via Tor (no leak).
 ```
 
 Informazioni utili:
-- `ip` — IP dell'exit node (non il mio)
-- `org` — spesso contiene "Tor Exit" nel nome
-- `country` — il paese dell'exit node (cambia ad ogni circuito/NEWNYM)
+- `ip` - IP dell'exit node (non il mio)
+- `org` - spesso contiene "Tor Exit" nel nome
+- `country` - il paese dell'exit node (cambia ad ogni circuito/NEWNYM)
 
 ### 5. Conferma che l'IP è un exit Tor
 
@@ -158,9 +158,9 @@ echo "IP Tor: $TOR_IP"
 
 # Confronto
 if [ "$REAL_IP" != "$TOR_IP" ]; then
-    echo "✓ IP diversi — Tor funziona"
+    echo "✓ IP diversi - Tor funziona"
 else
-    echo "✗ ATTENZIONE — stesso IP! Tor potrebbe non funzionare"
+    echo "✗ ATTENZIONE - stesso IP! Tor potrebbe non funzionare"
 fi
 
 # Verifica Tor
@@ -168,7 +168,7 @@ IS_TOR=$(proxychains curl -s https://check.torproject.org/api/ip 2>/dev/null | g
 if [ -n "$IS_TOR" ]; then
     echo "✓ Confermato: traffico esce da exit Tor"
 else
-    echo "✗ ATTENZIONE — traffico NON esce da Tor"
+    echo "✗ ATTENZIONE - traffico NON esce da Tor"
 fi
 ```
 
@@ -188,9 +188,9 @@ UNCONN  0  0  127.0.0.1:5353  0.0.0.0:*  users:(("tor",pid=1234,fd=8))
 ```
 
 Porte attese:
-- `9050 TCP` — SocksPort (proxy SOCKS5)
-- `9051 TCP` — ControlPort
-- `5353 UDP` — DNSPort
+- `9050 TCP` - SocksPort (proxy SOCKS5)
+- `9051 TCP` - ControlPort
+- `5353 UDP` - DNSPort
 
 Se una porta manca, verificare il torrc e riavviare Tor.
 
@@ -291,15 +291,15 @@ la rete Tor.
 
 ## Vedi anche
 
-- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — Analisi approfondita dei DNS leak
-- [ProxyChains — Guida Completa](proxychains-guida-completa.md) — Configurazione proxy_dns
-- [Tor e DNS — Risoluzione](tor-e-dns-risoluzione.md) — DNSPort e risoluzione via Tor
-- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — WebRTC leak e fingerprint
-- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Leak come errore OPSEC
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) - Analisi approfondita dei DNS leak
+- [ProxyChains - Guida Completa](proxychains-guida-completa.md) - Configurazione proxy_dns
+- [Tor e DNS - Risoluzione](tor-e-dns-risoluzione.md) - DNSPort e risoluzione via Tor
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) - WebRTC leak e fingerprint
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Leak come errore OPSEC
 
 ---
 
-## Cheat Sheet — Verifica rapida
+## Cheat Sheet - Verifica rapida
 
 | Test | Comando |
 |------|---------|
