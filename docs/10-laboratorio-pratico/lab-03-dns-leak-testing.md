@@ -1,4 +1,4 @@
-# Lab 03 — Rilevamento e Prevenzione DNS Leak
+# Lab 03 - Rilevamento e Prevenzione DNS Leak
 
 Esercizio pratico per comprendere, rilevare e prevenire i DNS leak quando si usa
 Tor. Include cattura con tcpdump, test automatici, e hardening con iptables.
@@ -37,7 +37,7 @@ Al termine di questo lab, saprai:
 ```bash
 # Primo, vediamo qual è il nostro resolver DNS attuale
 cat /etc/resolv.conf
-# Output: nameserver 192.168.1.1 (o simile — il tuo router/ISP)
+# Output: nameserver 192.168.1.1 (o simile - il tuo router/ISP)
 
 # Questo resolver è quello che riceve le query quando NON usiamo Tor
 # Se una query DNS esce senza passare da Tor, va a questo resolver
@@ -89,7 +89,7 @@ proxychains curl -s --max-time 15 https://check.torproject.org > /dev/null
 # TERMINALE 1: nessuna query DNS deve apparire
 
 # Test 2: cosa succede SENZA proxy_dns?
-# (NON fare su un sistema in produzione — solo per lab)
+# (NON fare su un sistema in produzione - solo per lab)
 # Commenta temporaneamente proxy_dns in /etc/proxychains4.conf
 # Ripeti il test → dovresti vedere query DNS in chiaro
 # RICORDA di riattivare proxy_dns dopo il test!
@@ -137,7 +137,7 @@ Crea il file `test-dns-leak.sh`:
 
 ```bash
 #!/bin/bash
-# test-dns-leak.sh — Test automatico DNS leak
+# test-dns-leak.sh - Test automatico DNS leak
 
 IFACE="${1:-eth0}"
 PASS=0
@@ -170,10 +170,10 @@ run_test() {
     rm -f "$PCAP"
 
     if [ "$expect_leak" = "leak" ] && [ "$QUERIES" -gt 0 ]; then
-        echo "LEAK rilevato ($QUERIES query) — atteso"
+        echo "LEAK rilevato ($QUERIES query) - atteso"
         PASS=$((PASS+1))
     elif [ "$expect_leak" = "noleak" ] && [ "$QUERIES" -eq 0 ]; then
-        echo "Nessun leak — OK"
+        echo "Nessun leak - OK"
         PASS=$((PASS+1))
     else
         echo "RISULTATO INATTESO ($QUERIES query)"
@@ -226,7 +226,7 @@ sudo systemd-resolve --flush-caches
 # 2. Il browser (non curl) fa prefetch DNS in background
 # → Disabilitare network.dns.disablePrefetch in about:config
 
-# 3. IPv6 DNS leak — il sistema usa DNS IPv6 non coperto dalle regole
+# 3. IPv6 DNS leak - il sistema usa DNS IPv6 non coperto dalle regole
 # → Aggiungere regole ip6tables o disabilitare IPv6:
 sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
 ```
@@ -261,6 +261,6 @@ sudo iptables -F OUTPUT
 
 ## Vedi anche
 
-- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) — Analisi completa dei DNS leak
-- [Tor e DNS — Risoluzione](../04-strumenti-operativi/tor-e-dns-risoluzione.md) — DNSPort e configurazione
-- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) — Regole firewall permanenti
+- [DNS Leak](../05-sicurezza-operativa/dns-leak.md) - Analisi completa dei DNS leak
+- [Tor e DNS - Risoluzione](../04-strumenti-operativi/tor-e-dns-risoluzione.md) - DNSPort e configurazione
+- [Hardening di Sistema](../05-sicurezza-operativa/hardening-sistema.md) - Regole firewall permanenti
