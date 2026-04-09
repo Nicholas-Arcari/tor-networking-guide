@@ -15,8 +15,8 @@ SecureDrop e OnionShare.
 - [Modello di minaccia per la comunicazione](#modello-di-minaccia-per-la-comunicazione)
 - [Email anonima via Tor](#email-anonima-via-tor)
 - [Messaggistica via Tor](#messaggistica-via-tor)
-- [SecureDrop — whistleblowing](#securedrop--whistleblowing)
-- [OnionShare — condivisione file](#onionshare--condivisione-file)
+- [SecureDrop - whistleblowing](#securedrop--whistleblowing)
+- [OnionShare - condivisione file](#onionshare--condivisione-file)
 - [SSH via Tor](#ssh-via-tor)
 - [IRC e chat via Tor](#irc-e-chat-via-tor)
 - [OPSEC per comunicazione sicura](#opsec-per-comunicazione-sicura)
@@ -174,7 +174,7 @@ Architettura Ricochet:
 
 ---
 
-## SecureDrop — whistleblowing
+## SecureDrop - whistleblowing
 
 ### Cos'è SecureDrop
 
@@ -216,7 +216,7 @@ Architettura SecureDrop:
 
 ---
 
-## OnionShare — condivisione file
+## OnionShare - condivisione file
 
 ### Cos'è OnionShare
 
@@ -380,7 +380,7 @@ perfettamente, anche se il transfer è lento a causa dei 6 hop totali
 **SSH via Tor**: uso `torsocks ssh` per connessioni dove non voglio esporre
 il mio IP. La latenza è notevole (~300ms per hop), rendendo l'uso interattivo
 scomodo. Per sessioni lunghe, il circuito che scade (MaxCircuitDirtiness 600s)
-può causare disconnessioni — ho dovuto aumentare `ServerAliveInterval` nella
+può causare disconnessioni - ho dovuto aumentare `ServerAliveInterval` nella
 config SSH.
 
 **IRC via Tor**: ho provato a connettermi a Libera Chat via Tor. La connessione
@@ -395,7 +395,7 @@ e separazione delle identità per prevenire correlazione.
 
 ## Vedi anche
 
-- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Errori nella comunicazione anonima
-- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) — Protocollo rendezvous per servizi nascosti
-- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) — Tails per comunicazione ad alto rischio
-- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) — Rischi di fingerprinting nelle comunicazioni
+- [OPSEC e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Errori nella comunicazione anonima
+- [Onion Services v3](../03-nodi-e-rete/onion-services-v3.md) - Protocollo rendezvous per servizi nascosti
+- [Isolamento e Compartimentazione](../05-sicurezza-operativa/isolamento-e-compartimentazione.md) - Tails per comunicazione ad alto rischio
+- [Fingerprinting](../05-sicurezza-operativa/fingerprinting.md) - Rischi di fingerprinting nelle comunicazioni
