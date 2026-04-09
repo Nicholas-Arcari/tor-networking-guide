@@ -47,7 +47,7 @@ CI/CD anonimo, e debug di servizi via Tor.
 
 ```bash
 #!/bin/bash
-# test-multi-ip.sh — Testa un endpoint da IP diversi
+# test-multi-ip.sh - Testa un endpoint da IP diversi
 
 TARGET_URL="https://api.example.com/endpoint"
 NUM_TESTS=10
@@ -147,7 +147,7 @@ if __name__ == "__main__":
 ### Forzare exit in paesi specifici
 
 ```ini
-# torrc — exit in Germania
+# torrc - exit in Germania
 ExitNodes {de}
 StrictNodes 1
 ```
@@ -169,7 +169,7 @@ proxychains curl -s https://myapp.com/api/geo
 
 ```bash
 #!/bin/bash
-# test-geo.sh — Testa la geolocalizzazione della tua app da paesi diversi
+# test-geo.sh - Testa la geolocalizzazione della tua app da paesi diversi
 
 TARGET="https://myapp.com/api/content"
 COUNTRIES=("us" "de" "fr" "jp" "br" "au")
@@ -466,7 +466,7 @@ Uso Tor regolarmente nel mio workflow di sviluppo e testing:
 **Test geolocalizzazione**: ho usato lo script multi-paese per verificare
 che un'applicazione web rispondesse correttamente con contenuti localizzati
 per diversi paesi. Funziona bene con `ExitNodes {country}`, ma non tutti i
-paesi hanno exit node affidabili — per paesi rari (Asia, Africa) i circuiti
+paesi hanno exit node affidabili - per paesi rari (Asia, Africa) i circuiti
 erano spesso lenti o fallivano.
 
 **Debug API dockerizzata**: come documentato nella sezione su Tor e localhost,
@@ -486,7 +486,7 @@ implementare anche rate limiting basato su token/sessione.
 
 ## Vedi anche
 
-- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) — Circuiti separati per test paralleli
-- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Rotazione IP per test
-- [ProxyChains — Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) — Proxare strumenti di sviluppo
-- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) — Cosa funziona e cosa no via Tor
+- [Multi-Istanza e Stream Isolation](../06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md) - Circuiti separati per test paralleli
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) - Rotazione IP per test
+- [ProxyChains - Guida Completa](../04-strumenti-operativi/proxychains-guida-completa.md) - Proxare strumenti di sviluppo
+- [Limitazioni nelle Applicazioni](../07-limitazioni-e-attacchi/limitazioni-applicazioni.md) - Cosa funziona e cosa no via Tor
