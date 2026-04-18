@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/descriptor-cache-e-attacchi.md)
+
 # Descriptor, Cache e Attacchi al Sistema del Consenso
 
 Server descriptor, microdescriptor, cache locale del consenso, e analisi
