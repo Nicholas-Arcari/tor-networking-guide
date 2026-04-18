@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/README.md)
+
 # Sezione 02 - Installazione e Configurazione
 
 Installazione di Tor su Debian/Kali, configurazione completa del torrc,
