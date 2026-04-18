@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/torrc-performance-e-relay.md)
+
 # Performance, Relay e Configurazione Completa del torrc
 
 Direttive di performance e tuning, configurazione come relay (middle, bridge, exit),
