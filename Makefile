@@ -27,9 +27,12 @@ test: validate  ## Esegue i test offline (alias per validate)
 stats:  ## Mostra statistiche del progetto
 	@echo "=== Statistiche Progetto ==="
 	@echo ""
-	@printf "Sezioni:        %d\n" $$(find docs -mindepth 1 -maxdepth 1 -type d | wc -l)
-	@printf "Documenti .md:  %d\n" $$(find docs -name '*.md' | wc -l)
-	@printf "Righe totali:   %d\n" $$(find docs -name '*.md' -exec cat {} + | wc -l)
+	@printf "Sezioni IT:     %d\n" $$(find docs -mindepth 1 -maxdepth 1 -type d -not -name en | wc -l)
+	@printf "Sezioni EN:     %d\n" $$(find docs/en -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+	@printf "Documenti IT:   %d\n" $$(find docs -name '*.md' -not -path 'docs/en/*' | wc -l)
+	@printf "Documenti EN:   %d\n" $$(find docs/en -name '*.md' 2>/dev/null | wc -l)
+	@printf "Righe IT:       %d\n" $$(find docs -name '*.md' -not -path 'docs/en/*' -exec cat {} + | wc -l)
+	@printf "Righe EN:       %d\n" $$(find docs/en -name '*.md' -exec cat {} + 2>/dev/null | wc -l)
 	@printf "Script:         %d\n" $$(find scripts -name '*.example' | wc -l)
 	@printf "Config:         %d\n" $$(find config-examples -name '*.example' | wc -l)
 	@printf "Test:           %d\n" $$(find tests -name '*.sh' | wc -l)
