@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/struttura-consenso-e-flag.md)
+
 # Struttura del Consenso, Flag e Bandwidth Authorities
 
 Il documento di consenso, i flag assegnati ai relay, e il sistema
@@ -10,7 +12,7 @@ Estratto da [Consenso e Directory Authorities](consenso-e-directory-authorities.
 ## Indice
 
 - [Struttura del documento di consenso](#struttura-del-documento-di-consenso)
-- [Flag del consenso — Analisi approfondita](#flag-del-consenso--analisi-approfondita)
+- [Flag del consenso - Analisi approfondita](#flag-del-consenso--analisi-approfondita)
 - [Bandwidth Authorities e misurazione della banda](#bandwidth-authorities-e-misurazione-della-banda)
 
 ---
@@ -75,7 +77,7 @@ directory-signature sha256 FINGERPRINT_DA
 
 ---
 
-## Flag del consenso — Analisi approfondita
+## Flag del consenso - Analisi approfondita
 
 I flag determinano come il client usa ogni relay. La loro assegnazione è critica per
 la sicurezza della rete.
@@ -158,7 +160,7 @@ software **sbws** (Simple Bandwidth Scanner):
 
 ### Bandwidth weights nel consenso
 
-Il consenso include anche i **bandwidth weights** — coefficienti globali che determinano
+Il consenso include anche i **bandwidth weights** - coefficienti globali che determinano
 come distribuire il traffico tra guard, middle, exit:
 
 ```
@@ -178,7 +180,7 @@ disponibili.
 
 ## Vedi anche
 
-- [Consenso e Directory Authorities](consenso-e-directory-authorities.md) — Perché il consenso, DAs, votazione
-- [Descriptor, Cache e Attacchi](descriptor-cache-e-attacchi.md) — Server descriptor, cache, attacchi al consenso
-- [Architettura di Tor](architettura-tor.md) — Componenti e panoramica
-- [Scenari Reali](scenari-reali.md) — Casi operativi da pentester
+- [Consenso e Directory Authorities](consenso-e-directory-authorities.md) - Perché il consenso, DAs, votazione
+- [Descriptor, Cache e Attacchi](descriptor-cache-e-attacchi.md) - Server descriptor, cache, attacchi al consenso
+- [Architettura di Tor](architettura-tor.md) - Componenti e panoramica
+- [Scenari Reali](scenari-reali.md) - Casi operativi da pentester
