@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/troubleshooting-e-struttura.md)
+
 # Troubleshooting, Struttura dei File e Aggiornamento di Tor
 
 Risoluzione dei problemi comuni di installazione, mappa completa dei file
