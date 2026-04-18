@@ -1,4 +1,6 @@
-# Scenari Reali — Fondamenti della Rete Tor in Azione
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/scenari-reali.md)
+
+# Scenari Reali - Fondamenti della Rete Tor in Azione
 
 Casi operativi in cui la conoscenza dei fondamenti Tor ha fatto la differenza
 durante attività di penetration testing, red teaming e audit di sicurezza.
@@ -46,7 +48,7 @@ NEW_EXIT=$(printf 'AUTHENTICATE "password"\r\nGETINFO circuit-status\r\nQUIT\r\n
   | nc 127.0.0.1 9051 | grep "BUILT" | head -1 | grep -oP '\$\w+~\w+' | tail -1)
 
 if [ "$OLD_EXIT" = "$NEW_EXIT" ]; then
-    echo "[!] Exit invariato: $OLD_EXIT — riprovare NEWNYM"
+    echo "[!] Exit invariato: $OLD_EXIT - riprovare NEWNYM"
 else
     echo "[+] Exit cambiato: $OLD_EXIT -> $NEW_EXIT"
 fi
@@ -56,7 +58,7 @@ fi
 
 La costruzione dei circuiti (trattata in [costruzione-circuiti.md](costruzione-circuiti.md))
 non garantisce un exit diverso ad ogni NEWNYM. Il path selection algorithm bilancia
-bandwidth e disponibilità — se pochi exit permettono la porta target, la probabilità
+bandwidth e disponibilità - se pochi exit permettono la porta target, la probabilità
 di riselezionare lo stesso è significativa. In quell'engagement, solo 12 exit
 permettevano la porta 8443 del target.
 
@@ -68,7 +70,7 @@ permettevano la porta 8443 del target.
 
 Durante un'attività di threat intelligence, il team monitorava un onion service
 sospetto. Le risposte HTTPS contenevano header anomali che non corrispondevano al
-server reale — un possibile segno di MITM da parte di un exit malevolo.
+server reale - un possibile segno di MITM da parte di un exit malevolo.
 
 ### Problema
 
@@ -103,7 +105,7 @@ Il team ha:
 
 Conoscere la struttura del consenso e i flag (vedi [struttura-consenso-e-flag.md](struttura-consenso-e-flag.md))
 permette di verificare in tempo reale se un relay è già noto come malevolo. Il
-flag `BadExit` è reattivo, non preventivo — le DA lo assegnano solo dopo la
+flag `BadExit` è reattivo, non preventivo - le DA lo assegnano solo dopo la
 segnalazione. Per attività sensibili, usare sempre HTTPS end-to-end oltre alla
 cifratura Tor.
 
@@ -211,7 +213,7 @@ La persistenza del file `state` e la cache del consenso (vedi
 vettori di attacco. Un avversario con accesso root al sistema può modificare il
 file `state` per forzare guard malevoli. In caso di compromissione, rigenerare
 completamente `/var/lib/tor/` e forzare un nuovo bootstrap è l'unica opzione
-sicura — ma va fatto consapevolmente, perché si perde la protezione dei guard
+sicura - ma va fatto consapevolmente, perché si perde la protezione dei guard
 persistenti.
 
 ---
@@ -244,7 +246,7 @@ dell'operatore, anche l'altra è compromessa.
 ### Mitigazione applicata
 
 ```
-# torrc — isolamento per porta SOCKS
+# torrc - isolamento per porta SOCKS
 SocksPort 9050 IsolateDestAddr IsolateDestPort  # ricognizione
 SocksPort 9052 IsolateClientAddr                 # uso personale
 
@@ -265,7 +267,7 @@ non condividono mai lo stesso exit node.
 
 Il modello di minaccia di Tor (vedi [isolamento-e-modello-minaccia.md](isolamento-e-modello-minaccia.md))
 protegge dalla correlazione IP ma non dalla correlazione comportamentale.
-La stream isolation non è attiva di default per tutte le porte — va configurata
+La stream isolation non è attiva di default per tutte le porte - va configurata
 esplicitamente. In un engagement, la regola è: un SocksPort per identità,
 `IsolateDestAddr` obbligatorio, mai mischiare traffico operativo e personale.
 
@@ -285,10 +287,10 @@ esplicitamente. In un engagement, la regola è: un SocksPort per identità,
 
 ## Vedi anche
 
-- [Architettura di Tor](architettura-tor.md) — Componenti e panoramica
-- [Costruzione Circuiti](costruzione-circuiti.md) — Path selection, NEWNYM
-- [Isolamento e Modello di Minaccia](isolamento-e-modello-minaccia.md) — Stream isolation, threat model
-- [Struttura Consenso e Flag](struttura-consenso-e-flag.md) — Flag e bandwidth authorities
-- [Descriptor, Cache e Attacchi](descriptor-cache-e-attacchi.md) — Cache, attacchi al consenso
-- [OpSec e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) — Errori operativi da evitare
-- [Ricognizione Anonima](../09-scenari-operativi/ricognizione-anonima.md) — Uso operativo per pentest
+- [Architettura di Tor](architettura-tor.md) - Componenti e panoramica
+- [Costruzione Circuiti](costruzione-circuiti.md) - Path selection, NEWNYM
+- [Isolamento e Modello di Minaccia](isolamento-e-modello-minaccia.md) - Stream isolation, threat model
+- [Struttura Consenso e Flag](struttura-consenso-e-flag.md) - Flag e bandwidth authorities
+- [Descriptor, Cache e Attacchi](descriptor-cache-e-attacchi.md) - Cache, attacchi al consenso
+- [OpSec e Errori Comuni](../05-sicurezza-operativa/opsec-e-errori-comuni.md) - Errori operativi da evitare
+- [Ricognizione Anonima](../09-scenari-operativi/ricognizione-anonima.md) - Uso operativo per pentest
