@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/manutenzione-e-monitoraggio.md)
+
 # Segnali, Monitoraggio e Manutenzione di Tor
 
 Segnali Unix del processo Tor, verifiche periodiche della salute del servizio,
