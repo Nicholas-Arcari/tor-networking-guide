@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/gestione-del-servizio.md)
+
 # Gestione del Servizio Tor - systemd, Debug e Operazioni
 
 Questo documento copre la gestione operativa del daemon Tor su sistemi Debian/Kali:
