@@ -1,4 +1,6 @@
-# Sezione 01 — Fondamenti della Rete Tor
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/README.md)
+
+# Sezione 01 - Fondamenti della Rete Tor
 
 Architettura, protocollo, crittografia e consenso: le basi teoriche e operative
 per comprendere il funzionamento interno di Tor.
@@ -60,7 +62,7 @@ Iniziare da `architettura-tor.md` per la panoramica, poi seguire i link
 
 ## Sezioni correlate
 
-- [02 — Installazione e Configurazione](../02-installazione-e-configurazione/) — Mettere in pratica quanto appreso
-- [03 — Nodi e Rete](../03-nodi-e-rete/) — Guard, middle, exit, bridge, onion services
-- [07 — Limitazioni e Attacchi](../07-limitazioni-e-attacchi/) — Limiti del protocollo e attacchi noti
-- [10 — Laboratorio Pratico](../10-laboratorio-pratico/) — Lab-02 (analisi circuiti) applica direttamente questi fondamenti
+- [02 - Installazione e Configurazione](../02-installazione-e-configurazione/) - Mettere in pratica quanto appreso
+- [03 - Nodi e Rete](../03-nodi-e-rete/) - Guard, middle, exit, bridge, onion services
+- [07 - Limitazioni e Attacchi](../07-limitazioni-e-attacchi/) - Limiti del protocollo e attacchi noti
+- [10 - Laboratorio Pratico](../10-laboratorio-pratico/) - Lab-02 (analisi circuiti) applica direttamente questi fondamenti
