@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/crittografia-e-handshake.md)
+
 # Crittografia dei Circuiti, Flow Control e Handshake ntor
 
 Cifratura AES-128-CTR strato per strato, meccanismo SENDME per flow control,
