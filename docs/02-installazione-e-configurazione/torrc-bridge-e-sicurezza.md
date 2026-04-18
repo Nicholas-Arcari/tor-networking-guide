@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/torrc-bridge-e-sicurezza.md)
+
 # Bridge, Pluggable Transports e Direttive di Sicurezza nel torrc
 
 Configurazione dei bridge obfs4, pluggable transports, e direttive di
