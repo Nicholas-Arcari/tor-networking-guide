@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/consenso-e-directory-authorities.md)
+
 # Consenso e Directory Authorities - Il Sistema Nervoso di Tor
 
 Questo documento analizza in dettaglio come la rete Tor mantiene una visione condivisa
