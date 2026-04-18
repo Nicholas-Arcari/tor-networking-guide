@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/architettura-tor.md)
+
 # Architettura di Tor - Analisi a Basso Livello
 
 Questo documento descrive l'architettura interna della rete Tor con un livello di dettaglio
