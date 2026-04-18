@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/costruzione-circuiti.md)
+
 # Costruzione dei Circuiti - Path Selection, ntor Handshake e Trasmissione Dati
 
 Come Tor seleziona i nodi, negozia le chiavi crittografiche con CREATE2/EXTEND2,
