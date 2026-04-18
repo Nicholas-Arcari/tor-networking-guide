@@ -1,5 +1,7 @@
 # Tor Networking Guide
 
+> **Lingua / Language**: Italiano (corrente) | [English](docs/en/README.md)
+
 Documentazione tecnica approfondita sulla rete Tor: architettura a livello di protocollo,
 crittografia dei circuiti, configurazione operativa, strumenti di analisi, sicurezza
 operativa, attacchi noti e difese, aspetti legali, scenari operativi reali.
