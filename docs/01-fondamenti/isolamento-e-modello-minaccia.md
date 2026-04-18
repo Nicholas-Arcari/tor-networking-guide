@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/isolamento-e-modello-minaccia.md)
+
 # Stream Isolation, Ciclo di Vita dei Circuiti e Modello di Minaccia
 
 Stream isolation, dirty timeout, NEWNYM, e il modello di sicurezza di Tor:
