@@ -37,6 +37,17 @@ EXPECTED_DIRS=(
     "docs/08-aspetti-legali-ed-etici"
     "docs/09-scenari-operativi"
     "docs/10-laboratorio-pratico"
+    "docs/en"
+    "docs/en/01-fondamenti"
+    "docs/en/02-installazione-e-configurazione"
+    "docs/en/03-nodi-e-rete"
+    "docs/en/04-strumenti-operativi"
+    "docs/en/05-sicurezza-operativa"
+    "docs/en/06-configurazioni-avanzate"
+    "docs/en/07-limitazioni-e-attacchi"
+    "docs/en/08-aspetti-legali-ed-etici"
+    "docs/en/09-scenari-operativi"
+    "docs/en/10-laboratorio-pratico"
     "config-examples/torrc"
     "config-examples/proxychains"
     "config-examples/iptables"
@@ -155,6 +166,22 @@ for doc in "${EXPECTED_DOCS[@]}"; do
     fi
 done
 
+# Genera array documenti EN (mirror di IT)
+EXPECTED_DOCS_EN=()
+for doc in "${EXPECTED_DOCS[@]}"; do
+    EXPECTED_DOCS_EN+=("${doc/docs\//docs/en/}")
+done
+
+section "2b. Documenti EN - esistenza"
+
+for doc in "${EXPECTED_DOCS_EN[@]}"; do
+    if [ -f "$REPO_ROOT/$doc" ]; then
+        pass "$doc"
+    else
+        fail "$doc non trovato"
+    fi
+done
+
 # ============================================================
 section "3. Documenti - dimensione minima"
 # ============================================================
@@ -177,11 +204,13 @@ done
 section "4. Documenti - intestazione e struttura"
 # ============================================================
 
-for doc in "${EXPECTED_DOCS[@]}"; do
+ALL_DOCS=("${EXPECTED_DOCS[@]}" "${EXPECTED_DOCS_EN[@]}")
+
+for doc in "${ALL_DOCS[@]}"; do
     filepath="$REPO_ROOT/$doc"
     if [ -f "$filepath" ]; then
-        # Verifica che inizi con un heading H1
-        if head -1 "$filepath" | grep -q "^# "; then
+        # Verifica heading H1 (puo essere preceduto dal language switcher)
+        if grep -m 1 -q "^# " "$filepath"; then
             pass "$doc ha heading H1"
         else
             fail "$doc manca heading H1"
@@ -272,7 +301,7 @@ section "8. Link interni (cross-reference)"
 
 # Verifica che i link relativi nei documenti puntino a file esistenti
 BROKEN_LINKS=0
-for doc in "${EXPECTED_DOCS[@]}"; do
+for doc in "${ALL_DOCS[@]}"; do
     filepath="$REPO_ROOT/$doc"
     if [ -f "$filepath" ]; then
         docdir=$(dirname "$filepath")
