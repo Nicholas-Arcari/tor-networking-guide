@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/stream-padding-e-pratica.md)
+
 # Stream, Padding e Osservazione Pratica dei Circuiti
 
 Apertura di stream TCP via RELAY_BEGIN, padding anti traffic analysis,
@@ -9,7 +11,7 @@ Estratto da [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md).
 
 ## Indice
 
-- [Apertura di uno stream — RELAY_BEGIN → RELAY_CONNECTED](#apertura-di-uno-stream--relay_begin--relay_connected)
+- [Apertura di uno stream - RELAY_BEGIN → RELAY_CONNECTED](#apertura-di-uno-stream--relay_begin--relay_connected)
 - [Padding e resistenza alla traffic analysis](#padding-e-resistenza-alla-traffic-analysis)
 - [Distruzione di un circuito](#distruzione-di-un-circuito)
 - [Osservare i circuiti nella pratica](#osservare-i-circuiti-nella-pratica)
@@ -17,7 +19,7 @@ Estratto da [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md).
 
 ---
 
-## Apertura di uno stream — RELAY_BEGIN → RELAY_CONNECTED
+## Apertura di uno stream - RELAY_BEGIN → RELAY_CONNECTED
 
 Quando proxychains chiede a Tor di connettersi a `api.ipify.org:443`:
 
@@ -101,7 +103,7 @@ c'è traffico reale vs. padding.
 
 ### Circuit padding
 
-Tor supporta "circuit padding machines" — macchine a stati che generano padding su
+Tor supporta "circuit padding machines" - macchine a stati che generano padding su
 circuiti specifici. Sono usate per:
 
 - **Rendez-vous circuits** (hidden services): padding per mascherare i pattern di
@@ -218,9 +220,9 @@ nyx
 
 ## Vedi anche
 
-- [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md) — Gerarchia protocollo, celle, RELAY
-- [Crittografia e Handshake](crittografia-e-handshake.md) — AES-128-CTR, SENDME, ntor
-- [Architettura di Tor](architettura-tor.md) — Visione d'insieme dei componenti
-- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) — Attacchi ai circuiti e padding
-- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) — Osservare circuiti attivi
-- [Scenari Reali](scenari-reali.md) — Casi operativi da pentester
+- [Circuiti, Crittografia e Celle](circuiti-crittografia-e-celle.md) - Gerarchia protocollo, celle, RELAY
+- [Crittografia e Handshake](crittografia-e-handshake.md) - AES-128-CTR, SENDME, ntor
+- [Architettura di Tor](architettura-tor.md) - Visione d'insieme dei componenti
+- [Traffic Analysis](../05-sicurezza-operativa/traffic-analysis.md) - Attacchi ai circuiti e padding
+- [Controllo Circuiti e NEWNYM](../04-strumenti-operativi/controllo-circuiti-e-newnym.md) - Osservare circuiti attivi
+- [Scenari Reali](scenari-reali.md) - Casi operativi da pentester
