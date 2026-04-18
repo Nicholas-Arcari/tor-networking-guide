@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/configurazione-iniziale.md)
+
 # Configurazione Iniziale - Torrc Minimo, Gruppo debian-tor e Firefox
 
 Configurazione iniziale minima del torrc, gestione del gruppo debian-tor
