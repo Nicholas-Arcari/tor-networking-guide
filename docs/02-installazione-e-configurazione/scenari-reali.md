@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/scenari-reali.md)
+
 # Scenari Reali - Installazione e Configurazione in Azione
 
 Casi operativi in cui la corretta installazione, configurazione del torrc
