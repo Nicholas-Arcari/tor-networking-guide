@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/torrc-guida-completa.md)
+
 # Configurazione torrc - Guida Completa a Ogni Direttiva
 
 Questo documento analizza in profondità il file di configurazione di Tor (`/etc/tor/torrc`),
