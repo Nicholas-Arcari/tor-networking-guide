@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/01-fondamenti/circuiti-crittografia-e-celle.md)
+
 # Circuiti, Crittografia e Celle - Il Protocollo Tor a Livello di Pacchetto
 
 Questo documento approfondisce il funzionamento interno del protocollo Tor a livello di
