@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/02-installazione-e-configurazione/installazione-e-verifica.md)
+
 # Installazione e Verifica di Tor - Guida Completa per Debian/Kali
 
 Questo documento copre l'installazione di Tor e dei componenti associati (obfs4proxy,
