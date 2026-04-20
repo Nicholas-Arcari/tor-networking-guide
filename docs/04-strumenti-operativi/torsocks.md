@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/torsocks.md)
+
 # torsocks - Wrapper LD_PRELOAD Dedicato per Tor
 
 torsocks è un wrapper LD_PRELOAD progettato **specificamente per Tor**. A differenza
