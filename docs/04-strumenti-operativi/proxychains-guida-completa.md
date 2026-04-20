@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/proxychains-guida-completa.md)
+
 # ProxyChains - Guida Completa e Analisi a Basso Livello
 
 Questo documento analizza ProxyChains in profondità: come funziona internamente
