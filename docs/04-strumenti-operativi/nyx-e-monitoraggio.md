@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/nyx-e-monitoraggio.md)
+
 # Nyx - Monitoraggio in Tempo Reale di Tor
 
 Nyx (precedentemente chiamato `arm`) è un monitor TUI (Text User Interface) per il
