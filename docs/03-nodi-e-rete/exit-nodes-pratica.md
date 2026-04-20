@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/exit-nodes-pratica.md)
+
 # Exit Nodes nella Pratica - Blocchi, DNS e Identificazione
 
 Blocchi e CAPTCHA dai siti web, risoluzione DNS dall'exit node,
