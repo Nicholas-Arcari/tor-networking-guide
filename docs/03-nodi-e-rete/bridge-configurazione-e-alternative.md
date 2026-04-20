@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/bridge-configurazione-e-alternative.md)
+
 # Configurazione Bridge, meek, Snowflake e Confronto
 
 Configurazione dei bridge nel torrc, debug del bootstrap, meek (CDN),
