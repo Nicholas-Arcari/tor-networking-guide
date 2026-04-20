@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/controllo-circuiti-e-newnym.md)
+
 # Controllo dei Circuiti e NEWNYM - Gestire Tor via ControlPort
 
 Questo documento analizza in profondità il protocollo di controllo di Tor
