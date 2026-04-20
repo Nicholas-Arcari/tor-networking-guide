@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/monitoring-avanzato.md)
+
 # Monitoring Avanzato - Prometheus, OONI e Script
 
 Monitoring con Prometheus/Grafana, bandwidth accounting, Relay Search,
