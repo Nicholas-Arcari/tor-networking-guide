@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/guard-nodes.md)
+
 # Guard Nodes - Il Primo Anello della Catena
 
 Questo documento analizza in profondità il ruolo, la selezione, la persistenza e i
