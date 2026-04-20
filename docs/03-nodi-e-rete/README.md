@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/README.md)
+
 # Sezione 03 - Nodi e Rete
 
 Guard, middle, exit, bridge, onion services: ruolo di ogni tipo di nodo nella rete Tor,
