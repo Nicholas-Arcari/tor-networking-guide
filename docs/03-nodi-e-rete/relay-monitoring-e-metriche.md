@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/relay-monitoring-e-metriche.md)
+
 # Relay Monitoring e Metriche
 
 Questo documento analizza come monitorare relay Tor, raccogliere metriche di
