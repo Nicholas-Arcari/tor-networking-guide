@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/middle-relay.md)
+
 # Middle Relay - Il Nodo Invisibile
 
 Questo documento analizza il ruolo dei Middle Relay nel circuito Tor, l'algoritmo di
