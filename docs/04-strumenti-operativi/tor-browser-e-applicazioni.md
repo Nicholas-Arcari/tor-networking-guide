@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/tor-browser-e-applicazioni.md)
+
 # Tor Browser e Routing delle Applicazioni
 
 Questo documento analizza Tor Browser (le sue protezioni interne, il funzionamento
