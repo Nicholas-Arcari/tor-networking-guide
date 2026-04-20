@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/exit-nodes.md)
+
 # Exit Nodes - L'Ultimo Hop e il Punto di Massimo Rischio
 
 Questo documento analizza in profondità gli Exit Node della rete Tor: il loro ruolo
