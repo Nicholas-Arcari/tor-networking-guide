@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/dns-avanzato-e-hardening.md)
+
 # DNS Avanzato - resolv.conf, Leak Dettagliati e Hardening
 
 Interazione con /etc/resolv.conf, internals DNS di proxychains e torsocks,
