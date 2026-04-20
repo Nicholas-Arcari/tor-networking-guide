@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/applicazioni-via-tor.md)
+
 # Applicazioni via Tor - Instradamento, Compatibilità e Problemi
 
 Metodi per instradare applicazioni attraverso Tor (proxychains, torsocks,
