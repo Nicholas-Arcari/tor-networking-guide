@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/tor-e-dns-risoluzione.md)
+
 # Tor e DNS - Risoluzione, Leak e Automapping
 
 La risoluzione DNS è uno dei vettori di deanonimizzazione più sottovalutati nell'uso
