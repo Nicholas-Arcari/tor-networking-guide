@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/nyx-avanzato.md)
+
 # Nyx Avanzato - Navigazione, Configurazione e Scripting
 
 Shortcut di navigazione, configurazione avanzata di Nyx (.nyx/config),
