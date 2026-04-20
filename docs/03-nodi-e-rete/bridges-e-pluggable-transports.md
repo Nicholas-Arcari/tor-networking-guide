@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/bridges-e-pluggable-transports.md)
+
 # Bridges e Pluggable Transports - Aggirare Censura e DPI
 
 Questo documento analizza in profondità i Bridge Tor, i Pluggable Transports (PT),
