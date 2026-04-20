@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/03-nodi-e-rete/scenari-reali.md)
+
 # Scenari Reali - Nodi e Rete Tor in Azione
 
 Casi operativi in cui la conoscenza dei nodi Tor (guard, exit, bridge) e
