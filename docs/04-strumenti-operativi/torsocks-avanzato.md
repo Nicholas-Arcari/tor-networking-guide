@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/torsocks-avanzato.md)
+
 # torsocks Avanzato - Variabili, Edge Cases, Debugging e Confronto
 
 Variabili d'ambiente, edge cases e problemi noti, debugging avanzato,
