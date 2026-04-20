@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/verifica-ip-dns-e-leak.md)
+
 # Verifica IP, DNS e Leak - Test Completi per la Sicurezza di Tor
 
 Questo documento copre tutti i metodi per verificare che il traffico stia effettivamente
