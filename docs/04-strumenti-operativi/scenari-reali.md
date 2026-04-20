@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/scenari-reali.md)
+
 # Scenari Reali - Strumenti Operativi Tor in Azione
 
 Casi operativi in cui proxychains, torsocks, Nyx, ControlPort e la gestione
