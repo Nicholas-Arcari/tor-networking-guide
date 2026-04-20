@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/04-strumenti-operativi/README.md)
+
 # Sezione 04 - Strumenti Operativi
 
 ProxyChains, torsocks, Nyx, ControlPort, DNS, Tor Browser: gli strumenti
