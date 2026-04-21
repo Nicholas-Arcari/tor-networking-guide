@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/isolamento-e-compartimentazione.md)
+
 # Isolamento e Compartimentazione - Protezione a Livello di Sistema
 
 Questo documento analizza le soluzioni per isolare completamente il traffico Tor
