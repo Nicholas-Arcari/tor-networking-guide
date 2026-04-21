@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/dns-leak.md)
+
 # DNS Leak - Come Avvengono e Come Prevenirli
 
 Questo documento analizza i DNS leak in contesto Tor: come avvengono a livello tecnico,
