@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/tor-e-localhost.md)
+
 # Tor e Localhost - Perché Tor Browser Non Accede a Servizi Locali
 
 Questo documento spiega in dettaglio perché Tor Browser blocca le connessioni a
