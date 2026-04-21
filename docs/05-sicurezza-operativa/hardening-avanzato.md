@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/hardening-avanzato.md)
+
 # Hardening Avanzato - Servizi, Rete, Filesystem e Firefox
 
 Servizi da disabilitare (Avahi, CUPS, Bluetooth), MAC/hostname randomization,
