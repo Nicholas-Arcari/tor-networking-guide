@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/dns-leak-prevenzione-e-hardening.md)
+
 # DNS Leak - Prevenzione e Hardening
 
 Mitigazioni multilivello per i DNS leak: configurazione Tor, proxychains, applicativa,
