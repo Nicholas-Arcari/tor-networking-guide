@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/scenari-reali.md)
+
 # Scenari Reali - Sicurezza Operativa Tor in Azione
 
 Casi operativi in cui DNS leak, fingerprinting, OPSEC, isolamento e hardening
