@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/fingerprinting-avanzato.md)
+
 # Fingerprinting Avanzato - HTTP/2, OS, Tracking e Difese
 
 Vettori di fingerprinting oltre il browser: HTTP/2 SETTINGS, TCP/IP stack, tracking
