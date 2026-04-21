@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/analisi-forense-e-artefatti.md)
+
 # Analisi Forense e Artefatti Tor
 
 Questo documento analizza gli artefatti che Tor lascia su un sistema dal punto
