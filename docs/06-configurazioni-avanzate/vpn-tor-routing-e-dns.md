@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/vpn-tor-routing-e-dns.md)
+
 # VPN e Tor - Routing Selettivo, DNS e Kill Switch
 
 Routing selettivo per applicazione, gestione DNS nelle configurazioni ibride,
