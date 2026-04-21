@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/opsec-casi-reali-e-difese.md)
+
 # OPSEC - Casi Reali, Stylometry e Difese
 
 Casi reali di deanonimizzazione (Silk Road, AlphaBay, LulzSec, Freedom Hosting),
