@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/README.md)
+
 # Sezione 06 - Configurazioni Avanzate
 
 Transparent proxy, VPN+Tor ibrido, multi-istanza con stream isolation
