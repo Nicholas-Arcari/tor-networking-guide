@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/transparent-proxy.md)
+
 # Transparent Proxy - Forzare Tutto il Traffico via Tor con iptables/nftables
 
 Questo documento analizza come configurare un transparent proxy Tor usando iptables
