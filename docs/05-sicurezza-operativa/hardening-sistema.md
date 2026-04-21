@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/hardening-sistema.md)
+
 # Hardening di Sistema per l'Uso di Tor
 
 Questo documento copre le misure di hardening a livello di sistema operativo per
