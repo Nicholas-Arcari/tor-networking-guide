@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/forense-browser-e-mitigazione.md)
+
 # Analisi Forense - Browser, Mitigazione e Strumenti
 
 Artefatti del browser (Firefox, Tor Browser), tracce di proxychains e torsocks,
