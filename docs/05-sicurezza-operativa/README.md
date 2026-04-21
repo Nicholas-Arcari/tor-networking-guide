@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/README.md)
+
 # Sezione 05 - Sicurezza Operativa
 
 DNS leak, fingerprinting, traffic analysis, OPSEC, isolamento, hardening
