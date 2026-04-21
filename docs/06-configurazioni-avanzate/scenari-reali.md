@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/scenari-reali.md)
+
 # Scenari Reali - Configurazioni Avanzate Tor in Azione
 
 Casi operativi in cui transparent proxy, VPN+Tor, multi-istanza, stream isolation
