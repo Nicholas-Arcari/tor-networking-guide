@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/opsec-e-errori-comuni.md)
+
 # OPSEC e Errori Comuni - Cosa Può Deanonimizzarti
 
 Questo documento cataloga gli errori di OPSEC (Operational Security) più comuni
