@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/traffic-analysis.md)
+
 # Traffic Analysis e Attacchi di Correlazione
 
 Questo documento analizza come un avversario può tentare di deanonimizzare utenti Tor
