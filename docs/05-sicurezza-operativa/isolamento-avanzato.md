@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/isolamento-avanzato.md)
+
 # Isolamento Avanzato - Qubes, Namespaces, Docker e Confronto
 
 Soluzioni avanzate di isolamento per Tor: Qubes OS con compartimentazione
