@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/multi-istanza-e-stream-isolation.md)
+
 # Multi-Istanza Tor e Stream Isolation
 
 Questo documento analizza come eseguire multiple istanze di Tor per separare
