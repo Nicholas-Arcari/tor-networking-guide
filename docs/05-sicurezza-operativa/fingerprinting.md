@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/fingerprinting.md)
+
 # Fingerprinting - Browser, Rete e Sistema Operativo
 
 Questo documento analizza tutti i vettori di fingerprinting che possono compromettere
