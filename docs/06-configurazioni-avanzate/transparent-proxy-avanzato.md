@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/transparent-proxy-avanzato.md)
+
 # Transparent Proxy Avanzato - LAN, Troubleshooting e Script Production
 
 Gateway Tor per la LAN (PREROUTING), troubleshooting completo (7 problemi comuni),
