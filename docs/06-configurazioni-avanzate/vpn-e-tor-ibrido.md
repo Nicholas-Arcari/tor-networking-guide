@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/vpn-e-tor-ibrido.md)
+
 # VPN e Tor - Configurazioni Ibride
 
 Questo documento analizza in profondità perché Tor non è una VPN, le configurazioni
