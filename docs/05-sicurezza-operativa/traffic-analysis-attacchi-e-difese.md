@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/05-sicurezza-operativa/traffic-analysis-attacchi-e-difese.md)
+
 # Traffic Analysis - Timing, NetFlow e Difese
 
 Timing attack (flow watermarking, clock skew, inter-packet), NetFlow analysis,
