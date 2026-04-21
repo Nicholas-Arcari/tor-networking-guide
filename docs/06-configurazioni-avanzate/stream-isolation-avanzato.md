@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/stream-isolation-avanzato.md)
+
 # Stream Isolation Avanzato - Tor Browser, SessionGroup e Gestione Operativa
 
 Come Tor Browser implementa l'isolamento SOCKS5 per dominio, SessionGroup per
