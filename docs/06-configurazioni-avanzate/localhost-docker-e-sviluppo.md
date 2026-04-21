@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/06-configurazioni-avanzate/localhost-docker-e-sviluppo.md)
+
 # Tor e Localhost - Docker, Sviluppo Web e Onion Services
 
 Docker e Tor (container via Tor, servizi .onion, debug API), sviluppo web locale
