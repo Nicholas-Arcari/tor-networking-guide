@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/aspetti-legali.md)
+
 # Aspetti Legali dell'Uso di Tor - Italia e UE
 
 Questo documento analizza il quadro legale dell'uso di Tor in Italia e nell'Unione
