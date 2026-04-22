@@ -1,10 +1,10 @@
-# torrc — Configurazione client con bridge obfs4
+# torrc - Configurazione client con bridge obfs4
 # Ambiente: Kali Linux (Debian-based)
 # Uso: navigazione anonima via proxychains, rotazione IP via ControlPort
 
 # === Porte client ===
 SocksPort 9050                    # Proxy SOCKS5 per applicazioni (proxychains, curl, browser)
-DNSPort 5353                      # DNS via Tor — previene DNS leak
+DNSPort 5353                      # DNS via Tor - previene DNS leak
 AutomapHostsOnResolve 1           # Mapping automatico .onion e hostname via Tor
 
 # === Controllo ===
@@ -12,7 +12,7 @@ ControlPort 9051                  # Per NEWNYM (rotazione IP), monitoring (nyx),
 CookieAuthentication 1            # Auth via cookie file (/run/tor/control.authcookie)
 
 # === Sicurezza ===
-ClientUseIPv6 0                   # Disabilita IPv6 — previene leak IPv6
+ClientUseIPv6 0                   # Disabilita IPv6 - previene leak IPv6
 
 # === Dati ===
 DataDirectory /var/lib/tor
