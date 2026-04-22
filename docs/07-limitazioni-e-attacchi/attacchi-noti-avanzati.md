@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/attacchi-noti-avanzati.md)
+
 # Attacchi Noti - HSDir, DoS, Browser Exploit e Contromisure
 
 HSDir enumeration, Denial of Service, exploit del browser (Freedom Hosting,
