@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/limitazioni-applicazioni.md)
+
 # Limitazioni nelle Applicazioni - Cosa Funziona e Cosa No con Tor
 
 Questo documento cataloga il comportamento di applicazioni specifiche quando usate
