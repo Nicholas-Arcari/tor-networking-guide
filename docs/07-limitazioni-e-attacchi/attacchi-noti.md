@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/attacchi-noti.md)
+
 # Attacchi Noti alla Rete Tor - Cronologia e Analisi Tecnica
 
 Questo documento cataloga gli attacchi documentati contro la rete Tor: attacchi
