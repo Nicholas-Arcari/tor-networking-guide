@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/etica-contribuire-e-comunita.md)
+
 # Etica e Responsabilità - Relay, Sorveglianza e Contribuire a Tor
 
 Responsabilità dell'operatore di relay, Tor e sorveglianza di massa,
