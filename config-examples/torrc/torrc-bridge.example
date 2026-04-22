@@ -1,4 +1,4 @@
-# torrc — Configurazione bridge server
+# torrc - Configurazione bridge server
 # Per operare un bridge Tor con obfs4 (aiuta gli utenti censurati)
 #
 # IMPORTANTE: un bridge NON è un exit node. Il tuo IP non apparirà nel
