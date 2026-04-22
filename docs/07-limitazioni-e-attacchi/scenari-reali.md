@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/scenari-reali.md)
+
 # Scenari Reali - Limitazioni e Attacchi Tor in Azione
 
 Casi operativi in cui le limitazioni del protocollo Tor, l'incompatibilità
