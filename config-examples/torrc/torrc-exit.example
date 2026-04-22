@@ -1,4 +1,4 @@
-# torrc — Configurazione exit node (reduced exit policy)
+# torrc - Configurazione exit node (reduced exit policy)
 # Per operare un exit relay con policy restrittiva
 #
 # ╔══════════════════════════════════════════════════════════════════╗
@@ -22,7 +22,7 @@ ORPort 443 NoListen                 # Advertise 443 per client dietro firewall
 DirPort 9030                        # Directory cache (opzionale, aiuta la rete)
 
 Nickname MyTorExit
-ContactInfo your-email@example.com  # OBBLIGATORIO per exit — per ricevere reclami
+ContactInfo your-email@example.com  # OBBLIGATORIO per exit - per ricevere reclami
 
 # === Reduced Exit Policy ===
 # Permette solo porte comuni e sicure. Basata su:
