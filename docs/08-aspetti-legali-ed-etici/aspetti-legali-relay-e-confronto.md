@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/aspetti-legali-relay-e-confronto.md)
+
 # Aspetti Legali - Relay, Data Retention e Confronto Internazionale
 
 Operare un relay Tor in Italia, obblighi degli ISP e data retention,
