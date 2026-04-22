@@ -8,10 +8,14 @@ Questo progetto usa versionamento basato su data.
 ## [Non rilasciato]
 
 ### Aggiunto
+- Localizzazione inglese completa: `docs/en/` con 99 documenti tradotti (mirror integrale)
+- Language switcher (Italiano | English) su tutti i 98 documenti italiani e 99 inglesi
+- `docs/en/README.md` come hub di navigazione inglese
+- Glossario inglese (`docs/en/glossario.md`) con 60+ termini tecnici
 - Sezione `docs/10-laboratorio-pratico/` con 5 esercizi pratici (lab-01 a lab-05)
-- Split file dedicati per sezioni 01–08 (hub + approfondimento per ogni documento >500 righe)
+- Split file dedicati per sezioni 01-08 (hub + approfondimento per ogni documento >500 righe)
 - README indice per tutte le 10 sezioni con tabelle categorizzate
-- Scenari reali (3–5 casi operativi da senior pentester) per tutte le 10 sezioni
+- Scenari reali (3-5 casi operativi da senior pentester) per tutte le 10 sezioni
 - Diagrammi Mermaid e cheat sheet nei documenti chiave
 - Cross-reference (`## Vedi anche`) e indici (`## Indice`) in tutti i documenti
 - CI/CD: GitHub Action per validazione automatica su push/PR
@@ -19,7 +23,9 @@ Questo progetto usa versionamento basato su data.
 - CHANGELOG.md (questo file)
 
 ### Modificato
-- `tests/validate-docs.sh`: aggiornato con tutti i nuovi file (386 check, 0 falliti)
+- `tests/validate-docs.sh`: aggiornato con check documenti EN (esistenza, H1, H2, cross-ref)
+- `Makefile`: target `stats` con conteggi separati IT/EN
+- `README.md`: aggiunto language selector verso versione inglese
 - Hub files troncati con puntatore "Continua in" verso file dedicati
 - Indice dei documenti aggiornato con sezione "Approfondimenti (file dedicati)"
 
