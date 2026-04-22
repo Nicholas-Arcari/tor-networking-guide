@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/etica-e-responsabilita.md)
+
 # Etica e Responsabilità nell'Uso di Tor
 
 Questo documento affronta l'aspetto etico dell'uso di Tor: la responsabilità che
