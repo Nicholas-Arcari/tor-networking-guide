@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/scenari-reali.md)
+
 # Scenari Reali - Aspetti Legali ed Etici di Tor in Azione
 
 Casi operativi in cui aspetti legali, responsabilità dell'operatore relay,
