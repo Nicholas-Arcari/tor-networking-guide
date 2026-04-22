@@ -1,5 +1,5 @@
 #!/bin/bash
-# transparent-proxy.sh — Forza tutto il traffico TCP del sistema via Tor
+# transparent-proxy.sh - Forza tutto il traffico TCP del sistema via Tor
 #
 # ATTENZIONE:
 # - UDP (tranne DNS) viene bloccato
