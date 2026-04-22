@@ -1,4 +1,4 @@
-# torrc — Configurazione Onion Service v3
+# torrc - Configurazione Onion Service v3
 # Per esporre un servizio locale come indirizzo .onion
 
 # === Porte client (opzionali, se si usa anche come client) ===
