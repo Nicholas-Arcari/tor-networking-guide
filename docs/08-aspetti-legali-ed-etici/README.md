@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/08-aspetti-legali-ed-etici/README.md)
+
 # Sezione 08 - Aspetti Legali ed Etici
 
 Quadro legale dell'uso di Tor in Italia e nell'UE, responsabilità
