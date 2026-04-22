@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/limitazioni-protocollo.md)
+
 # Limitazioni del Protocollo Tor - Analisi Tecnica Completa
 
 Questo documento analizza in profondità tutte le limitazioni architetturali e
