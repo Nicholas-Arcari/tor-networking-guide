@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](en/glossario.md)
+
 # Glossario
 
 Terminologia tecnica usata in questa guida, con definizioni specifiche al
@@ -47,7 +49,7 @@ contesto Tor e anonimato di rete.
 | **Nyx** | Monitor TUI per Tor (successore di `arm`). Visualizza circuiti, bandwidth, log. |
 | **obfs4** | Pluggable transport che offusca il traffico Tor per resistere al DPI. |
 | **Onion Service** | Servizio accessibile solo via Tor (indirizzo .onion), senza exit node. |
-| **OONI** | Open Observatory of Network Interference — misura la censura Internet globale. |
+| **OONI** | Open Observatory of Network Interference - misura la censura Internet globale. |
 | **OR Port** | Porta usata dai relay per comunicare tra loro (default 9001). |
 | **Path Bias** | Meccanismo di Tor che rileva circuiti che falliscono troppo spesso (possibile attacco). |
 | **Pluggable Transport (PT)** | Protocollo che trasforma il traffico Tor per evitare il rilevamento. |
