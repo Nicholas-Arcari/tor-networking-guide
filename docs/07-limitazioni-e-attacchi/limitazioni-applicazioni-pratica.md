@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/limitazioni-applicazioni-pratica.md)
+
 # Limitazioni Applicazioni - Strumenti, Cloud e Sessioni via Tor
 
 Strumenti di sicurezza (nmap, nikto, sqlmap, Burp, Metasploit), strumenti
