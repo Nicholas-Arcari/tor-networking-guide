@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/07-limitazioni-e-attacchi/README.md)
+
 # Sezione 07 - Limitazioni e Attacchi
 
 Limitazioni architetturali del protocollo Tor, incompatibilità con le
