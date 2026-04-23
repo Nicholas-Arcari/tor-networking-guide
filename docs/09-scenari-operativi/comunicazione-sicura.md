@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/comunicazione-sicura.md)
+
 # Comunicazione Sicura via Tor
 
 Questo documento analizza come utilizzare Tor per comunicazioni sicure e anonime:
