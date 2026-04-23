@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/README.md)
+
 # Sezione 10 - Laboratorio Pratico
 
 Cinque laboratori hands-on progressivi: dal setup base alla stream
