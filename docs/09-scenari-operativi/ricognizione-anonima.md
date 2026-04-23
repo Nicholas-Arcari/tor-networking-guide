@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/ricognizione-anonima.md)
+
 # Ricognizione Anonima - OSINT via Tor
 
 Questo documento analizza come utilizzare Tor per attività di ricognizione e
