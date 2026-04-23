@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/incident-response.md)
+
 # Incident Response - Compromissione e Recupero
 
 Questo documento analizza come gestire incidenti di sicurezza legati all'uso di Tor:
