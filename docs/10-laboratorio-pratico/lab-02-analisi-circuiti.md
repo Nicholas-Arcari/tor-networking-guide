@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/lab-02-analisi-circuiti.md)
+
 # Lab 02 - Analisi dei Circuiti Tor con Stem e nyx
 
 Esercizio pratico per osservare, analizzare e manipolare i circuiti Tor usando
