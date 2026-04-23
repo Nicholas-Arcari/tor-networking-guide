@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/lab-05-stream-isolation.md)
+
 # Lab 05 - Stream Isolation e Multi-Istanza Tor
 
 Esercizio pratico per configurare stream isolation con SocksPort multipli,
