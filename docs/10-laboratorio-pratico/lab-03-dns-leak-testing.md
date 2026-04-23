@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/lab-03-dns-leak-testing.md)
+
 # Lab 03 - Rilevamento e Prevenzione DNS Leak
 
 Esercizio pratico per comprendere, rilevare e prevenire i DNS leak quando si usa
