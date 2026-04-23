@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/scenari-reali.md)
+
 # Scenari Reali - Operazioni Tor in Contesto Professionale
 
 Casi operativi in cui ricognizione anonima, comunicazione sicura,
