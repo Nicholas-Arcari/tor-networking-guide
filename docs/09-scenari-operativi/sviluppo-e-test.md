@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/sviluppo-e-test.md)
+
 # Sviluppo e Test via Tor
 
 Questo documento analizza come usare Tor nel contesto dello sviluppo software
