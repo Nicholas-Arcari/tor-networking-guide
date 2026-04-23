@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/lab-01-setup-e-verifica.md)
+
 # Lab 01 - Setup Completo e Verifica di Tor
 
 Esercizio pratico per installare, configurare e verificare un setup Tor completo
