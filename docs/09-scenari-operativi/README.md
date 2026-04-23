@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/09-scenari-operativi/README.md)
+
 # Sezione 09 - Scenari Operativi
 
 Scenari completi di utilizzo di Tor in contesto professionale: ricognizione
