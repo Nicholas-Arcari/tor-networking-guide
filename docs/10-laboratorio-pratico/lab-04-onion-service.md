@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/lab-04-onion-service.md)
+
 # Lab 04 - Creare e Testare un Onion Service v3
 
 Esercizio pratico per configurare un Onion Service v3, verificarne il
