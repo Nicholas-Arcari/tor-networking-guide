@@ -1,3 +1,5 @@
+> **Lingua / Language**: Italiano | [English](../en/10-laboratorio-pratico/scenari-reali.md)
+
 # Scenari Reali - Laboratorio Pratico in Contesto Operativo
 
 Casi in cui le competenze pratiche dei laboratori (setup, analisi
